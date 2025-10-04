@@ -75,7 +75,11 @@ const Analysis = () => {
   
   // Custom content for the treemap
   const CustomizedContent = (props: any) => {
-    const { root, depth, x, y, width, height, index, name, changePercent, value } = props;
+    const { root, depth, x, y, width, height, index, name, value } = props;
+    
+    // Find the matching data from stockGrowthData to get changePercent
+    const stockData = stockGrowthData.find(s => s.name === name);
+    const changePercent = stockData?.changePercent || 0;
     
     // Color based on change percent (green for positive, red for negative)
     const color = changePercent >= 0 ? "#4ade80" : "#f87171";
