@@ -1,137 +1,285 @@
-
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
-import { useStockData, mockStocks } from '@/utils/stocksApi';
-import { PieChart, Cell, Pie, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+import { formatCurrency, formatPercentage } from '@/utils/stocksApi';
+import { TrendingUp, TrendingDown, Wallet, Activity } from 'lucide-react';
+import { mockStocks } from '@/utils/stocksApi';
+
+interface Investment {
+  id: string;
+  stock_symbol: string;
+  stock_name: string;
+  quantity: number;
+  purchase_price: number;
+  purchase_date: string;
+}
+
+interface Transaction {
+  id: string;
+  stock_symbol: string;
+  stock_name: string;
+  transaction_type: string;
+  quantity: number;
+  price_per_unit: number;
+  total_amount: number;
+  transaction_date: string;
+}
 
 const Portfolio = () => {
-  const stocks = useStockData(mockStocks);
-  
-  // Mock portfolio data
-  const portfolio = [
-    { symbol: 'AAPL', shares: 15, costBasis: 150.75 },
-    { symbol: 'MSFT', shares: 8, costBasis: 380.25 },
-    { symbol: 'NVDA', shares: 5, costBasis: 820.50 },
-    { symbol: 'GOOGL', shares: 10, costBasis: 145.30 },
-  ];
-  
-  // Calculate portfolio values
-  const portfolioItems = portfolio.map(item => {
-    const stock = stocks.find(s => s.symbol === item.symbol);
-    if (!stock) return null;
-    
-    const currentValue = stock.price * item.shares;
-    const costBasis = item.costBasis * item.shares;
-    const gain = currentValue - costBasis;
-    const gainPercent = (gain / costBasis) * 100;
-    
-    return {
-      ...item,
-      name: stock.name,
-      currentPrice: stock.price,
-      currentValue,
-      costBasis,
-      gain,
-      gainPercent
-    };
-  }).filter(Boolean);
-  
-  const totalValue = portfolioItems.reduce((sum, item) => sum + item.currentValue, 0);
-  const totalCost = portfolioItems.reduce((sum, item) => sum + item.costBasis, 0);
-  const totalGain = totalValue - totalCost;
-  const totalGainPercent = (totalGain / totalCost) * 100;
-  
-  // Data for pie chart
-  const pieData = portfolioItems.map(item => ({
-    name: item.symbol,
-    value: item.currentValue
-  }));
-  
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
-  
+  const [investments, setInvestments] = useState<Investment[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPortfolioData();
+  }, []);
+
+  const fetchPortfolioData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Fetch investments
+      const { data: investmentsData } = await supabase
+        .from('user_investments')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('purchase_date', { ascending: false });
+
+      // Fetch transactions
+      const { data: transactionsData } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('transaction_date', { ascending: false })
+        .limit(10);
+
+      // Fetch balance
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', user.id)
+        .single();
+
+      setInvestments(investmentsData || []);
+      setTransactions(transactionsData || []);
+      setBalance(profile?.balance || 0);
+    } catch (error) {
+      console.error('Error fetching portfolio:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCurrentPrice = (symbol: string) => {
+    const stock = mockStocks.find(s => s.symbol === symbol);
+    return stock?.price || 0;
+  };
+
+  const calculateTotalValue = () => {
+    return investments.reduce((total, inv) => {
+      const currentPrice = getCurrentPrice(inv.stock_symbol);
+      return total + (currentPrice * inv.quantity);
+    }, 0);
+  };
+
+  const calculateTotalInvested = () => {
+    return investments.reduce((total, inv) => {
+      return total + (inv.purchase_price * inv.quantity);
+    }, 0);
+  };
+
+  const totalValue = calculateTotalValue();
+  const totalInvested = calculateTotalInvested();
+  const totalPnL = totalValue - totalInvested;
+  const totalPnLPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
+
+  if (loading) {
+    return (
+      <PageLayout title="Portfolio">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title="Portfolio">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <div className="bg-card rounded-lg p-6 shadow">
-            <h2 className="text-xl font-semibold mb-4">Portfolio Summary</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Value</p>
-                <p className="text-2xl font-bold">${totalValue.toFixed(2)}</p>
+      <div className="space-y-6">
+        {/* Portfolio Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Available Balance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-primary" />
+                <p className="text-2xl font-bold">{formatCurrency(balance)}</p>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Gain/Loss</p>
-                <div className="flex items-center">
-                  <p className={`text-xl font-bold ${totalGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${totalGain.toFixed(2)}
-                  </p>
-                  <p className={`ml-2 ${totalGain >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ({totalGain >= 0 ? '+' : ''}{totalGainPercent.toFixed(2)}%)
-                  </p>
-                </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Invested
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatCurrency(totalInvested)}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Current Value
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total P&L
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                {totalPnL >= 0 ? (
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                ) : (
+                  <TrendingDown className="h-4 w-4 text-red-500" />
+                )}
+                <p className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {formatCurrency(Math.abs(totalPnL))}
+                </p>
+                <span className={`text-sm ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  ({formatPercentage(totalPnLPercent)})
+                </span>
               </div>
-            </div>
-            
-            <div className="mt-6 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Value']} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
-        
-        <div className="lg:col-span-2">
-          <div className="bg-card rounded-lg p-6 shadow">
-            <h2 className="text-xl font-semibold mb-4">Holdings</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-4">Symbol</th>
-                    <th className="text-left py-2 px-4">Name</th>
-                    <th className="text-right py-2 px-4">Shares</th>
-                    <th className="text-right py-2 px-4">Price</th>
-                    <th className="text-right py-2 px-4">Value</th>
-                    <th className="text-right py-2 px-4">Gain/Loss</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {portfolioItems.map((item) => (
-                    <tr key={item.symbol} className="border-b">
-                      <td className="py-3 px-4 font-medium">{item.symbol}</td>
-                      <td className="py-3 px-4">{item.name}</td>
-                      <td className="py-3 px-4 text-right">{item.shares}</td>
-                      <td className="py-3 px-4 text-right">${item.currentPrice.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">${item.currentValue.toFixed(2)}</td>
-                      <td className="py-3 px-4 text-right">
-                        <div className={item.gain >= 0 ? 'text-green-500' : 'text-red-500'}>
-                          ${item.gain.toFixed(2)} ({item.gain >= 0 ? '+' : ''}{item.gainPercent.toFixed(2)}%)
-                        </div>
-                      </td>
+
+        {/* Holdings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>My Holdings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {investments.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No holdings yet. Start investing to see your portfolio here!
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4">Stock</th>
+                      <th className="text-right py-3 px-4">Qty</th>
+                      <th className="text-right py-3 px-4">Avg Price</th>
+                      <th className="text-right py-3 px-4">Current Price</th>
+                      <th className="text-right py-3 px-4">Total Value</th>
+                      <th className="text-right py-3 px-4">P&L</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+                  </thead>
+                  <tbody>
+                    {investments.map((inv) => {
+                      const currentPrice = getCurrentPrice(inv.stock_symbol);
+                      const currentValue = currentPrice * inv.quantity;
+                      const investedValue = inv.purchase_price * inv.quantity;
+                      const pnl = currentValue - investedValue;
+                      const pnlPercent = (pnl / investedValue) * 100;
+
+                      return (
+                        <tr key={inv.id} className="border-b hover:bg-muted/50">
+                          <td className="py-3 px-4">
+                            <div>
+                              <div className="font-semibold">{inv.stock_symbol}</div>
+                              <div className="text-sm text-muted-foreground">{inv.stock_name}</div>
+                            </div>
+                          </td>
+                          <td className="text-right py-3 px-4">{inv.quantity}</td>
+                          <td className="text-right py-3 px-4">{formatCurrency(inv.purchase_price)}</td>
+                          <td className="text-right py-3 px-4">{formatCurrency(currentPrice)}</td>
+                          <td className="text-right py-3 px-4 font-semibold">
+                            {formatCurrency(currentValue)}
+                          </td>
+                          <td className={`text-right py-3 px-4 ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                            <div className="font-semibold">{formatCurrency(Math.abs(pnl))}</div>
+                            <div className="text-xs">({formatPercentage(pnlPercent)})</div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Transaction History */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Recent Transactions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {transactions.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No transactions yet
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {transactions.map((txn) => (
+                  <div
+                    key={txn.id}
+                    className="flex items-center justify-between p-3 rounded-md border"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${txn.transaction_type === 'buy' ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                        {txn.transaction_type === 'buy' ? (
+                          <TrendingUp className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-semibold">
+                          {txn.transaction_type.toUpperCase()} {txn.quantity} x {txn.stock_symbol}
+                        </div>
+                        <div className="text-sm text-muted-foreground">{txn.stock_name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(txn.transaction_date).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold">{formatCurrency(txn.total_amount)}</div>
+                      <div className="text-sm text-muted-foreground">
+                        @ {formatCurrency(txn.price_per_unit)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </PageLayout>
   );

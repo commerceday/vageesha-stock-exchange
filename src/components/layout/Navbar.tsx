@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Search, Bell, User, LogOut } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Bell, User, LogOut, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/utils/stocksApi';
 
 interface NavbarProps {
   className?: string;
@@ -24,6 +25,48 @@ interface NavbarProps {
 export function Navbar({ className }: NavbarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [balance, setBalance] = useState<number>(100000);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('balance')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile) {
+          setBalance(profile.balance);
+        }
+      }
+    };
+    
+    fetchBalance();
+    
+    // Set up realtime subscription for balance updates
+    const channel = supabase
+      .channel('balance-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles'
+        },
+        (payload) => {
+          if (payload.new.balance !== undefined) {
+            setBalance(payload.new.balance);
+          }
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -59,6 +102,11 @@ export function Navbar({ className }: NavbarProps) {
         </div>
         
         <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-md bg-primary/10">
+            <Wallet className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold">{formatCurrency(balance)}</span>
+          </div>
+          
           <Button 
             variant="ghost" 
             size="icon" 
@@ -78,10 +126,9 @@ export function Navbar({ className }: NavbarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
-                Settings
-              </DropdownMenuItem>
+              <DropdownMenuLabel className="font-normal text-sm text-muted-foreground">
+                Balance: {formatCurrency(balance)}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
