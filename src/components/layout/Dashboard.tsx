@@ -18,20 +18,9 @@ export function Dashboard() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedStock, setSelectedStock] = useState(mockStocks[0]);
   
-  // Use our hooks to get real-time mock data
-  const { stocks, isMarketOpen } = useStockData(mockStocks);
+  // Use our hooks to get real-time data
+  const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
   const indices = useMarketIndices(mockIndices);
-  
-  // Generate chart data for the selected stock
-  const selectedStockHistory = generatePriceHistory(30, selectedStock.price, 2);
-  
-  // Generate chart data for stock cards
-  const stocksWithHistory = stocks.map(stock => {
-    return {
-      ...stock,
-      priceHistory: generatePriceHistory(30, stock.price, 2)
-    };
-  });
   
   // Calculate market statistics
   const gainers = stocks.filter(stock => stock.changePercent > 0);
@@ -98,11 +87,11 @@ export function Dashboard() {
               <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
                 <h2 className="text-xl font-semibold">Watchlist</h2>
                 <div className="space-y-4">
-                  {stocksWithHistory.slice(0, 5).map((stock) => (
+                  {stocks.slice(0, 5).map((stock) => (
                     <StockCard 
                       key={stock.symbol} 
                       stock={stock} 
-                      priceHistory={stock.priceHistory}
+                      priceHistory={priceHistory.get(stock.symbol) || []}
                       onClick={() => setSelectedStock(stock)}
                       className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
                     />

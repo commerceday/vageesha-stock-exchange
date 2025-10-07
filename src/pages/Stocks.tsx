@@ -9,21 +9,14 @@ import { Input } from '@/components/ui/input';
 import { ShoppingCart, Search } from 'lucide-react';
 
 const Stocks = () => {
-  const { stocks, isMarketOpen } = useStockData(mockStocks);
+  const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState('');
-  
-  const stocksWithHistory = stocks.map(stock => {
-    return {
-      ...stock,
-      priceHistory: generatePriceHistory(30, stock.price, 2)
-    };
-  });
 
   // Filter stocks based on search query
-  const filteredStocks = stocksWithHistory.filter(stock => 
+  const filteredStocks = stocks.filter(stock => 
     stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
     stock.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -65,7 +58,7 @@ const Stocks = () => {
               <StockCard 
                 key={stock.symbol} 
                 stock={stock} 
-                priceHistory={stock.priceHistory}
+                priceHistory={priceHistory.get(stock.symbol) || []}
                 onClick={() => setSelectedStock(stock)}
                 className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
               />
