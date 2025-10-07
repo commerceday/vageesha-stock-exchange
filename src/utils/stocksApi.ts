@@ -713,6 +713,17 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
     return historyMap;
   });
   const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
+  const [stockTrends, setStockTrends] = useState<Map<string, { direction: number; momentum: number }>>(() => {
+    // Initialize trends for realistic ups and downs
+    const trendsMap = new Map<string, { direction: number; momentum: number }>();
+    initialData.forEach(stock => {
+      trendsMap.set(stock.symbol, {
+        direction: Math.random() > 0.5 ? 1 : -1, // Random initial direction
+        momentum: Math.random() * 0.5 + 0.3 // Random momentum between 0.3 and 0.8
+      });
+    });
+    return trendsMap;
+  });
   
   useEffect(() => {
     // Initial fetch
@@ -750,13 +761,38 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - use last known price and generate realistic variations
+            // Market closed - generate realistic ups and downs like real stocks
             const lastKnownHistory = priceHistory.get(stock.symbol) || [stock.price];
             const lastKnownPrice = lastKnownHistory[lastKnownHistory.length - 1] || stock.price;
             
-            // Generate small realistic price movements when market is closed
-            const priceVariation = lastKnownPrice * (Math.random() - 0.5) * 0.001; // 0.1% max variation
-            const newPrice = lastKnownPrice + priceVariation;
+            // Get or create trend for this stock
+            const currentTrend = stockTrends.get(stock.symbol) || { direction: 1, momentum: 0.5 };
+            
+            // Randomly change direction (10% chance) for realistic market behavior
+            let newDirection = currentTrend.direction;
+            let newMomentum = currentTrend.momentum;
+            
+            if (Math.random() < 0.1) {
+              // Trend reversal
+              newDirection = -currentTrend.direction;
+              newMomentum = Math.random() * 0.5 + 0.3; // New momentum between 0.3 and 0.8
+            } else {
+              // Continue current trend with slight momentum decay
+              newMomentum = Math.max(0.2, currentTrend.momentum * (0.95 + Math.random() * 0.1));
+            }
+            
+            // Update trend state
+            setStockTrends(prev => {
+              const newMap = new Map(prev);
+              newMap.set(stock.symbol, { direction: newDirection, momentum: newMomentum });
+              return newMap;
+            });
+            
+            // Calculate realistic price movement (0.1% to 0.8% per update)
+            const volatility = 0.002 + Math.random() * 0.006; // Between 0.2% and 0.8%
+            const priceVariation = lastKnownPrice * volatility * newDirection * newMomentum;
+            const newPrice = Math.max(lastKnownPrice + priceVariation, lastKnownPrice * 0.5); // Prevent negative prices
+            
             const priceChange = newPrice - lastKnownPrice;
             const changePercent = (priceChange / lastKnownPrice) * 100;
             
