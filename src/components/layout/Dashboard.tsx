@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   useStockData, useMarketIndices,
-  mockStocks, mockIndices, mockNews,
+  mockStocks, mockIndices,
   generatePriceHistory 
 } from '@/utils/stocksApi';
 import { Navbar } from '@/components/layout/Navbar';
@@ -10,7 +10,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { StockCard } from '@/components/stocks/StockCard';
 import { StockChart } from '@/components/stocks/StockChart';
 import { MarketOverview } from '@/components/markets/MarketOverview';
-import { NewsCard } from '@/components/news/NewsCard';
+
 import { StatsCard } from '@/components/ui/StatsCard';
 import { BarChart3, TrendingDown, TrendingUp, Wallet2 } from 'lucide-react';
 
@@ -99,7 +99,7 @@ export function Dashboard() {
                 </div>
               </div>
               
-              {/* Middle column - Chart and news */}
+              {/* Middle column - Chart */}
               <div className="lg:col-span-2 space-y-4 animate-slide-up" style={{ '--delay': '300ms' } as React.CSSProperties}>
                 <StockChart 
                   symbol={selectedStock.symbol} 
@@ -107,7 +107,6 @@ export function Dashboard() {
                   currentPrice={selectedStock.price}
                   volatility={2.5}
                 />
-                <NewsCard news={mockNews} className="mt-6" />
               </div>
               
               {/* Right column - Markets */}

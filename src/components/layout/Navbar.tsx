@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/utils/stocksApi';
+import { NewsNotification } from './NewsNotification';
 
 interface NavbarProps {
   className?: string;
@@ -107,14 +108,7 @@ export function Navbar({ className }: NavbarProps) {
             <span className="text-sm font-semibold">{formatCurrency(balance)}</span>
           </div>
           
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="relative h-9 w-9"
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse" />
-          </Button>
+          <NewsNotification />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
