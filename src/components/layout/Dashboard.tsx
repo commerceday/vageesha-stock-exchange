@@ -51,7 +51,7 @@ export function Dashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
               <StatsCard 
                 title="Market Cap" 
-                value="$13.42T"
+                value="₹13.42T"
                 trend={0.47}
                 icon={<Wallet2 />}
                 className="bg-primary/5"
