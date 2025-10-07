@@ -704,7 +704,19 @@ function generatePatternBasedPrice(stock: Stock, historicalData: number[]): Stoc
 
 export function useStockData(initialData: Stock[], updateInterval = 5000) {
   const [stocks, setStocks] = useState<Stock[]>(initialData);
-  const [priceHistory, setPriceHistory] = useState<Map<string, number[]>>(new Map());
+  const [priceHistory, setPriceHistory] = useState<Map<string, number[]>>(() => {
+    // Initialize with some base history from mock data
+    const historyMap = new Map<string, number[]>();
+    initialData.forEach(stock => {
+      // Create initial history with small variations around the stock's changePercent
+      const baseChange = stock.changePercent;
+      const history = Array.from({ length: 10 }, (_, i) => 
+        baseChange + (Math.random() - 0.5) * 0.5
+      );
+      historyMap.set(stock.symbol, history);
+    });
+    return historyMap;
+  });
   const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
   
   useEffect(() => {
@@ -717,11 +729,15 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
         prevStocks.map(stock => {
           const realtimeStock = realTimeData.find(d => d.symbol === stock.symbol);
           
+          // Find base price from mockStocks
+          const baseStock = mockStocks.find(s => s.symbol === stock.symbol);
+          const basePrice = baseStock?.price || stock.price;
+          
           if (marketOpen && realtimeStock && !realtimeStock.error && !realtimeStock.marketClosed) {
             // Use real-time data when market is open
             const newStock = {
               ...stock,
-              price: realtimeStock.price || stock.price,
+              price: realtimeStock.price || basePrice,
               change: realtimeStock.change || stock.change,
               changePercent: realtimeStock.changePercent || stock.changePercent,
               lastUpdated: new Date()
@@ -738,9 +754,28 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - use pattern-based generation
-            const history = priceHistory.get(stock.symbol) || [stock.changePercent];
-            return generatePatternBasedPrice(stock, history);
+            // Market closed - ensure we have a valid base price first
+            const currentStock = {
+              ...stock,
+              price: stock.price || basePrice,
+              change: stock.change || (baseStock?.change || 0),
+              changePercent: stock.changePercent || (baseStock?.changePercent || 0)
+            };
+            
+            // Use pattern-based generation on top of the base price
+            const history = priceHistory.get(stock.symbol) || [currentStock.changePercent];
+            const generatedStock = generatePatternBasedPrice(currentStock, history);
+            
+            // Update price history for next iteration
+            setPriceHistory(prev => {
+              const history = prev.get(stock.symbol) || [];
+              const newHistory = [...history, generatedStock.changePercent].slice(-30);
+              const newMap = new Map(prev);
+              newMap.set(stock.symbol, newHistory);
+              return newMap;
+            });
+            
+            return generatedStock;
           }
         })
       );
