@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Stock {
   symbol: string;
@@ -650,33 +651,108 @@ export function formatDate(date: Date): string {
   }
 }
 
+async function fetchRealTimeStockPrices(stocks: Stock[]): Promise<{ data: any[], marketOpen: boolean }> {
+  try {
+    const symbols = stocks.map(stock => ({
+      symbol: stock.symbol,
+      exchange: 'NSE' // National Stock Exchange of India
+    }));
+    
+    const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
+      body: { symbols }
+    });
+    
+    if (error) {
+      console.error('Error fetching stock prices:', error);
+      return { data: [], marketOpen: false };
+    }
+    
+    return {
+      data: data.data || [],
+      marketOpen: data.marketOpen || false
+    };
+  } catch (error) {
+    console.error('Failed to fetch real-time prices:', error);
+    return { data: [], marketOpen: false };
+  }
+}
+
+function generatePatternBasedPrice(stock: Stock, historicalData: number[]): Stock {
+  // Analyze pattern from historical price changes
+  const avgChange = historicalData.reduce((sum, val) => sum + val, 0) / historicalData.length;
+  const volatility = Math.sqrt(
+    historicalData.reduce((sum, val) => sum + Math.pow(val - avgChange, 2), 0) / historicalData.length
+  );
+  
+  // Generate change based on historical pattern with some randomness
+  const trendFactor = avgChange * 0.7; // 70% weight to trend
+  const randomFactor = (Math.random() - 0.5) * volatility * 0.3; // 30% random within volatility
+  const changeAmount = (trendFactor + randomFactor) * stock.price / 100;
+  
+  const newPrice = Math.max(stock.price + changeAmount, 0.01);
+  const newChange = stock.change + changeAmount;
+  const newChangePercent = (newChange / (newPrice - newChange)) * 100;
+  
+  return {
+    ...stock,
+    price: parseFloat(newPrice.toFixed(2)),
+    change: parseFloat(newChange.toFixed(2)),
+    changePercent: parseFloat(newChangePercent.toFixed(2)),
+    lastUpdated: new Date()
+  };
+}
+
 export function useStockData(initialData: Stock[], updateInterval = 5000) {
   const [stocks, setStocks] = useState<Stock[]>(initialData);
+  const [priceHistory, setPriceHistory] = useState<Map<string, number[]>>(new Map());
+  const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
   
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    // Initial fetch
+    const updateStockPrices = async () => {
+      const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(stocks);
+      setIsMarketOpen(marketOpen);
+      
       setStocks(prevStocks => 
         prevStocks.map(stock => {
-          const changeAmount = (Math.random() - 0.5) * (stock.price * 0.01);
-          const newPrice = Math.max(stock.price + changeAmount, 0.01);
-          const newChange = stock.change + changeAmount;
-          const newChangePercent = (newChange / (newPrice - newChange)) * 100;
+          const realtimeStock = realTimeData.find(d => d.symbol === stock.symbol);
           
-          return {
-            ...stock,
-            price: parseFloat(newPrice.toFixed(2)),
-            change: parseFloat(newChange.toFixed(2)),
-            changePercent: parseFloat(newChangePercent.toFixed(2)),
-            lastUpdated: new Date()
-          };
+          if (marketOpen && realtimeStock && !realtimeStock.error && !realtimeStock.marketClosed) {
+            // Use real-time data when market is open
+            const newStock = {
+              ...stock,
+              price: realtimeStock.price || stock.price,
+              change: realtimeStock.change || stock.change,
+              changePercent: realtimeStock.changePercent || stock.changePercent,
+              lastUpdated: new Date()
+            };
+            
+            // Update price history for pattern analysis
+            setPriceHistory(prev => {
+              const history = prev.get(stock.symbol) || [];
+              const newHistory = [...history, realtimeStock.changePercent].slice(-30); // Keep last 30 changes
+              const newMap = new Map(prev);
+              newMap.set(stock.symbol, newHistory);
+              return newMap;
+            });
+            
+            return newStock;
+          } else {
+            // Market closed - use pattern-based generation
+            const history = priceHistory.get(stock.symbol) || [stock.changePercent];
+            return generatePatternBasedPrice(stock, history);
+          }
         })
       );
-    }, updateInterval);
+    };
+    
+    updateStockPrices();
+    const intervalId = setInterval(updateStockPrices, updateInterval);
     
     return () => clearInterval(intervalId);
-  }, [initialData, updateInterval]);
+  }, [updateInterval]);
   
-  return stocks;
+  return { stocks, isMarketOpen };
 }
 
 export function useMarketIndices(initialData: MarketIndex[], updateInterval = 8000) {

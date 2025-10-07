@@ -19,7 +19,7 @@ export function Dashboard() {
   const [selectedStock, setSelectedStock] = useState(mockStocks[0]);
   
   // Use our hooks to get real-time mock data
-  const stocks = useStockData(mockStocks);
+  const { stocks, isMarketOpen } = useStockData(mockStocks);
   const indices = useMarketIndices(mockIndices);
   
   // Generate chart data for the selected stock

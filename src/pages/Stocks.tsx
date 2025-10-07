@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { ShoppingCart, Search } from 'lucide-react';
 
 const Stocks = () => {
-  const stocks = useStockData(mockStocks);
+  const { stocks, isMarketOpen } = useStockData(mockStocks);
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
@@ -34,6 +34,15 @@ const Stocks = () => {
   
   return (
     <PageLayout title="Stocks">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-success animate-pulse' : 'bg-muted-foreground'}`} />
+          <span className="text-sm text-muted-foreground">
+            Market is {isMarketOpen ? 'OPEN' : 'CLOSED'} 
+            {!isMarketOpen && ' (Using pattern-based simulation)'}
+          </span>
+        </div>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
           <h2 className="text-xl font-semibold">All Stocks</h2>
