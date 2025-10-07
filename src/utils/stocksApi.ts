@@ -134,6 +134,206 @@ export const mockStocks: Stock[] = [
     volume: 1943760,
     marketCap: 5780000000000,
     lastUpdated: new Date()
+  },
+  {
+    symbol: 'ITC',
+    name: 'ITC Ltd.',
+    price: 445.60,
+    change: 5.30,
+    changePercent: 1.20,
+    volume: 7254890,
+    marketCap: 5540000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'LT',
+    name: 'Larsen & Toubro Ltd.',
+    price: 3567.80,
+    change: -22.40,
+    changePercent: -0.62,
+    volume: 1845670,
+    marketCap: 4890000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'AXISBANK',
+    name: 'Axis Bank Ltd.',
+    price: 1134.50,
+    change: 12.85,
+    changePercent: 1.15,
+    volume: 4567230,
+    marketCap: 3520000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'KOTAKBANK',
+    name: 'Kotak Mahindra Bank Ltd.',
+    price: 1845.25,
+    change: -18.75,
+    changePercent: -1.01,
+    volume: 2346780,
+    marketCap: 3660000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'BAJFINANCE',
+    name: 'Bajaj Finance Ltd.',
+    price: 6842.30,
+    change: 78.90,
+    changePercent: 1.17,
+    volume: 987650,
+    marketCap: 4230000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'MARUTI',
+    name: 'Maruti Suzuki India Ltd.',
+    price: 11547.85,
+    change: -134.50,
+    changePercent: -1.15,
+    volume: 456230,
+    marketCap: 3490000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'WIPRO',
+    name: 'Wipro Ltd.',
+    price: 456.75,
+    change: 6.20,
+    changePercent: 1.38,
+    volume: 5234560,
+    marketCap: 2480000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'TATAMOTORS',
+    name: 'Tata Motors Ltd.',
+    price: 945.60,
+    change: 15.35,
+    changePercent: 1.65,
+    volume: 6845320,
+    marketCap: 3350000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'ASIANPAINT',
+    name: 'Asian Paints Ltd.',
+    price: 2934.70,
+    change: -24.50,
+    changePercent: -0.83,
+    volume: 1234560,
+    marketCap: 2810000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'HCLTECH',
+    name: 'HCL Technologies Ltd.',
+    price: 1487.90,
+    change: 18.65,
+    changePercent: 1.27,
+    volume: 2345670,
+    marketCap: 4030000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'TITAN',
+    name: 'Titan Company Ltd.',
+    price: 3245.80,
+    change: 42.30,
+    changePercent: 1.32,
+    volume: 1876540,
+    marketCap: 2880000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'NESTLEIND',
+    name: 'Nestle India Ltd.',
+    price: 24567.45,
+    change: -156.80,
+    changePercent: -0.63,
+    volume: 234560,
+    marketCap: 2370000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'SUNPHARMA',
+    name: 'Sun Pharmaceutical Industries Ltd.',
+    price: 1634.25,
+    change: 21.50,
+    changePercent: 1.33,
+    volume: 3456780,
+    marketCap: 3920000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'ONGC',
+    name: 'Oil & Natural Gas Corporation Ltd.',
+    price: 234.80,
+    change: -3.45,
+    changePercent: -1.45,
+    volume: 9876540,
+    marketCap: 2950000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'ULTRACEMCO',
+    name: 'UltraTech Cement Ltd.',
+    price: 9845.60,
+    change: 67.80,
+    changePercent: 0.69,
+    volume: 345670,
+    marketCap: 2830000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'ADANIGREEN',
+    name: 'Adani Green Energy Ltd.',
+    price: 1845.75,
+    change: -32.40,
+    changePercent: -1.73,
+    volume: 2345670,
+    marketCap: 2940000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'TATASTEEL',
+    name: 'Tata Steel Ltd.',
+    price: 134.65,
+    change: 2.35,
+    changePercent: 1.78,
+    volume: 15678900,
+    marketCap: 1650000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'POWERGRID',
+    name: 'Power Grid Corporation of India Ltd.',
+    price: 289.40,
+    change: 4.20,
+    changePercent: 1.47,
+    volume: 4567890,
+    marketCap: 2670000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'BAJAJFINSV',
+    name: 'Bajaj Finserv Ltd.',
+    price: 1634.90,
+    change: 18.75,
+    changePercent: 1.16,
+    volume: 1234560,
+    marketCap: 2600000000000,
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'TECHM',
+    name: 'Tech Mahindra Ltd.',
+    price: 1278.45,
+    change: -15.60,
+    changePercent: -1.20,
+    volume: 2345670,
+    marketCap: 1240000000000,
+    lastUpdated: new Date()
   }
 ];
 

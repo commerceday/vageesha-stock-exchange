@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { useStockData, mockStocks, generatePriceHistory } from '@/utils/stocksApi';
@@ -6,13 +5,15 @@ import { StockCard } from '@/components/stocks/StockCard';
 import { StockChart } from '@/components/stocks/StockChart';
 import { BuySellDialog } from '@/components/stocks/BuySellDialog';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ShoppingCart, Search } from 'lucide-react';
 
 const Stocks = () => {
   const stocks = useStockData(mockStocks);
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
+  const [searchQuery, setSearchQuery] = React.useState('');
   
   const stocksWithHistory = stocks.map(stock => {
     return {
@@ -20,6 +21,12 @@ const Stocks = () => {
       priceHistory: generatePriceHistory(30, stock.price, 2)
     };
   });
+
+  // Filter stocks based on search query
+  const filteredStocks = stocksWithHistory.filter(stock => 
+    stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    stock.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSuccess = () => {
     setRefreshKey(prev => prev + 1);
@@ -30,8 +37,22 @@ const Stocks = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
           <h2 className="text-xl font-semibold">All Stocks</h2>
-          <div className="space-y-4">
-            {stocksWithHistory.map((stock) => (
+          
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search stocks by name or symbol..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+            {filteredStocks.length > 0 ? (
+              filteredStocks.map((stock) => (
               <StockCard 
                 key={stock.symbol} 
                 stock={stock} 
@@ -39,7 +60,12 @@ const Stocks = () => {
                 onClick={() => setSelectedStock(stock)}
                 className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
               />
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No stocks found matching "{searchQuery}"
+              </div>
+            )}
           </div>
         </div>
         
