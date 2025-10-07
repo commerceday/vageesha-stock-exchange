@@ -33,7 +33,13 @@ export function NewsNotification() {
         const storedNews = localStorage.getItem('newsData');
         const storedUnread = localStorage.getItem('unreadCount');
         if (storedNews) {
-          setNews(JSON.parse(storedNews));
+          const parsedNews = JSON.parse(storedNews);
+          // Convert publishedAt strings back to Date objects
+          const newsWithDates = parsedNews.map((item: NewsItem) => ({
+            ...item,
+            publishedAt: new Date(item.publishedAt)
+          }));
+          setNews(newsWithDates);
           setUnreadCount(Number(storedUnread) || 0);
         }
       }
