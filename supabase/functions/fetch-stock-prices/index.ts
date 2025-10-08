@@ -7,7 +7,6 @@ const corsHeaders = {
 
 interface StockSymbol {
   symbol: string;
-  exchange: string;
 }
 
 serve(async (req) => {
@@ -17,23 +16,24 @@ serve(async (req) => {
 
   try {
     const { symbols } = await req.json() as { symbols: StockSymbol[] };
-    const apiKey = Deno.env.get('STOCK_API_KEY');
-    
-    if (!apiKey) {
-      throw new Error('STOCK_API_KEY not configured');
-    }
 
     // Check if Indian stock market is open (IST: 9:15 AM - 3:30 PM, Mon-Fri)
     const isMarketOpen = checkMarketHours();
     console.log('Market status:', isMarketOpen ? 'OPEN' : 'CLOSED');
 
     const stockData = await Promise.all(
-      symbols.map(async ({ symbol, exchange }) => {
+      symbols.map(async ({ symbol }) => {
         try {
           if (isMarketOpen) {
-            // Fetch real-time data from Finnhub API
+            // Fetch real-time data from Yahoo Finance API (free, supports NSE)
+            const yahooSymbol = `${symbol}.NS`; // NSE stocks use .NS suffix
             const response = await fetch(
-              `https://finnhub.io/api/v1/quote?symbol=${exchange}:${symbol}&token=${apiKey}`
+              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`,
+              {
+                headers: {
+                  'User-Agent': 'Mozilla/5.0'
+                }
+              }
             );
             
             if (!response.ok) {
@@ -42,16 +42,27 @@ serve(async (req) => {
             }
             
             const data = await response.json();
+            const quote = data?.chart?.result?.[0];
+            
+            if (!quote || !quote.meta) {
+              console.error(`No data for ${symbol}`);
+              return { symbol, error: true };
+            }
+            
+            const currentPrice = quote.meta.regularMarketPrice || 0;
+            const previousClose = quote.meta.chartPreviousClose || quote.meta.previousClose || 0;
+            const change = currentPrice - previousClose;
+            const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
             
             return {
               symbol,
-              price: data.c || 0, // current price
-              change: data.d || 0, // change
-              changePercent: data.dp || 0, // change percent
-              high: data.h || 0,
-              low: data.l || 0,
-              open: data.o || 0,
-              previousClose: data.pc || 0,
+              price: currentPrice,
+              change: change,
+              changePercent: changePercent,
+              high: quote.meta.regularMarketDayHigh || 0,
+              low: quote.meta.regularMarketDayLow || 0,
+              open: quote.meta.regularMarketOpen || 0,
+              previousClose: previousClose,
             };
           } else {
             // Market closed - return null to indicate pattern-based generation should be used

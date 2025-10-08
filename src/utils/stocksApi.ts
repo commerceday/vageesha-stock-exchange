@@ -655,7 +655,7 @@ async function fetchRealTimeStockPrices(stocks: Stock[]): Promise<{ data: any[],
   try {
     const symbols = stocks.map(stock => ({
       symbol: stock.symbol,
-      exchange: 'NSE' // National Stock Exchange of India
+      exchange: 'NSE' // Kept for backwards compatibility, not used by Yahoo Finance
     }));
     
     const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
