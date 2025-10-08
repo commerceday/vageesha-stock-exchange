@@ -42,6 +42,8 @@ serve(async (req) => {
             }
             
             const data = await response.json();
+            console.log(`Raw data for ${symbol}:`, JSON.stringify(data).substring(0, 200));
+            
             const quote = data?.chart?.result?.[0];
             
             if (!quote || !quote.meta) {
@@ -53,6 +55,8 @@ serve(async (req) => {
             const previousClose = quote.meta.chartPreviousClose || quote.meta.previousClose || 0;
             const change = currentPrice - previousClose;
             const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
+            
+            console.log(`${symbol}: Price=${currentPrice}, Change=${change}, %=${changePercent}`);
             
             return {
               symbol,
