@@ -59,7 +59,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'RELIANCE',
     name: 'Reliance Industries Ltd.',
-    price: 1285.40,
+    price: 1377.80,
     change: 10.50,
     changePercent: 0.82,
     volume: 8934210,
@@ -69,7 +69,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'TCS',
     name: 'Tata Consultancy Services Ltd.',
-    price: 3456.75,
+    price: 3061.70,
     change: 42.20,
     changePercent: 1.24,
     volume: 2154780,
@@ -79,7 +79,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'HDFCBANK',
     name: 'HDFC Bank Ltd.',
-    price: 1542.30,
+    price: 977.10,
     change: -11.25,
     changePercent: -0.72,
     volume: 5729340,
@@ -89,7 +89,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'INFY',
     name: 'Infosys Ltd.',
-    price: 1623.85,
+    price: 1509.30,
     change: 19.60,
     changePercent: 1.22,
     volume: 4194600,
@@ -99,7 +99,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ICICIBANK',
     name: 'ICICI Bank Ltd.',
-    price: 1089.50,
+    price: 1376.20,
     change: 8.15,
     changePercent: 0.75,
     volume: 6638210,
@@ -109,7 +109,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'BHARTIARTL',
     name: 'Bharti Airtel Ltd.',
-    price: 1534.20,
+    price: 1942.00,
     change: -17.80,
     changePercent: -1.15,
     volume: 3129580,
@@ -119,7 +119,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'SBIN',
     name: 'State Bank of India',
-    price: 798.65,
+    price: 862.10,
     change: 10.55,
     changePercent: 1.34,
     volume: 8283940,
@@ -129,7 +129,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'HINDUNILVR',
     name: 'Hindustan Unilever Ltd.',
-    price: 2387.40,
+    price: 2517.60,
     change: -8.20,
     changePercent: -0.34,
     volume: 1943760,
@@ -139,7 +139,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ITC',
     name: 'ITC Ltd.',
-    price: 423.75,
+    price: 399.90,
     change: 5.05,
     changePercent: 1.21,
     volume: 7254890,
@@ -149,7 +149,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'LT',
     name: 'Larsen & Toubro Ltd.',
-    price: 3289.50,
+    price: 3769.20,
     change: -20.65,
     changePercent: -0.62,
     volume: 1845670,
@@ -159,7 +159,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'AXISBANK',
     name: 'Axis Bank Ltd.',
-    price: 1067.85,
+    price: 1167.40,
     change: 12.10,
     changePercent: 1.15,
     volume: 4567230,
@@ -169,7 +169,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'KOTAKBANK',
     name: 'Kotak Mahindra Bank Ltd.',
-    price: 1723.40,
+    price: 2144.60,
     change: -17.55,
     changePercent: -1.01,
     volume: 2346780,
@@ -179,7 +179,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'BAJFINANCE',
     name: 'Bajaj Finance Ltd.',
-    price: 6234.50,
+    price: 1024.10,
     change: 71.90,
     changePercent: 1.17,
     volume: 987650,
@@ -189,7 +189,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'MARUTI',
     name: 'Maruti Suzuki India Ltd.',
-    price: 10876.25,
+    price: 15985.00,
     change: -126.70,
     changePercent: -1.15,
     volume: 456230,
@@ -199,7 +199,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'WIPRO',
     name: 'Wipro Ltd.',
-    price: 287.60,
+    price: 246.40,
     change: 3.90,
     changePercent: 1.38,
     volume: 5234560,
@@ -209,7 +209,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'TATAMOTORS',
     name: 'Tata Motors Ltd.',
-    price: 784.30,
+    price: 681.10,
     change: 12.75,
     changePercent: 1.65,
     volume: 6845320,
@@ -219,7 +219,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ASIANPAINT',
     name: 'Asian Paints Ltd.',
-    price: 2456.80,
+    price: 2336.40,
     change: -20.50,
     changePercent: -0.83,
     volume: 1234560,
@@ -229,7 +229,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'HCLTECH',
     name: 'HCL Technologies Ltd.',
-    price: 1698.45,
+    price: 1486.50,
     change: 21.30,
     changePercent: 1.27,
     volume: 2345670,
@@ -239,7 +239,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'TITAN',
     name: 'Titan Company Ltd.',
-    price: 3187.65,
+    price: 3550.60,
     change: 41.50,
     changePercent: 1.32,
     volume: 1876540,
@@ -249,7 +249,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'NESTLEIND',
     name: 'Nestle India Ltd.',
-    price: 1176.80,
+    price: 1187.80,
     change: -7.45,
     changePercent: -0.63,
     volume: 234560,
@@ -259,7 +259,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'SUNPHARMA',
     name: 'Sun Pharmaceutical Industries Ltd.',
-    price: 1756.35,
+    price: 1658.50,
     change: 23.10,
     changePercent: 1.33,
     volume: 3456780,
@@ -269,7 +269,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ONGC',
     name: 'Oil & Natural Gas Corporation Ltd.',
-    price: 241.75,
+    price: 243.39,
     change: -3.55,
     changePercent: -1.45,
     volume: 9876540,
@@ -279,7 +279,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ULTRACEMCO',
     name: 'UltraTech Cement Ltd.',
-    price: 11234.80,
+    price: 12192.00,
     change: 77.40,
     changePercent: 0.69,
     volume: 345670,
@@ -289,7 +289,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'ADANIGREEN',
     name: 'Adani Green Energy Ltd.',
-    price: 956.85,
+    price: 1051.50,
     change: -16.80,
     changePercent: -1.73,
     volume: 2345670,
@@ -299,7 +299,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'TATASTEEL',
     name: 'Tata Steel Ltd.',
-    price: 143.50,
+    price: 176.42,
     change: 2.51,
     changePercent: 1.78,
     volume: 15678900,
@@ -309,7 +309,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'POWERGRID',
     name: 'Power Grid Corporation of India Ltd.',
-    price: 323.75,
+    price: 286.15,
     change: 4.69,
     changePercent: 1.47,
     volume: 4567890,
@@ -319,7 +319,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'BAJAJFINSV',
     name: 'Bajaj Finserv Ltd.',
-    price: 1598.20,
+    price: 2014.60,
     change: 18.33,
     changePercent: 1.16,
     volume: 1234560,
@@ -329,7 +329,7 @@ export const mockStocks: Stock[] = [
   {
     symbol: 'TECHM',
     name: 'Tech Mahindra Ltd.',
-    price: 1634.85,
+    price: 1466.60,
     change: -19.88,
     changePercent: -1.20,
     volume: 2345670,
@@ -721,17 +721,6 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
     });
     return pricesMap;
   });
-  const [stockTrends, setStockTrends] = useState<Map<string, { direction: number; momentum: number }>>(() => {
-    // Initialize trends for realistic ups and downs
-    const trendsMap = new Map<string, { direction: number; momentum: number }>();
-    initialData.forEach(stock => {
-      trendsMap.set(stock.symbol, {
-        direction: Math.random() > 0.5 ? 1 : -1, // Random initial direction
-        momentum: Math.random() * 0.5 + 0.3 // Random momentum between 0.3 and 0.8
-      });
-    });
-    return trendsMap;
-  });
   
   useEffect(() => {
     // Initial fetch
@@ -776,52 +765,25 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - generate prices that oscillate within ±5 rupees of last real price
+            // Market closed - generate prices within ±5% of last real price
             const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
             
-            // Get or create trend for this stock
-            const currentTrend = stockTrends.get(stock.symbol) || { direction: 1, momentum: 0.5 };
+            // Generate random price change between -5% and +5%
+            const randomChangePercent = (Math.random() - 0.5) * 10; // Random value between -5 and +5
+            const priceChange = lastRealPrice * (randomChangePercent / 100);
+            let newPrice = lastRealPrice + priceChange;
             
-            // Randomly change direction (15% chance) for realistic market behavior
-            let newDirection = currentTrend.direction;
-            let newMomentum = currentTrend.momentum;
+            // Ensure price stays positive
+            newPrice = Math.max(newPrice, 0.01);
             
-            if (Math.random() < 0.15) {
-              // Trend reversal
-              newDirection = -currentTrend.direction;
-              newMomentum = Math.random() * 0.5 + 0.3; // New momentum between 0.3 and 0.8
-            } else {
-              // Continue current trend with slight momentum variation
-              newMomentum = Math.max(0.2, Math.min(0.8, currentTrend.momentum * (0.9 + Math.random() * 0.2)));
-            }
-            
-            // Update trend state
-            setStockTrends(prev => {
-              const newMap = new Map(prev);
-              newMap.set(stock.symbol, { direction: newDirection, momentum: newMomentum });
-              return newMap;
-            });
-            
-            // Generate price that oscillates around lastRealPrice within ±5 rupees
-            // Use a sine-wave-like pattern with randomness
-            const maxDeviation = 5; // ±5 rupees
-            const randomOffset = (Math.random() - 0.5) * maxDeviation * 2 * newMomentum * newDirection;
-            
-            // Add some smooth oscillation
-            let newPrice = lastRealPrice + randomOffset;
-            
-            // Ensure we stay within bounds
-            newPrice = Math.max(lastRealPrice - maxDeviation, Math.min(lastRealPrice + maxDeviation, newPrice));
-            newPrice = Math.max(newPrice, 0.01); // Ensure positive
-            
-            const priceChange = newPrice - lastRealPrice;
-            const changePercent = (priceChange / lastRealPrice) * 100;
+            const finalChange = newPrice - lastRealPrice;
+            const finalChangePercent = (finalChange / lastRealPrice) * 100;
             
             const newStock = {
               ...stock,
               price: parseFloat(newPrice.toFixed(2)),
-              change: parseFloat(priceChange.toFixed(2)),
-              changePercent: parseFloat(changePercent.toFixed(2)),
+              change: parseFloat(finalChange.toFixed(2)),
+              changePercent: parseFloat(finalChangePercent.toFixed(2)),
               lastUpdated: new Date()
             };
             
