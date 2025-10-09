@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatCurrency, formatPercentage } from '@/utils/stocksApi';
 import { TrendingUp, TrendingDown, Wallet, Activity } from 'lucide-react';
 import { mockStocks } from '@/utils/stocksApi';
+import { toast } from '@/components/ui/use-toast';
 
 interface Investment {
   id: string;
@@ -31,6 +32,7 @@ const Portfolio = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [currentPrices, setCurrentPrices] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchPortfolioData();
@@ -73,8 +75,47 @@ const Portfolio = () => {
     }
   };
 
+  const fetchLivePrices = async (symbols: string[]) => {
+    if (!symbols.length) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
+        body: { symbols: symbols.map((s) => ({ symbol: s })) },
+      });
+      if (error) {
+        console.error('Error fetching live prices:', error);
+        toast({ description: 'Failed to refresh live prices.' });
+        return;
+      }
+      const payload: any = data as any;
+      const items = payload?.data || [];
+      const isOpen = payload?.marketOpen;
+      if (isOpen === false) {
+        toast({ description: 'Market closed. Showing last known/mock prices.' });
+      }
+      const priceMap: Record<string, number> = {};
+      for (const item of items) {
+        if (item && typeof item.price === 'number' && item.price > 0) {
+          priceMap[item.symbol] = item.price;
+        }
+      }
+      setCurrentPrices((prev) => ({ ...prev, ...priceMap }));
+    } catch (err) {
+      console.error('Live price fetch failed:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!investments.length) return;
+    const symbols = Array.from(new Set(investments.map((inv) => inv.stock_symbol)));
+    fetchLivePrices(symbols);
+    const interval = setInterval(() => fetchLivePrices(symbols), 30000);
+    return () => clearInterval(interval);
+  }, [investments]);
+
   const getCurrentPrice = (symbol: string) => {
-    const stock = mockStocks.find(s => s.symbol === symbol);
+    const live = currentPrices[symbol];
+    if (typeof live === 'number' && live > 0) return live;
+    const stock = mockStocks.find((s) => s.symbol === symbol);
     return stock?.price || 0;
   };
 
