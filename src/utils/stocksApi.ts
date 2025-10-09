@@ -776,25 +776,23 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - generate realistic ups and downs within ±5 rupees of last real price
-            const lastKnownHistory = priceHistory.get(stock.symbol) || [stock.price];
-            const lastKnownPrice = lastKnownHistory[lastKnownHistory.length - 1] || stock.price;
+            // Market closed - generate prices that oscillate within ±5 rupees of last real price
             const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
             
             // Get or create trend for this stock
             const currentTrend = stockTrends.get(stock.symbol) || { direction: 1, momentum: 0.5 };
             
-            // Randomly change direction (10% chance) for realistic market behavior
+            // Randomly change direction (15% chance) for realistic market behavior
             let newDirection = currentTrend.direction;
             let newMomentum = currentTrend.momentum;
             
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.15) {
               // Trend reversal
               newDirection = -currentTrend.direction;
               newMomentum = Math.random() * 0.5 + 0.3; // New momentum between 0.3 and 0.8
             } else {
-              // Continue current trend with slight momentum decay
-              newMomentum = Math.max(0.2, currentTrend.momentum * (0.95 + Math.random() * 0.1));
+              // Continue current trend with slight momentum variation
+              newMomentum = Math.max(0.2, Math.min(0.8, currentTrend.momentum * (0.9 + Math.random() * 0.2)));
             }
             
             // Update trend state
@@ -804,33 +802,32 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
               return newMap;
             });
             
-            // Calculate realistic price movement (0.1% to 0.8% per update)
-            const volatility = 0.002 + Math.random() * 0.006; // Between 0.2% and 0.8%
-            const priceVariation = lastKnownPrice * volatility * newDirection * newMomentum;
-            let newPrice = lastKnownPrice + priceVariation;
+            // Generate price that oscillates around lastRealPrice within ±5 rupees
+            // Use a sine-wave-like pattern with randomness
+            const maxDeviation = 5; // ±5 rupees
+            const randomOffset = (Math.random() - 0.5) * maxDeviation * 2 * newMomentum * newDirection;
             
-            // Constrain price to be within ±5 rupees of last real exchange price
-            const minPrice = lastRealPrice - 5;
-            const maxPrice = lastRealPrice + 5;
-            newPrice = Math.max(minPrice, Math.min(maxPrice, newPrice));
+            // Add some smooth oscillation
+            let newPrice = lastRealPrice + randomOffset;
             
-            // Ensure price stays positive
-            newPrice = Math.max(newPrice, 0.01);
+            // Ensure we stay within bounds
+            newPrice = Math.max(lastRealPrice - maxDeviation, Math.min(lastRealPrice + maxDeviation, newPrice));
+            newPrice = Math.max(newPrice, 0.01); // Ensure positive
             
-            const priceChange = newPrice - lastKnownPrice;
-            const changePercent = (priceChange / lastKnownPrice) * 100;
+            const priceChange = newPrice - lastRealPrice;
+            const changePercent = (priceChange / lastRealPrice) * 100;
             
             const newStock = {
               ...stock,
-              price: newPrice,
-              change: priceChange,
-              changePercent: changePercent,
+              price: parseFloat(newPrice.toFixed(2)),
+              change: parseFloat(priceChange.toFixed(2)),
+              changePercent: parseFloat(changePercent.toFixed(2)),
               lastUpdated: new Date()
             };
             
             // Update price history with generated prices
             setPriceHistory(prev => {
-              const history = prev.get(stock.symbol) || [lastKnownPrice];
+              const history = prev.get(stock.symbol) || [lastRealPrice];
               const newHistory = [...history, newPrice].slice(-30);
               const newMap = new Map(prev);
               newMap.set(stock.symbol, newHistory);
