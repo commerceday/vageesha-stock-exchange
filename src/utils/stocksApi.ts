@@ -713,6 +713,14 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
     return historyMap;
   });
   const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
+  const [lastRealPrices, setLastRealPrices] = useState<Map<string, number>>(() => {
+    // Store last real exchange prices for each stock
+    const pricesMap = new Map<string, number>();
+    initialData.forEach(stock => {
+      pricesMap.set(stock.symbol, stock.price);
+    });
+    return pricesMap;
+  });
   const [stockTrends, setStockTrends] = useState<Map<string, { direction: number; momentum: number }>>(() => {
     // Initialize trends for realistic ups and downs
     const trendsMap = new Map<string, { direction: number; momentum: number }>();
@@ -759,11 +767,19 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
               return newMap;
             });
             
+            // Store this as the last real exchange price
+            setLastRealPrices(prev => {
+              const newMap = new Map(prev);
+              newMap.set(stock.symbol, newPrice);
+              return newMap;
+            });
+            
             return newStock;
           } else {
-            // Market closed - generate realistic ups and downs like real stocks
+            // Market closed - generate realistic ups and downs within ±5 rupees of last real price
             const lastKnownHistory = priceHistory.get(stock.symbol) || [stock.price];
             const lastKnownPrice = lastKnownHistory[lastKnownHistory.length - 1] || stock.price;
+            const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
             
             // Get or create trend for this stock
             const currentTrend = stockTrends.get(stock.symbol) || { direction: 1, momentum: 0.5 };
@@ -791,7 +807,15 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             // Calculate realistic price movement (0.1% to 0.8% per update)
             const volatility = 0.002 + Math.random() * 0.006; // Between 0.2% and 0.8%
             const priceVariation = lastKnownPrice * volatility * newDirection * newMomentum;
-            const newPrice = Math.max(lastKnownPrice + priceVariation, lastKnownPrice * 0.5); // Prevent negative prices
+            let newPrice = lastKnownPrice + priceVariation;
+            
+            // Constrain price to be within ±5 rupees of last real exchange price
+            const minPrice = lastRealPrice - 5;
+            const maxPrice = lastRealPrice + 5;
+            newPrice = Math.max(minPrice, Math.min(maxPrice, newPrice));
+            
+            // Ensure price stays positive
+            newPrice = Math.max(newPrice, 0.01);
             
             const priceChange = newPrice - lastKnownPrice;
             const changePercent = (priceChange / lastKnownPrice) * 100;
