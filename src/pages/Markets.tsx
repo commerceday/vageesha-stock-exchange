@@ -5,7 +5,7 @@ import { MarketOverview } from '@/components/markets/MarketOverview';
 import { useMarketIndices, mockIndices } from '@/utils/stocksApi';
 
 const Markets = () => {
-  const indices = useMarketIndices(mockIndices);
+  const indices = useMarketIndices(mockIndices, 5000);
   
   return (
     <PageLayout title="Markets Overview">
