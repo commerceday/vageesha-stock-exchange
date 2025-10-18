@@ -765,11 +765,11 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - generate prices within ±5% of last real price
+            // Market closed - generate prices within ±0.1% of last real price
             const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
             
-            // Generate random price change between -5% and +5%
-            const randomChangePercent = (Math.random() - 0.5) * 10; // Random value between -5 and +5
+            // Generate random price change between -0.1% and +0.1%
+            const randomChangePercent = (Math.random() - 0.5) * 0.2; // Random value between -0.1 and +0.1
             const priceChange = lastRealPrice * (randomChangePercent / 100);
             let newPrice = lastRealPrice + priceChange;
             
