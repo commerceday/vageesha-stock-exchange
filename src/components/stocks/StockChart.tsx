@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { createChart, ColorType } from 'lightweight-charts';
+import { createChart, ColorType, CandlestickSeries } from 'lightweight-charts';
 import { generatePriceHistory } from '@/utils/stocksApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -95,8 +95,7 @@ export function StockChart({
 
     chartRef.current = chart;
 
-    // @ts-ignore - lightweight-charts types issue
-    const candlestickSeries = chart.addCandlestickSeries({
+    const candlestickSeries = chart.addSeries(CandlestickSeries, {
       upColor: 'hsl(142, 76%, 36%)',
       downColor: 'hsl(0, 84%, 60%)',
       borderVisible: false,
