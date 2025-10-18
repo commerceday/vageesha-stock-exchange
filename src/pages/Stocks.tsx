@@ -6,7 +6,8 @@ import { StockChart } from '@/components/stocks/StockChart';
 import { BuySellDialog } from '@/components/stocks/BuySellDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Search } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ShoppingCart, Search, Filter } from 'lucide-react';
 
 const Stocks = () => {
   const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
@@ -14,12 +15,24 @@ const Stocks = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [selectedSector, setSelectedSector] = React.useState<string>('all');
 
-  // Filter stocks based on search query
-  const filteredStocks = stocks.filter(stock => 
-    stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    stock.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get unique sectors from stocks
+  const sectors = React.useMemo(() => {
+    const uniqueSectors = Array.from(new Set(stocks.map(stock => stock.sector)));
+    return uniqueSectors.sort();
+  }, [stocks]);
+
+  // Filter stocks based on search query and sector
+  const filteredStocks = React.useMemo(() => {
+    return stocks.filter(stock => {
+      const matchesSearch = 
+        stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        stock.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSector = selectedSector === 'all' || stock.sector === selectedSector;
+      return matchesSearch && matchesSector;
+    });
+  }, [stocks, searchQuery, selectedSector]);
 
   const handleSuccess = () => {
     setRefreshKey(prev => prev + 1);
@@ -34,6 +47,9 @@ const Stocks = () => {
             Market is {isMarketOpen ? 'OPEN' : 'CLOSED'} 
             {!isMarketOpen && ' (Using pattern-based simulation)'}
           </span>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          {filteredStocks.length} of {stocks.length} stocks
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -52,7 +68,25 @@ const Stocks = () => {
             />
           </div>
 
-          <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+          {/* Sector Filter */}
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+            <Select value={selectedSector} onValueChange={setSelectedSector}>
+              <SelectTrigger className="pl-10">
+                <SelectValue placeholder="Filter by sector" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sectors</SelectItem>
+                {sectors.map((sector) => (
+                  <SelectItem key={sector} value={sector}>
+                    {sector}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto">
             {filteredStocks.length > 0 ? (
               filteredStocks.map((stock) => (
               <StockCard 
@@ -65,7 +99,7 @@ const Stocks = () => {
               ))
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                No stocks found matching "{searchQuery}"
+                No stocks found matching your criteria
               </div>
             )}
           </div>
@@ -73,7 +107,10 @@ const Stocks = () => {
         
         <div className="lg:col-span-2 space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">{selectedStock.name}</h2>
+            <div>
+              <h2 className="text-2xl font-bold">{selectedStock.name}</h2>
+              <p className="text-sm text-muted-foreground">{selectedStock.sector}</p>
+            </div>
             <Button onClick={() => setDialogOpen(true)}>
               <ShoppingCart className="mr-2 h-4 w-4" />
               Buy/Sell
