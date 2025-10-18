@@ -1,9 +1,6 @@
 
-import React, { useState, useMemo } from 'react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
-  ResponsiveContainer, Legend 
-} from 'recharts';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createChart, ColorType } from 'lightweight-charts';
 import { generatePriceHistory } from '@/utils/stocksApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,6 +31,9 @@ export function StockChart({
   className
 }: StockChartProps) {
   const [selectedRange, setSelectedRange] = useState(timeRanges[2]); // Default to 1M
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<any>(null);
+  const candlestickSeriesRef = useRef<any>(null);
   
   const chartData = useMemo(() => {
     const prices = generatePriceHistory(selectedRange.days, currentPrice, volatility);
@@ -45,26 +45,84 @@ export function StockChart({
     
     for (let i = 0; i < prices.length; i++) {
       const date = new Date(now.getTime() - (selectedRange.days - i) * msPerDay);
+      const basePrice = prices[i];
+      
+      // Generate OHLC data for candlestick
+      const open = basePrice * (1 + (Math.random() - 0.5) * 0.02);
+      const close = basePrice * (1 + (Math.random() - 0.5) * 0.02);
+      const high = Math.max(open, close) * (1 + Math.random() * 0.01);
+      const low = Math.min(open, close) * (1 - Math.random() * 0.01);
+      
       data.push({
-        date: date.toLocaleDateString('en-US', { 
-          month: selectedRange.days > 90 ? 'short' : 'numeric', 
-          day: 'numeric',
-          year: selectedRange.days > 90 ? '2-digit' : undefined
-        }),
-        price: prices[i]
+        time: Math.floor(date.getTime() / 1000) as any,
+        open,
+        high,
+        low,
+        close,
       });
     }
     
     return data;
   }, [selectedRange, currentPrice, volatility]);
-  
-  // Calculate min and max for Y axis with some padding
-  const minPrice = Math.min(...chartData.map(d => d.price)) * 0.98;
-  const maxPrice = Math.max(...chartData.map(d => d.price)) * 1.02;
-  
-  const formatYAxis = (value: number) => {
-    return `$${value.toFixed(2)}`;
-  };
+
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
+
+    const handleResize = () => {
+      if (chartRef.current && chartContainerRef.current) {
+        chartRef.current.applyOptions({ 
+          width: chartContainerRef.current.clientWidth 
+        });
+      }
+    };
+
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        background: { type: ColorType.Solid, color: 'transparent' },
+        textColor: 'hsl(var(--foreground))',
+      },
+      grid: {
+        vertLines: { color: 'hsl(var(--border))' },
+        horzLines: { color: 'hsl(var(--border))' },
+      },
+      width: chartContainerRef.current.clientWidth,
+      height: 300,
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
+    });
+
+    chartRef.current = chart;
+
+    // @ts-ignore - lightweight-charts types issue
+    const candlestickSeries = chart.addCandlestickSeries({
+      upColor: 'hsl(142, 76%, 36%)',
+      downColor: 'hsl(0, 84%, 60%)',
+      borderVisible: false,
+      wickUpColor: 'hsl(142, 76%, 36%)',
+      wickDownColor: 'hsl(0, 84%, 60%)',
+    });
+
+    candlestickSeriesRef.current = candlestickSeries;
+    candlestickSeries.setData(chartData);
+
+    chart.timeScale().fitContent();
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chart.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (candlestickSeriesRef.current) {
+      candlestickSeriesRef.current.setData(chartData);
+      chartRef.current?.timeScale().fitContent();
+    }
+  }, [chartData]);
   
   return (
     <Card className={cn("overflow-hidden h-full", className)}>
@@ -88,62 +146,7 @@ export function StockChart({
         </div>
       </CardHeader>
       <CardContent className="p-0 pb-4">
-        <div className="h-[300px] w-full px-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                vertical={false} 
-                stroke="hsl(var(--border))" 
-              />
-              <XAxis 
-                dataKey="date" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10 }}
-                tickMargin={10}
-                interval={Math.floor(chartData.length / selectedRange.interval)}
-              />
-              <YAxis 
-                domain={[minPrice, maxPrice]} 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 10 }}
-                tickMargin={10}
-                tickFormatter={formatYAxis}
-                width={60}
-              />
-              <Tooltip
-                contentStyle={{
-                  background: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "var(--radius)",
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                }}
-                formatter={(value: number) => [`$${value.toFixed(2)}`, 'Price']}
-                labelFormatter={(label) => `Date: ${label}`}
-              />
-              <Legend />
-              <Area 
-                type="monotone" 
-                dataKey="price" 
-                stroke="hsl(var(--primary))" 
-                fillOpacity={1}
-                fill="url(#colorPrice)"
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <div ref={chartContainerRef} className="h-[300px] w-full px-4" />
       </CardContent>
     </Card>
   );
