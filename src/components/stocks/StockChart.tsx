@@ -1,18 +1,19 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createChart, ColorType, CandlestickSeries } from 'lightweight-charts';
-import { generatePriceHistory } from '@/utils/stocksApi';
+import { generateIntradayData, generateDailyCandlestickData } from '@/utils/stocksApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const timeRanges = [
-  { label: '1D', days: 1, interval: 24 },
-  { label: '1W', days: 7, interval: 7 },
-  { label: '1M', days: 30, interval: 30 },
-  { label: '3M', days: 90, interval: 30 },
-  { label: '1Y', days: 365, interval: 52 },
-  { label: 'All', days: 1825, interval: 104 },
+  { label: '1D', type: 'intraday', intervalMinutes: 5, periods: 75, isIntraday: true }, // 5-min candles for 6.25 hours
+  { label: '5D', type: 'intraday', intervalMinutes: 15, periods: 120, isIntraday: true }, // 15-min candles for 5 days
+  { label: '1M', type: 'daily', days: 30, isIntraday: false },
+  { label: '3M', type: 'daily', days: 90, isIntraday: false },
+  { label: '6M', type: 'daily', days: 180, isIntraday: false },
+  { label: '1Y', type: 'daily', days: 365, isIntraday: false },
+  { label: 'All', type: 'daily', days: 1825, isIntraday: false },
 ];
 
 interface StockChartProps {
@@ -36,33 +37,23 @@ export function StockChart({
   const candlestickSeriesRef = useRef<any>(null);
   
   const chartData = useMemo(() => {
-    const prices = generatePriceHistory(selectedRange.days, currentPrice, volatility);
-    const data = [];
-    
-    // Calculate dates going backward from today
-    const now = new Date();
-    const msPerDay = 24 * 60 * 60 * 1000;
-    
-    for (let i = 0; i < prices.length; i++) {
-      const date = new Date(now.getTime() - (selectedRange.days - i) * msPerDay);
-      const basePrice = prices[i];
-      
-      // Generate OHLC data for candlestick
-      const open = basePrice * (1 + (Math.random() - 0.5) * 0.02);
-      const close = basePrice * (1 + (Math.random() - 0.5) * 0.02);
-      const high = Math.max(open, close) * (1 + Math.random() * 0.01);
-      const low = Math.min(open, close) * (1 - Math.random() * 0.01);
-      
-      data.push({
-        time: Math.floor(date.getTime() / 1000) as any,
-        open,
-        high,
-        low,
-        close,
-      });
+    if (selectedRange.isIntraday && 'intervalMinutes' in selectedRange && 'periods' in selectedRange) {
+      // Generate intraday candlestick data
+      return generateIntradayData(
+        selectedRange.intervalMinutes,
+        selectedRange.periods,
+        currentPrice,
+        volatility
+      );
+    } else if ('days' in selectedRange) {
+      // Generate daily candlestick data
+      return generateDailyCandlestickData(
+        selectedRange.days,
+        currentPrice,
+        volatility
+      );
     }
-    
-    return data;
+    return [];
   }, [selectedRange, currentPrice, volatility]);
 
   useEffect(() => {
@@ -90,6 +81,10 @@ export function StockChart({
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderColor: 'hsl(var(--border))',
+      },
+      rightPriceScale: {
+        borderColor: 'hsl(var(--border))',
       },
     });
 
