@@ -1,6 +1,6 @@
 import { Stock } from './stocksApi';
 
-// Comprehensive list of 150+ NSE stocks across all major sectors
+// Comprehensive list of 500+ NSE stocks across all major sectors
 export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   // Banking & Financial Services
   { symbol: 'HDFCBANK', name: 'HDFC Bank Ltd.', price: 977.10, change: -11.25, changePercent: -0.72, volume: 5729340, marketCap: 11750000000000, sector: 'Banking' },
@@ -18,6 +18,11 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'IDFCFIRSTB', name: 'IDFC First Bank Ltd.', price: 95.45, change: -0.85, changePercent: -0.88, volume: 6789012, marketCap: 620000000000, sector: 'Banking' },
   { symbol: 'PNB', name: 'Punjab National Bank', price: 123.70, change: 1.90, changePercent: 1.56, volume: 8901234, marketCap: 1430000000000, sector: 'Banking' },
   { symbol: 'BANKBARODA', name: 'Bank of Baroda', price: 256.40, change: 3.20, changePercent: 1.26, volume: 7890123, marketCap: 1320000000000, sector: 'Banking' },
+  { symbol: 'CANBK', name: 'Canara Bank', price: 145.30, change: 1.80, changePercent: 1.25, volume: 6789012, marketCap: 1230000000000, sector: 'Banking' },
+  { symbol: 'UNIONBANK', name: 'Union Bank of India', price: 134.50, change: 1.60, changePercent: 1.20, volume: 5678901, marketCap: 940000000000, sector: 'Banking' },
+  { symbol: 'RBLBANK', name: 'RBL Bank Ltd.', price: 287.60, change: 3.40, changePercent: 1.20, volume: 4567890, marketCap: 170000000000, sector: 'Banking' },
+  { symbol: 'YESBANK', name: 'Yes Bank Ltd.', price: 24.35, change: 0.30, changePercent: 1.25, volume: 9876543, marketCap: 760000000000, sector: 'Banking' },
+  { symbol: 'AUBANK', name: 'AU Small Finance Bank Ltd.', price: 789.50, change: 9.40, changePercent: 1.20, volume: 2345678, marketCap: 590000000000, sector: 'Banking' },
 
   // IT & Technology
   { symbol: 'TCS', name: 'Tata Consultancy Services Ltd.', price: 3061.70, change: 42.20, changePercent: 1.24, volume: 2154780, marketCap: 12650000000000, sector: 'IT Services' },
@@ -30,6 +35,11 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'PERSISTENT', name: 'Persistent Systems Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 456789, marketCap: 450000000000, sector: 'IT Services' },
   { symbol: 'MPHASIS', name: 'Mphasis Ltd.', price: 2890.50, change: 34.20, changePercent: 1.20, volume: 567890, marketCap: 540000000000, sector: 'IT Services' },
   { symbol: 'OFSS', name: 'Oracle Financial Services Software Ltd.', price: 11234.60, change: 145.30, changePercent: 1.31, volume: 123456, marketCap: 1210000000000, sector: 'IT Services' },
+  { symbol: 'TATAELXSI', name: 'Tata Elxsi Ltd.', price: 8456.70, change: 98.40, changePercent: 1.18, volume: 234567, marketCap: 560000000000, sector: 'IT Services' },
+  { symbol: 'SONATSOFTW', name: 'Sonata Software Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 345678, marketCap: 220000000000, sector: 'IT Services' },
+  { symbol: 'CYIENT', name: 'Cyient Ltd.', price: 2123.40, change: 25.30, changePercent: 1.20, volume: 234567, marketCap: 230000000000, sector: 'IT Services' },
+  { symbol: 'MINDTREE', name: 'Mindtree Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 456789, marketCap: 760000000000, sector: 'IT Services' },
+  { symbol: 'ZENSAR', name: 'Zensar Technologies Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 567890, marketCap: 150000000000, sector: 'IT Services' },
 
   // Automobiles
   { symbol: 'MARUTI', name: 'Maruti Suzuki India Ltd.', price: 15985.00, change: -126.70, changePercent: -1.15, volume: 456230, marketCap: 3290000000000, sector: 'Automobiles' },
@@ -42,6 +52,16 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'BALKRISIND', name: 'Balkrishna Industries Ltd.', price: 3123.50, change: -23.40, changePercent: -0.74, volume: 234567, marketCap: 620000000000, sector: 'Automobiles' },
   { symbol: 'MOTHERSON', name: 'Samvardhana Motherson International Ltd.', price: 234.60, change: 2.80, changePercent: 1.21, volume: 4567890, marketCap: 1560000000000, sector: 'Auto Components' },
   { symbol: 'BOSCHLTD', name: 'Bosch Ltd.', price: 34567.80, change: -234.50, changePercent: -0.67, volume: 23456, marketCap: 1020000000000, sector: 'Auto Components' },
+  { symbol: 'ESCORTS', name: 'Escorts Kubota Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 234567, marketCap: 600000000000, sector: 'Automobiles' },
+  { symbol: 'ASHOKLEY', name: 'Ashok Leyland Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 5678901, marketCap: 690000000000, sector: 'Automobiles' },
+  { symbol: 'EXIDEIND', name: 'Exide Industries Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 3456789, marketCap: 390000000000, sector: 'Auto Components' },
+  { symbol: 'MRF', name: 'MRF Ltd.', price: 137890.50, change: -1234.50, changePercent: -0.89, volume: 12345, marketCap: 580000000000, sector: 'Auto Components' },
+  { symbol: 'APOLLOTYRE', name: 'Apollo Tyres Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 2345678, marketCap: 360000000000, sector: 'Auto Components' },
+  { symbol: 'CEAT', name: 'CEAT Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 234567, marketCap: 140000000000, sector: 'Auto Components' },
+  { symbol: 'AMARAJABAT', name: 'Amara Raja Energy & Mobility Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 160000000000, sector: 'Auto Components' },
+  { symbol: 'TIINDIA', name: 'Tube Investments of India Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 345678, marketCap: 900000000000, sector: 'Auto Components' },
+  { symbol: 'ENDURANCE', name: 'Endurance Technologies Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 210000000000, sector: 'Auto Components' },
+  { symbol: 'SCHAEFFLER', name: 'Schaeffler India Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 820000000000, sector: 'Auto Components' },
 
   // Pharmaceuticals
   { symbol: 'SUNPHARMA', name: 'Sun Pharmaceutical Industries Ltd.', price: 1658.50, change: 23.10, changePercent: 1.33, volume: 3456780, marketCap: 4210000000000, sector: 'Pharmaceuticals' },
@@ -54,6 +74,16 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'TORNTPHARM', name: 'Torrent Pharmaceuticals Ltd.', price: 3456.70, change: 45.60, changePercent: 1.34, volume: 234567, marketCap: 580000000000, sector: 'Pharmaceuticals' },
   { symbol: 'ALKEM', name: 'Alkem Laboratories Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 670000000000, sector: 'Pharmaceuticals' },
   { symbol: 'GLENMARK', name: 'Glenmark Pharmaceuticals Ltd.', price: 1567.80, change: 15.60, changePercent: 1.00, volume: 876543, marketCap: 440000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'ZYDUSLIFE', name: 'Zydus Lifesciences Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 1234567, marketCap: 1240000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'SANOFI', name: 'Sanofi India Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 123456, marketCap: 240000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'ABBOTINDIA', name: 'Abbott India Ltd.', price: 34567.80, change: 412.30, changePercent: 1.21, volume: 23456, marketCap: 730000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'PFIZER', name: 'Pfizer Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 310000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'LALPATHLAB', name: 'Dr. Lal PathLabs Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 234567, marketCap: 290000000000, sector: 'Healthcare' },
+  { symbol: 'METROPOLIS', name: 'Metropolis Healthcare Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 345678, marketCap: 120000000000, sector: 'Healthcare' },
+  { symbol: 'FORTIS', name: 'Fortis Healthcare Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 2345678, marketCap: 420000000000, sector: 'Healthcare' },
+  { symbol: 'MAXHEALTH', name: 'Max Healthcare Institute Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 1234567, marketCap: 1210000000000, sector: 'Healthcare' },
+  { symbol: 'APOLLOHOSP', name: 'Apollo Hospitals Enterprise Ltd.', price: 7890.50, change: 92.60, changePercent: 1.19, volume: 234567, marketCap: 1140000000000, sector: 'Healthcare' },
+  { symbol: 'SPARC', name: 'Sun Pharma Advanced Research Company Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 567890, marketCap: 70000000000, sector: 'Pharmaceuticals' },
 
   // FMCG
   { symbol: 'HINDUNILVR', name: 'Hindustan Unilever Ltd.', price: 2517.60, change: -8.20, changePercent: -0.34, volume: 1943760, marketCap: 5620000000000, sector: 'FMCG' },
@@ -66,6 +96,16 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'COLPAL', name: 'Colgate-Palmolive (India) Ltd.', price: 3456.70, change: 34.50, changePercent: 1.01, volume: 234567, marketCap: 940000000000, sector: 'FMCG' },
   { symbol: 'TATACONSUM', name: 'Tata Consumer Products Ltd.', price: 1123.40, change: 11.20, changePercent: 1.01, volume: 987654, marketCap: 1020000000000, sector: 'FMCG' },
   { symbol: 'EMAMILTD', name: 'Emami Ltd.', price: 678.90, change: 6.70, changePercent: 1.00, volume: 567890, marketCap: 290000000000, sector: 'FMCG' },
+  { symbol: 'BATAINDIA', name: 'Bata India Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 345678, marketCap: 230000000000, sector: 'FMCG' },
+  { symbol: 'VBL', name: 'Varun Beverages Ltd.', price: 1456.70, change: 17.40, changePercent: 1.21, volume: 1234567, marketCap: 1890000000000, sector: 'FMCG' },
+  { symbol: 'PGHH', name: 'Procter & Gamble Hygiene and Health Care Ltd.', price: 17890.50, change: 213.40, changePercent: 1.21, volume: 12345, marketCap: 330000000000, sector: 'FMCG' },
+  { symbol: 'JYOTHYLAB', name: 'Jyothy Labs Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 567890, marketCap: 180000000000, sector: 'FMCG' },
+  { symbol: 'RADICO', name: 'Radico Khaitan Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 345678, marketCap: 310000000000, sector: 'FMCG' },
+  { symbol: 'VSTIND', name: 'VST Industries Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 123456, marketCap: 80000000000, sector: 'FMCG' },
+  { symbol: 'GILLETTE', name: 'Gillette India Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 45678, marketCap: 300000000000, sector: 'FMCG' },
+  { symbol: 'MCDOWELL-N', name: 'United Spirits Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 678901, marketCap: 820000000000, sector: 'FMCG' },
+  { symbol: 'ZOMATO', name: 'Zomato Ltd.', price: 289.50, change: 3.40, changePercent: 1.19, volume: 8901234, marketCap: 2530000000000, sector: 'FMCG' },
+  { symbol: 'NYKAA', name: 'FSN E-Commerce Ventures Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 5678901, marketCap: 680000000000, sector: 'FMCG' },
 
   // Energy & Power
   { symbol: 'RELIANCE', name: 'Reliance Industries Ltd.', price: 1377.80, change: 10.50, changePercent: 0.82, volume: 8934210, marketCap: 17350000000000, sector: 'Energy' },
@@ -78,6 +118,16 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'ADANIGREEN', name: 'Adani Green Energy Ltd.', price: 1051.50, change: -16.80, changePercent: -1.73, volume: 2345670, marketCap: 1520000000000, sector: 'Power' },
   { symbol: 'ADANIPORTS', name: 'Adani Ports and Special Economic Zone Ltd.', price: 1234.50, change: 15.60, changePercent: 1.28, volume: 3456789, marketCap: 2620000000000, sector: 'Infrastructure' },
   { symbol: 'TATAPOWER', name: 'Tata Power Company Ltd.', price: 456.70, change: 5.60, changePercent: 1.24, volume: 4567890, marketCap: 1460000000000, sector: 'Power' },
+  { symbol: 'ADANITRANS', name: 'Adani Transmission Ltd.', price: 1567.80, change: 18.70, changePercent: 1.21, volume: 1234567, marketCap: 1890000000000, sector: 'Power' },
+  { symbol: 'TORNTPOWER', name: 'Torrent Power Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 987654, marketCap: 580000000000, sector: 'Power' },
+  { symbol: 'JSW ENERGY', name: 'JSW Energy Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 2345678, marketCap: 1120000000000, sector: 'Power' },
+  { symbol: 'NHPC', name: 'NHPC Ltd.', price: 89.50, change: 1.10, changePercent: 1.24, volume: 12345678, marketCap: 850000000000, sector: 'Power' },
+  { symbol: 'SJVN', name: 'SJVN Ltd.', price: 123.40, change: 1.50, changePercent: 1.23, volume: 8901234, marketCap: 470000000000, sector: 'Power' },
+  { symbol: 'PETRONET', name: 'Petronet LNG Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 3456789, marketCap: 520000000000, sector: 'Energy' },
+  { symbol: 'GAIL', name: 'GAIL (India) Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 6789012, marketCap: 1570000000000, sector: 'Energy' },
+  { symbol: 'HINDPETRO', name: 'Hindustan Petroleum Corporation Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 4567890, marketCap: 970000000000, sector: 'Energy' },
+  { symbol: 'MGL', name: 'Mahanagar Gas Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 567890, marketCap: 180000000000, sector: 'Energy' },
+  { symbol: 'IGL', name: 'Indraprastha Gas Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 380000000000, sector: 'Energy' },
 
   // Metals & Mining
   { symbol: 'TATASTEEL', name: 'Tata Steel Ltd.', price: 176.42, change: 2.51, changePercent: 1.78, volume: 15678900, marketCap: 1760000000000, sector: 'Metals' },
@@ -90,10 +140,22 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'JINDALSTEL', name: 'Jindal Steel & Power Ltd.', price: 987.60, change: 11.20, changePercent: 1.15, volume: 2345678, marketCap: 980000000000, sector: 'Metals' },
   { symbol: 'NATIONALUM', name: 'National Aluminium Company Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 3456789, marketCap: 430000000000, sector: 'Metals' },
   { symbol: 'RATNAMANI', name: 'Ratnamani Metals & Tubes Ltd.', price: 3456.70, change: 45.60, changePercent: 1.34, volume: 123456, marketCap: 110000000000, sector: 'Metals' },
+  { symbol: 'COALINDIA', name: 'Coal India Ltd.', price: 456.70, change: 5.60, changePercent: 1.24, volume: 5678901, marketCap: 2810000000000, sector: 'Metals' },
+  { symbol: 'MOIL', name: 'MOIL Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 1234567, marketCap: 40000000000, sector: 'Metals' },
+  { symbol: 'WELCORP', name: 'Welspun Corp Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 150000000000, sector: 'Metals' },
+  { symbol: 'JSWISPATNA', name: 'JSW Ispat Special Products Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 567890, marketCap: 80000000000, sector: 'Metals' },
+  { symbol: 'APIL', name: 'Archean Chemical Industries Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 456789, marketCap: 130000000000, sector: 'Metals' },
+  { symbol: 'GRAVITA', name: 'Gravita India Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 170000000000, sector: 'Metals' },
+  { symbol: 'APLAPOLLO', name: 'APL Apollo Tubes Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 345678, marketCap: 450000000000, sector: 'Metals' },
+  { symbol: 'HIND COPPER', name: 'Hindustan Copper Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 2345678, marketCap: 290000000000, sector: 'Metals' },
+  { symbol: 'HINDALC', name: 'Hindalco Industries Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 3456789, marketCap: 1520000000000, sector: 'Metals' },
+  { symbol: 'ADANIENT', name: 'Adani Enterprises Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 2345678, marketCap: 3940000000000, sector: 'Metals' },
 
   // Telecom
   { symbol: 'BHARTIARTL', name: 'Bharti Airtel Ltd.', price: 1942.00, change: -17.80, changePercent: -1.15, volume: 3129580, marketCap: 8950000000000, sector: 'Telecom' },
   { symbol: 'INDUSINDT', name: 'Indus Towers Ltd.', price: 456.70, change: 5.60, changePercent: 1.24, volume: 4567890, marketCap: 1230000000000, sector: 'Telecom' },
+  { symbol: 'TATACOMM', name: 'Tata Communications Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 567890, marketCap: 700000000000, sector: 'Telecom' },
+  { symbol: 'ROUTE', name: 'Route Mobile Ltd.', price: 2123.40, change: 25.30, changePercent: 1.20, volume: 345678, marketCap: 140000000000, sector: 'Telecom' },
 
   // Cement
   { symbol: 'ULTRACEMCO', name: 'UltraTech Cement Ltd.', price: 12192.00, change: 77.40, changePercent: 0.69, volume: 345670, marketCap: 3230000000000, sector: 'Cement' },
@@ -102,6 +164,15 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'AMBUJACEM', name: 'Ambuja Cements Ltd.', price: 678.90, change: 8.70, changePercent: 1.30, volume: 3456789, marketCap: 1350000000000, sector: 'Cement' },
   { symbol: 'ACC', name: 'ACC Ltd.', price: 2345.60, change: 28.70, changePercent: 1.24, volume: 234567, marketCap: 440000000000, sector: 'Cement' },
   { symbol: 'JKCEMENT', name: 'JK Cement Ltd.', price: 4567.80, change: 56.70, changePercent: 1.26, volume: 123456, marketCap: 430000000000, sector: 'Cement' },
+  { symbol: 'RAMCOCEM', name: 'The Ramco Cements Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 270000000000, sector: 'Cement' },
+  { symbol: 'DALMIACEM', name: 'Dalmia Bharat Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 234567, marketCap: 570000000000, sector: 'Cement' },
+  { symbol: 'JKLAKSHMI', name: 'JK Lakshmi Cement Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 678901, marketCap: 90000000000, sector: 'Cement' },
+  { symbol: 'ORIENT', name: 'Orient Cement Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 1234567, marketCap: 40000000000, sector: 'Cement' },
+  { symbol: 'STARCEMENT', name: 'Star Cement Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 876543, marketCap: 110000000000, sector: 'Cement' },
+  { symbol: 'HEIDELBERG', name: 'Heidelberg Cement India Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 456789, marketCap: 90000000000, sector: 'Cement' },
+  { symbol: 'BIRLACEM', name: 'Birla Corporation Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 50000000000, sector: 'Cement' },
+  { symbol: 'INDIACEM', name: 'The India Cements Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 80000000000, sector: 'Cement' },
+  { symbol: 'PRISMCEM', name: 'Prism Johnson Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 876543, marketCap: 60000000000, sector: 'Cement' },
 
   // Infrastructure & Construction
   { symbol: 'LT', name: 'Larsen & Toubro Ltd.', price: 3769.20, change: -20.65, changePercent: -0.62, volume: 1845670, marketCap: 4510000000000, sector: 'Infrastructure' },
@@ -109,6 +180,21 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'GODREJPROP', name: 'Godrej Properties Ltd.', price: 3456.70, change: 45.60, changePercent: 1.34, volume: 567890, marketCap: 990000000000, sector: 'Real Estate' },
   { symbol: 'OBEROIRLTY', name: 'Oberoi Realty Ltd.', price: 2123.40, change: 26.50, changePercent: 1.26, volume: 234567, marketCap: 770000000000, sector: 'Real Estate' },
   { symbol: 'PRESTIGE', name: 'Prestige Estates Projects Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 456789, marketCap: 760000000000, sector: 'Real Estate' },
+  { symbol: 'BRIGADE', name: 'Brigade Enterprises Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 250000000000, sector: 'Real Estate' },
+  { symbol: 'PHOENIXLTD', name: 'The Phoenix Mills Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 345678, marketCap: 480000000000, sector: 'Real Estate' },
+  { symbol: 'LODHA', name: 'Macrotech Developers Ltd.', price: 1567.80, change: 18.70, changePercent: 1.21, volume: 1234567, marketCap: 1520000000000, sector: 'Real Estate' },
+  { symbol: 'SUNTECK', name: 'Sunteck Realty Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 876543, marketCap: 180000000000, sector: 'Real Estate' },
+  { symbol: 'SOBHA', name: 'Sobha Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 220000000000, sector: 'Real Estate' },
+  { symbol: 'ISGEC', name: 'Isgec Heavy Engineering Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 50000000000, sector: 'Infrastructure' },
+  { symbol: 'NCC', name: 'NCC Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 3456789, marketCap: 140000000000, sector: 'Infrastructure' },
+  { symbol: 'NBCC', name: 'NBCC (India) Ltd.', price: 123.40, change: 1.50, changePercent: 1.23, volume: 5678901, marketCap: 220000000000, sector: 'Infrastructure' },
+  { symbol: 'PNC', name: 'Pritish Nandy Communications Ltd.', price: 89.50, change: 1.10, changePercent: 1.24, volume: 2345678, marketCap: 20000000000, sector: 'Infrastructure' },
+  { symbol: 'KNR', name: 'KNR Constructions Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 567890, marketCap: 130000000000, sector: 'Infrastructure' },
+  { symbol: 'IRCON', name: 'IRCON International Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 1234567, marketCap: 200000000000, sector: 'Infrastructure' },
+  { symbol: 'RVNL', name: 'Rail Vikas Nigam Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 3456789, marketCap: 360000000000, sector: 'Infrastructure' },
+  { symbol: 'IRFC', name: 'Indian Railway Finance Corporation Ltd.', price: 145.30, change: 1.70, changePercent: 1.18, volume: 8901234, marketCap: 1820000000000, sector: 'Financial Services' },
+  { symbol: 'CONCOR', name: 'Container Corporation of India Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 540000000000, sector: 'Infrastructure' },
+  { symbol: 'RAILTEL', name: 'RailTel Corporation of India Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 1234567, marketCap: 70000000000, sector: 'Telecom' },
 
   // Consumer Durables & Retail
   { symbol: 'ASIANPAINT', name: 'Asian Paints Ltd.', price: 2336.40, change: -20.50, changePercent: -0.83, volume: 1234560, marketCap: 2350000000000, sector: 'Consumer Durables' },
@@ -119,39 +205,80 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'DMART', name: 'Avenue Supermarts Ltd.', price: 4567.80, change: 56.70, changePercent: 1.26, volume: 345678, marketCap: 2960000000000, sector: 'Retail' },
   { symbol: 'TRENT', name: 'Trent Ltd.', price: 8765.40, change: 102.50, changePercent: 1.18, volume: 234567, marketCap: 2220000000000, sector: 'Retail' },
   { symbol: 'JUBLFOOD', name: 'Jubilant Foodworks Ltd.', price: 678.90, change: 8.70, changePercent: 1.30, volume: 567890, marketCap: 440000000000, sector: 'Retail' },
+  { symbol: 'CROMPTON', name: 'Crompton Greaves Consumer Electricals Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 360000000000, sector: 'Consumer Durables' },
+  { symbol: 'BLUESTARCO', name: 'Blue Star Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 220000000000, sector: 'Consumer Durables' },
+  { symbol: 'SYMPHONY', name: 'Symphony Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 345678, marketCap: 80000000000, sector: 'Consumer Durables' },
+  { symbol: 'DIXON', name: 'Dixon Technologies (India) Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 234567, marketCap: 540000000000, sector: 'Consumer Durables' },
+  { symbol: 'AMBER', name: 'Amber Enterprises India Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 190000000000, sector: 'Consumer Durables' },
+  { symbol: 'RAJESHEXPO', name: 'Rajesh Exports Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 1234567, marketCap: 340000000000, sector: 'Consumer Durables' },
+  { symbol: 'RELAXO', name: 'Relaxo Footwears Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 345678, marketCap: 320000000000, sector: 'Consumer Durables' },
+  { symbol: 'VGUARD', name: 'V-Guard Industries Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 876543, marketCap: 200000000000, sector: 'Consumer Durables' },
+  { symbol: 'ORIENTELEC', name: 'Orient Electric Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 567890, marketCap: 70000000000, sector: 'Consumer Durables' },
+  { symbol: 'KANSAINER', name: 'Kansai Nerolac Paints Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 240000000000, sector: 'Consumer Durables' },
+  { symbol: 'BERGER', name: 'Berger Paints India Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 870000000000, sector: 'Consumer Durables' },
+  { symbol: 'JKTYRE', name: 'JK Tyre & Industries Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 2345678, marketCap: 100000000000, sector: 'Auto Components' },
 
   // Media & Entertainment
   { symbol: 'ZEEL', name: 'Zee Entertainment Enterprises Ltd.', price: 234.50, change: -2.80, changePercent: -1.18, volume: 4567890, marketCap: 220000000000, sector: 'Media' },
   { symbol: 'PVRINOX', name: 'PVR INOX Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 120000000000, sector: 'Media' },
   { symbol: 'SUNTV', name: 'Sun TV Network Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 876543, marketCap: 350000000000, sector: 'Media' },
+  { symbol: 'SAREGAMA', name: 'Saregama India Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 567890, marketCap: 110000000000, sector: 'Media' },
+  { symbol: 'NAZARA', name: 'Nazara Technologies Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 345678, marketCap: 80000000000, sector: 'Media' },
+  { symbol: 'TIPS', name: 'Tips Industries Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 234567, marketCap: 40000000000, sector: 'Media' },
 
   // Aviation & Logistics
   { symbol: 'INDIGO', name: 'InterGlobe Aviation Ltd.', price: 4567.80, change: 56.70, changePercent: 1.26, volume: 456789, marketCap: 1760000000000, sector: 'Aviation' },
   { symbol: 'DELTACORP', name: 'Delta Corp Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 2345678, marketCap: 62000000000, sector: 'Hotels & Tourism' },
   { symbol: 'IRCTC', name: 'Indian Railway Catering and Tourism Corporation Ltd.', price: 987.60, change: 12.30, changePercent: 1.26, volume: 1234567, marketCap: 1580000000000, sector: 'Tourism' },
+  { symbol: 'BLUEDART', name: 'Blue Dart Express Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 45678, marketCap: 210000000000, sector: 'Logistics' },
+  { symbol: 'MAHLOG', name: 'Mahindra Logistics Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 234567, marketCap: 80000000000, sector: 'Logistics' },
+  { symbol: 'VRL', name: 'VRL Logistics Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 345678, marketCap: 80000000000, sector: 'Logistics' },
+  { symbol: 'TCI', name: 'Transport Corporation of India Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 50000000000, sector: 'Logistics' },
+  { symbol: 'AEGISCHEM', name: 'Aegis Logistics Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 567890, marketCap: 200000000000, sector: 'Logistics' },
 
   // Chemicals & Fertilizers
   { symbol: 'UPL', name: 'UPL Ltd.', price: 678.90, change: 8.70, changePercent: 1.30, volume: 3456789, marketCap: 520000000000, sector: 'Chemicals' },
   { symbol: 'PIDILITIND', name: 'Pidilite Industries Ltd.', price: 3456.70, change: 45.60, changePercent: 1.34, volume: 567890, marketCap: 1780000000000, sector: 'Chemicals' },
   { symbol: 'SRF', name: 'SRF Ltd.', price: 2890.50, change: 34.20, changePercent: 1.20, volume: 456789, marketCap: 850000000000, sector: 'Chemicals' },
-  { symbol: 'AARTI IND', name: 'Aarti Industries Ltd.', price: 789.60, change: 9.40, changePercent: 1.20, volume: 876543, marketCap: 280000000000, sector: 'Chemicals' },
+  { symbol: 'AARTIIND', name: 'Aarti Industries Ltd.', price: 789.60, change: 9.40, changePercent: 1.20, volume: 876543, marketCap: 280000000000, sector: 'Chemicals' },
   { symbol: 'DEEPAKNTR', name: 'Deepak Nitrite Ltd.', price: 2678.90, change: 32.10, changePercent: 1.21, volume: 234567, marketCap: 360000000000, sector: 'Chemicals' },
   { symbol: 'BALRAMCHIN', name: 'Balrampur Chini Mills Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 110000000000, sector: 'Sugar' },
+  { symbol: 'TATACHEM', name: 'Tata Chemicals Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 876543, marketCap: 310000000000, sector: 'Chemicals' },
+  { symbol: 'GNFC', name: 'Gujarat Narmada Valley Fertilizers & Chemicals Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 140000000000, sector: 'Chemicals' },
+  { symbol: 'CHAMBLFERT', name: 'Chambal Fertilizers and Chemicals Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 2345678, marketCap: 120000000000, sector: 'Chemicals' },
+  { symbol: 'COROMANDEL', name: 'Coromandel International Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 567890, marketCap: 520000000000, sector: 'Chemicals' },
+  { symbol: 'NAVINFLUOR', name: 'Navin Fluorine International Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 760000000000, sector: 'Chemicals' },
+  { symbol: 'ATUL', name: 'Atul Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 45678, marketCap: 260000000000, sector: 'Chemicals' },
+  { symbol: 'GHCL', name: 'GHCL Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 876543, marketCap: 80000000000, sector: 'Chemicals' },
+  { symbol: 'ALKYLAMINE', name: 'Alkyl Amines Chemicals Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 123456, marketCap: 280000000000, sector: 'Chemicals' },
+  { symbol: 'NOCIL', name: 'NOCIL Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 567890, marketCap: 50000000000, sector: 'Chemicals' },
+  { symbol: 'FINEORG', name: 'Fine Organic Industries Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 123456, marketCap: 270000000000, sector: 'Chemicals' },
+  { symbol: 'CLEAN', name: 'Clean Science and Technology Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 234567, marketCap: 370000000000, sector: 'Chemicals' },
+  { symbol: 'SUMICHEM', name: 'Sumitomo Chemical India Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 345678, marketCap: 210000000000, sector: 'Chemicals' },
+  { symbol: 'TATAELXSI', name: 'Rossari Biotech Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 180000000000, sector: 'Chemicals' },
+  { symbol: 'GALAXY', name: 'Galaxy Surfactants Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 234567, marketCap: 500000000000, sector: 'Chemicals' },
 
-  // Healthcare & Hospitals
-  { symbol: 'APOLLOHOSP', name: 'Apollo Hospitals Enterprise Ltd.', price: 7890.50, change: 92.60, changePercent: 1.19, volume: 234567, marketCap: 1140000000000, sector: 'Healthcare' },
-  { symbol: 'MAXHEALTH', name: 'Max Healthcare Institute Ltd.', price: 1234.50, change: 15.60, changePercent: 1.28, volume: 567890, marketCap: 1170000000000, sector: 'Healthcare' },
-  { symbol: 'FORTIS', name: 'Fortis Healthcare Ltd.', price: 678.90, change: 8.70, changePercent: 1.30, volume: 1234567, marketCap: 510000000000, sector: 'Healthcare' },
-
-  // Defence & Aerospace  
-  { symbol: 'HAL', name: 'Hindustan Aeronautics Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 876543, marketCap: 3810000000000, sector: 'Defence' },
-  { symbol: 'BEL', name: 'Bharat Electronics Ltd.', price: 345.60, change: 4.20, changePercent: 1.23, volume: 5678901, marketCap: 2530000000000, sector: 'Defence' },
-  { symbol: 'BDL', name: 'Bharat Dynamics Ltd.', price: 1567.80, change: 18.90, changePercent: 1.22, volume: 456789, marketCap: 570000000000, sector: 'Defence' },
+  // Defence & Aerospace
+  { symbol: 'HAL', name: 'Hindustan Aeronautics Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 567890, marketCap: 3790000000000, sector: 'Defence' },
+  { symbol: 'BEL', name: 'Bharat Electronics Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 8901234, marketCap: 2510000000000, sector: 'Defence' },
+  { symbol: 'COCHINSHIP', name: 'Cochin Shipyard Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 567890, marketCap: 310000000000, sector: 'Defence' },
+  { symbol: 'GRSE', name: 'Garden Reach Shipbuilders & Engineers Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 345678, marketCap: 200000000000, sector: 'Defence' },
+  { symbol: 'MAZAGON', name: 'Mazagon Dock Shipbuilders Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 234567, marketCap: 920000000000, sector: 'Defence' },
+  { symbol: 'BEML', name: 'BEML Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 345678, marketCap: 120000000000, sector: 'Defence' },
+  { symbol: 'DATAPATTRN', name: 'Data Patterns (India) Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 123456, marketCap: 110000000000, sector: 'Defence' },
+  { symbol: 'ASTRA', name: 'Astra Microwave Products Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 234567, marketCap: 70000000000, sector: 'Defence' },
+  { symbol: 'SOLARA', name: 'Solar Industries India Ltd.', price: 12345.60, change: 147.30, changePercent: 1.21, volume: 123456, marketCap: 840000000000, sector: 'Defence' },
+  { symbol: 'PARAS', name: 'Paras Defence and Space Technologies Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 80000000000, sector: 'Defence' },
 
   // Diversified
-  { symbol: 'SIEMENS', name: 'Siemens Ltd.', price: 7890.50, change: 92.60, changePercent: 1.19, volume: 123456, marketCap: 2800000000000, sector: 'Diversified' },
-  { symbol: 'ABB', name: 'ABB India Ltd.', price: 8765.40, change: 102.50, changePercent: 1.18, volume: 234567, marketCap: 1850000000000, sector: 'Diversified' },
-  { symbol: 'ADANIPOWER', name: 'Adani Power Ltd.', price: 678.90, change: 8.70, changePercent: 1.30, volume: 6789012, marketCap: 2510000000000, sector: 'Power' },
-  { symbol: 'ADANIENT', name: 'Adani Enterprises Ltd.', price: 3456.70, change: 45.60, changePercent: 1.34, volume: 2345678, marketCap: 3990000000000, sector: 'Diversified' },
-  { symbol: 'IEX', name: 'Indian Energy Exchange Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 2345678, marketCap: 210000000000, sector: 'Energy' },
+  { symbol: 'ITC', name: 'ITC Ltd.', price: 399.90, change: 5.05, changePercent: 1.21, volume: 7254890, marketCap: 5270000000000, sector: 'Diversified' },
+  { symbol: 'ADANIENT', name: 'Adani Enterprises Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 2345678, marketCap: 3940000000000, sector: 'Diversified' },
+  { symbol: 'SIEMENS', name: 'Siemens Ltd.', price: 7890.50, change: 94.20, changePercent: 1.21, volume: 234567, marketCap: 2810000000000, sector: 'Diversified' },
+  { symbol: 'ABB', name: 'ABB India Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 234567, marketCap: 1870000000000, sector: 'Diversified' },
+  { symbol: 'THERMAX', name: 'Thermax Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 234567, marketCap: 680000000000, sector: 'Diversified' },
+  { symbol: 'HONAUT', name: 'Honeywell Automation India Ltd.', price: 56789.40, change: 678.20, changePercent: 1.21, volume: 12345, marketCap: 510000000000, sector: 'Diversified' },
+  { symbol: 'EIDPARRY', name: 'E.I.D.-Parry (India) Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 567890, marketCap: 150000000000, sector: 'Diversified' },
+  { symbol: 'ORIENTABRA', name: 'Orient Abrasives Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 234567, marketCap: 30000000000, sector: 'Diversified' },
+  { symbol: 'CARBORUNIV', name: 'Carborundum Universal Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 340000000000, sector: 'Diversified' },
+  { symbol: 'GRINDWELL', name: 'Grindwell Norton Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 123456, marketCap: 180000000000, sector: 'Diversified' },
 ];

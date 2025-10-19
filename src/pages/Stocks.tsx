@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShoppingCart, Search, Filter } from 'lucide-react';
+import { VirtualizedStockList } from '@/components/stocks/VirtualizedStockList';
 
 const Stocks = () => {
   const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
@@ -86,23 +87,12 @@ const Stocks = () => {
             </Select>
           </div>
 
-          <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto">
-            {filteredStocks.length > 0 ? (
-              filteredStocks.map((stock) => (
-              <StockCard 
-                key={stock.symbol} 
-                stock={stock} 
-                priceHistory={priceHistory.get(stock.symbol) || []}
-                onClick={() => setSelectedStock(stock)}
-                className={selectedStock.symbol === stock.symbol ? "ring-2 ring-primary" : ""}
-              />
-              ))
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No stocks found matching your criteria
-              </div>
-            )}
-          </div>
+          <VirtualizedStockList
+            stocks={filteredStocks}
+            priceHistory={priceHistory}
+            selectedStock={selectedStock}
+            onStockClick={setSelectedStock}
+          />
         </div>
         
         <div className="lg:col-span-2 space-y-4">
