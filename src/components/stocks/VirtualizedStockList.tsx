@@ -21,7 +21,7 @@ export function VirtualizedStockList({
   const virtualizer = useVirtualizer({
     count: stocks.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 180,
+    estimateSize: () => 220,
     overscan: 5,
   });
 
