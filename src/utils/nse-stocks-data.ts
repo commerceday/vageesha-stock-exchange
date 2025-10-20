@@ -413,4 +413,59 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'WESTLIFE', name: 'Westlife Foodworld Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 180000000000, sector: 'Retail' },
   { symbol: 'DEVYANI', name: 'Devyani International Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 1234567, marketCap: 240000000000, sector: 'Retail' },
   { symbol: 'SAPPHIRE', name: 'Sapphire Foods India Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 200000000000, sector: 'Retail' },
+
+  // Additional IT & Software
+  { symbol: 'KPITTECH', name: 'KPIT Technologies Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 567890, marketCap: 490000000000, sector: 'IT Services' },
+  { symbol: 'LTTS', name: 'L&T Technology Services Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 234567, marketCap: 600000000000, sector: 'IT Services' },
+  { symbol: 'INTELLECT', name: 'Intellect Design Arena Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 456789, marketCap: 170000000000, sector: 'IT Services' },
+  { symbol: 'MASTEK', name: 'Mastek Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 234567, marketCap: 110000000000, sector: 'IT Services' },
+  { symbol: 'ROUTE', name: 'Route Mobile Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 160000000000, sector: 'IT Services' },
+
+  // Additional Pharmaceuticals & Healthcare
+  { symbol: 'STAR', name: 'Strides Pharma Science Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 110000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'NATCOPHARM', name: 'Natco Pharma Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 567890, marketCap: 300000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'CAPLIPOINT', name: 'Caplin Point Laboratories Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 234567, marketCap: 160000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'LAURUSLABS', name: 'Laurus Labs Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 1234567, marketCap: 620000000000, sector: 'Pharmaceuticals' },
+  { symbol: 'SEQUENT', name: 'Sequent Scientific Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 567890, marketCap: 110000000000, sector: 'Pharmaceuticals' },
+
+  // Additional Banking & Finance
+  { symbol: 'BAJAJHLDNG', name: 'Bajaj Holdings & Investment Ltd.', price: 11234.50, change: 134.00, changePercent: 1.21, volume: 123456, marketCap: 1970000000000, sector: 'Financial Services' },
+  { symbol: 'LICHSGFIN', name: 'LIC Housing Finance Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 480000000000, sector: 'Financial Services' },
+  { symbol: 'RECLTD', name: 'REC Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 4567890, marketCap: 1440000000000, sector: 'Financial Services' },
+  { symbol: 'PFC', name: 'Power Finance Corporation Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 5678901, marketCap: 1790000000000, sector: 'Financial Services' },
+  { symbol: 'IIFLWAM', name: 'IIFL Wealth Management Ltd.', price: 2345.60, change: 28.00, changePercent: 1.21, volume: 234567, marketCap: 170000000000, sector: 'Financial Services' },
+
+  // Additional Automobiles & Components
+  { symbol: 'SWARAJENG', name: 'Swaraj Engines Ltd.', price: 4567.80, change: 54.60, changePercent: 1.21, volume: 123456, marketCap: 100000000000, sector: 'Auto Components' },
+  { symbol: 'SUPRAJIT', name: 'Suprajit Engineering Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 234567, marketCap: 90000000000, sector: 'Auto Components' },
+  { symbol: 'GABRIEL', name: 'Gabriel India Ltd.', price: 456.70, change: 5.40, changePercent: 1.20, volume: 345678, marketCap: 70000000000, sector: 'Auto Components' },
+  { symbol: 'SUNDRMFAST', name: 'Sundram Fasteners Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 280000000000, sector: 'Auto Components' },
+  { symbol: 'FORCEMOT', name: 'Force Motors Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 123456, marketCap: 130000000000, sector: 'Automobiles' },
+
+  // Additional Metals & Mining
+  { symbol: 'MOIL', name: 'MOIL Ltd.', price: 345.60, change: 4.10, changePercent: 1.20, volume: 1234567, marketCap: 230000000000, sector: 'Metals' },
+  { symbol: 'NMDC', name: 'NMDC Ltd.', price: 234.50, change: 2.80, changePercent: 1.21, volume: 8901234, marketCap: 690000000000, sector: 'Metals' },
+  { symbol: 'SAIL', name: 'Steel Authority of India Ltd.', price: 145.30, change: 1.80, changePercent: 1.25, volume: 12345678, marketCap: 600000000000, sector: 'Metals' },
+  { symbol: 'RATNAMANI', name: 'Ratnamani Metals & Tubes Ltd.', price: 3456.70, change: 41.20, changePercent: 1.20, volume: 123456, marketCap: 130000000000, sector: 'Metals' },
+  { symbol: 'ASTRAL', name: 'Astral Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 234567, marketCap: 780000000000, sector: 'Diversified' },
+
+  // Additional Chemicals & Fertilizers
+  { symbol: 'DEEPAKNTR', name: 'Deepak Nitrite Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 567890, marketCap: 390000000000, sector: 'Chemicals' },
+  { symbol: 'NAVINFLUOR', name: 'Navin Fluorine International Ltd.', price: 5678.90, change: 67.80, changePercent: 1.21, volume: 234567, marketCap: 530000000000, sector: 'Chemicals' },
+  { symbol: 'AARTI', name: 'Aarti Industries Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 1234567, marketCap: 330000000000, sector: 'Chemicals' },
+  { symbol: 'GNFC', name: 'Gujarat Narmada Valley Fertilizers & Chemicals Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 567890, marketCap: 130000000000, sector: 'Chemicals' },
+  { symbol: 'CHAMBLFERT', name: 'Chambal Fertilizers and Chemicals Ltd.', price: 567.80, change: 6.70, changePercent: 1.19, volume: 2345678, marketCap: 240000000000, sector: 'Chemicals' },
+
+  // Additional Real Estate
+  { symbol: 'DLF', name: 'DLF Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 4567890, marketCap: 3060000000000, sector: 'Real Estate' },
+  { symbol: 'PHOENIXLTD', name: 'The Phoenix Mills Ltd.', price: 2890.50, change: 34.50, changePercent: 1.21, volume: 567890, marketCap: 470000000000, sector: 'Real Estate' },
+  { symbol: 'BRIGADE', name: 'Brigade Enterprises Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 260000000000, sector: 'Real Estate' },
+  { symbol: 'MAHLIFE', name: 'Mahindra Lifespace Developers Ltd.', price: 890.50, change: 10.60, changePercent: 1.20, volume: 345678, marketCap: 110000000000, sector: 'Real Estate' },
+  { symbol: 'SUNTECK', name: 'Sunteck Realty Ltd.', price: 678.90, change: 8.10, changePercent: 1.21, volume: 567890, marketCap: 170000000000, sector: 'Real Estate' },
+
+  // Additional Consumer & Retail
+  { symbol: 'TRENT', name: 'Trent Ltd.', price: 8765.40, change: 104.50, changePercent: 1.21, volume: 234567, marketCap: 2730000000000, sector: 'Retail' },
+  { symbol: 'SHOPERSTOP', name: 'Shoppers Stop Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 140000000000, sector: 'Retail' },
+  { symbol: 'RELAXO', name: 'Relaxo Footwears Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 460000000000, sector: 'Consumer Durables' },
+  { symbol: 'CENTURYPLY', name: 'Century Plyboards (India) Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 150000000000, sector: 'Consumer Durables' },
 ];
