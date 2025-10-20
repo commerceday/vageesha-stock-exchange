@@ -19,6 +19,45 @@ export function MarketOverview({ indices, className }: MarketOverviewProps) {
     return acc;
   }, {});
   
+  const renderMarketContent = () => (
+    <>
+      {Object.entries(groupedByRegion).map(([region, indices]) => (
+        <div key={region} className="p-4">
+          <h3 className="text-sm font-medium mb-2">{region}</h3>
+          <div className="space-y-2">
+            {indices.map((index) => (
+              <div 
+                key={index.symbol}
+                className="flex items-center justify-between py-1 border-b border-border/50 last:border-0"
+              >
+                <div className="flex flex-col">
+                  <span className="font-medium">{index.name}</span>
+                  <span className="text-xs text-muted-foreground">{index.symbol}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="font-medium">{index.value.toLocaleString(undefined, { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                  })}</span>
+                  <span className={cn(
+                    "flex items-center text-xs",
+                    index.change >= 0 ? "text-success" : "text-danger"
+                  )}>
+                    {index.change >= 0 ? 
+                      <ArrowUpIcon className="h-3 w-3 mr-1" /> : 
+                      <ArrowDownIcon className="h-3 w-3 mr-1" />
+                    }
+                    {formatPercentage(index.changePercent)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+  
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader className="pb-3">
@@ -28,41 +67,13 @@ export function MarketOverview({ indices, className }: MarketOverviewProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="grid gap-0.5">
-          {Object.entries(groupedByRegion).map(([region, indices]) => (
-            <div key={region} className="p-4">
-              <h3 className="text-sm font-medium mb-2">{region}</h3>
-              <div className="space-y-2">
-                {indices.map((index) => (
-                  <div 
-                    key={index.symbol}
-                    className="flex items-center justify-between py-1 border-b border-border/50 last:border-0"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{index.name}</span>
-                      <span className="text-xs text-muted-foreground">{index.symbol}</span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="font-medium">{index.value.toLocaleString(undefined, { 
-                        minimumFractionDigits: 2, 
-                        maximumFractionDigits: 2 
-                      })}</span>
-                      <span className={cn(
-                        "flex items-center text-xs",
-                        index.change >= 0 ? "text-success" : "text-danger"
-                      )}>
-                        {index.change >= 0 ? 
-                          <ArrowUpIcon className="h-3 w-3 mr-1" /> : 
-                          <ArrowDownIcon className="h-3 w-3 mr-1" />
-                        }
-                        {formatPercentage(index.changePercent)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        <div className="relative h-[400px] overflow-hidden">
+          <div className="absolute inset-0 animate-scroll-markets hover:[animation-play-state:paused]">
+            <div className="grid gap-0.5">
+              {renderMarketContent()}
+              {renderMarketContent()}
             </div>
-          ))}
+          </div>
         </div>
       </CardContent>
     </Card>

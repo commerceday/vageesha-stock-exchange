@@ -165,4 +165,18 @@
   .loading-pulse {
     @apply animate-pulse-gentle;
   }
+
+  /* Markets scrolling animation */
+  @keyframes scroll-markets {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+
+  .animate-scroll-markets {
+    animation: scroll-markets 20s linear infinite;
+  }
 }
