@@ -116,6 +116,33 @@ export const mockIndices: MarketIndex[] = [
     changePercent: -0.12,
     region: 'India',
     lastUpdated: new Date()
+  },
+  {
+    symbol: 'SPX',
+    name: 'S&P 500',
+    value: 5618.26,
+    change: 28.47,
+    changePercent: 0.51,
+    region: 'United States',
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'FTSE',
+    name: 'FTSE 100',
+    value: 8292.66,
+    change: -15.33,
+    changePercent: -0.18,
+    region: 'United Kingdom',
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'N225',
+    name: 'Nikkei 225',
+    value: 38920.26,
+    change: 145.89,
+    changePercent: 0.38,
+    region: 'Japan',
+    lastUpdated: new Date()
   }
 ];
 

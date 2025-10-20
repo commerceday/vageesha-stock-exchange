@@ -103,14 +103,17 @@ serve(async (req) => {
 });
 
 function mapToYahooSymbol(symbol: string): string {
-  // Map Indian index symbols to Yahoo Finance symbols
+  // Map index symbols to Yahoo Finance symbols
   const symbolMap: Record<string, string> = {
     'NIFTY50': '^NSEI',
     'SENSEX': '^BSESN',
     'NIFTYBANK': '^NSEBANK',
     'NIFTYIT': '^CNXIT',
     'NIFTYNEXT50': 'NIFTYJR.NS',
-    'NIFTYMIDCAP': '^NSEMDCP50'
+    'NIFTYMIDCAP': '^NSEMDCP50',
+    'SPX': '^GSPC',
+    'FTSE': '^FTSE',
+    'N225': '^N225'
   };
   
   return symbolMap[symbol] || symbol;
