@@ -49,7 +49,7 @@ const Analysis = () => {
       .slice(0, 40); // Show top 40 stocks for better visibility
   });
 
-  // Auto-refresh heatmap every 10 seconds
+  // Auto-refresh heatmap every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setStockGrowthData(
@@ -63,27 +63,60 @@ const Analysis = () => {
           .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
           .slice(0, 40)
       );
-    }, 10000); // Update every 10 seconds
+    }, 5000); // Update every 5 seconds
 
     return () => clearInterval(interval);
   }, []);
   
-  // Format cryptocurrency data for analysis
-  const cryptoData = mockCryptos
-    .map(crypto => ({
-      name: crypto.name,
-      symbol: crypto.symbol,
-      value: crypto.marketCap,
-      price: crypto.price,
-      change: crypto.changePercent,
-      marketCap: crypto.marketCap,
-      volume: crypto.volume
-    }))
-    .sort((a, b) => b.value - a.value);
+  // State for cryptocurrency data with auto-refresh
+  const [cryptoData, setCryptoData] = useState(() => 
+    mockCryptos
+      .map(crypto => ({
+        name: crypto.name,
+        symbol: crypto.symbol,
+        value: crypto.marketCap,
+        price: crypto.price,
+        change: crypto.changePercent,
+        marketCap: crypto.marketCap,
+        volume: crypto.volume
+      }))
+      .sort((a, b) => b.value - a.value)
+  );
   
   // Generate price history for Bitcoin and Ethereum
   const [btcHistory, setBtcHistory] = useState(generatePriceHistory(30, 62000, 5));
   const [ethHistory, setEthHistory] = useState(generatePriceHistory(30, 3200, 6));
+  
+  // Auto-refresh cryptocurrency data every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Update crypto data with slight price fluctuations
+      setCryptoData(prev => 
+        prev.map(crypto => ({
+          ...crypto,
+          price: crypto.price * (1 + (Math.random() * 0.02 - 0.01)),
+          change: crypto.change + (Math.random() * 0.4 - 0.2),
+          volume: crypto.volume * (1 + (Math.random() * 0.05 - 0.025))
+        }))
+      );
+
+      // Update Bitcoin history with new data point
+      setBtcHistory(prev => {
+        const lastPrice = prev[prev.length - 1];
+        const newPrice = lastPrice * (1 + (Math.random() * 0.015 - 0.0075));
+        return [...prev.slice(1), newPrice]; // Keep last 30 points
+      });
+
+      // Update Ethereum history with new data point
+      setEthHistory(prev => {
+        const lastPrice = prev[prev.length - 1];
+        const newPrice = lastPrice * (1 + (Math.random() * 0.02 - 0.01));
+        return [...prev.slice(1), newPrice];
+      });
+    }, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
   
   // Format historical data for charts
   const btcHistoryData = btcHistory.map((price, index) => ({
@@ -186,7 +219,7 @@ const Analysis = () => {
             <h2 className="text-xl font-semibold">NSE Stock Performance Heatmap</h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Live updates every 10s</span>
+              <span>Live updates every 5s</span>
             </div>
           </div>
           <div className="h-80 animate-fade-in">
@@ -219,10 +252,16 @@ const Analysis = () => {
         
         {/* Cryptocurrency Analysis Section */}
         <div className="lg:col-span-2 mt-4">
-          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-            <Bitcoin className="text-orange-500" />
-            Cryptocurrency Analysis
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Bitcoin className="text-orange-500" />
+              Cryptocurrency Analysis
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Live updates every 5s</span>
+            </div>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {cryptoData.slice(0, 4).map((crypto) => (
