@@ -23,33 +23,33 @@ export function MarketOverview({ indices, className, horizontal = false }: Marke
   const renderMarketContent = () => (
     <>
       {Object.entries(groupedByRegion).map(([region, indices]) => (
-        <div key={region} className={horizontal ? "px-4 flex-shrink-0" : "p-4"}>
-          <h3 className="text-sm font-medium mb-2">{region}</h3>
-          <div className={horizontal ? "flex gap-4" : "space-y-2"}>
+        <div key={region} className={horizontal ? "px-3 flex-shrink-0" : "p-4"}>
+          <h3 className="text-xs font-medium mb-1.5">{region}</h3>
+          <div className={horizontal ? "flex gap-2" : "space-y-2"}>
             {indices.map((index) => (
               <div 
                 key={index.symbol}
                 className={cn(
                   "flex items-center justify-between",
-                  horizontal ? "flex-col gap-1 min-w-[140px] p-2 rounded-lg bg-card border" : "py-1 border-b border-border/50 last:border-0"
+                  horizontal ? "flex-col gap-0.5 min-w-[110px] px-2 py-1 rounded-md bg-card border" : "py-1 border-b border-border/50 last:border-0"
                 )}
               >
                 <div className={cn("flex flex-col", horizontal ? "items-center" : "")}>
-                  <span className="font-medium text-sm">{index.name}</span>
-                  <span className="text-xs text-muted-foreground">{index.symbol}</span>
+                  <span className="font-medium text-xs">{index.name}</span>
+                  <span className="text-[10px] text-muted-foreground">{index.symbol}</span>
                 </div>
                 <div className={cn("flex flex-col", horizontal ? "items-center" : "items-end")}>
-                  <span className="font-medium text-sm">{index.value.toLocaleString(undefined, { 
+                  <span className="font-medium text-xs">{index.value.toLocaleString(undefined, { 
                     minimumFractionDigits: 2, 
                     maximumFractionDigits: 2 
                   })}</span>
                   <span className={cn(
-                    "flex items-center text-xs",
+                    "flex items-center text-[10px]",
                     index.change >= 0 ? "text-success" : "text-danger"
                   )}>
                     {index.change >= 0 ? 
-                      <ArrowUpIcon className="h-3 w-3 mr-1" /> : 
-                      <ArrowDownIcon className="h-3 w-3 mr-1" />
+                      <ArrowUpIcon className="h-2.5 w-2.5 mr-0.5" /> : 
+                      <ArrowDownIcon className="h-2.5 w-2.5 mr-0.5" />
                     }
                     {formatPercentage(index.changePercent)}
                   </span>
@@ -65,13 +65,13 @@ export function MarketOverview({ indices, className, horizontal = false }: Marke
   if (horizontal) {
     return (
       <Card className={cn("overflow-hidden", className)}>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center">
-            <GlobeIcon className="h-5 w-5 mr-2" />
+        <CardHeader className="pb-2 pt-3">
+          <CardTitle className="flex items-center text-sm">
+            <GlobeIcon className="h-4 w-4 mr-1.5" />
             Global Markets
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 pb-2">
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll-horizontal hover:[animation-play-state:paused]">
               {renderMarketContent()}
