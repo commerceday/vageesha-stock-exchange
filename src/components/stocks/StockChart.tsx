@@ -5,6 +5,7 @@ import { generateIntradayData, generateDailyCandlestickData } from '@/utils/stoc
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const timeRanges = [
   { label: '1D', type: 'intraday', intervalMinutes: 5, periods: 75, isIntraday: true }, // 5-min candles for 6.25 hours
@@ -35,6 +36,7 @@ export function StockChart({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const candlestickSeriesRef = useRef<any>(null);
+  const [serverData, setServerData] = useState<any[]>([]);
   
   const chartData = useMemo(() => {
     if (selectedRange.isIntraday && 'intervalMinutes' in selectedRange && 'periods' in selectedRange) {
@@ -111,12 +113,73 @@ export function StockChart({
     };
   }, []);
 
+  // Fallback: use simulated data if no server data yet
   useEffect(() => {
-    if (candlestickSeriesRef.current) {
+    if (!serverData.length && candlestickSeriesRef.current) {
       candlestickSeriesRef.current.setData(chartData);
       chartRef.current?.timeScale().fitContent();
     }
-  }, [chartData]);
+  }, [chartData, serverData.length]);
+
+  // Apply server data when available
+  useEffect(() => {
+    if (serverData.length && candlestickSeriesRef.current) {
+      candlestickSeriesRef.current.setData(serverData);
+      chartRef.current?.timeScale().fitContent();
+    }
+  }, [serverData]);
+
+  // Fetch real OHLC data for the selected symbol and range
+  useEffect(() => {
+    let isCancelled = false;
+
+    const mapToYahoo = () => {
+      switch (selectedRange.label) {
+        case '1D':
+          return { range: '1d', interval: '5m' };
+        case '5D':
+          return { range: '5d', interval: '15m' };
+        case '1M':
+          return { range: '1mo', interval: '1d' };
+        case '3M':
+          return { range: '3mo', interval: '1d' };
+        case '6M':
+          return { range: '6mo', interval: '1d' };
+        case '1Y':
+          return { range: '1y', interval: '1d' };
+        case 'All':
+          return { range: '5y', interval: '1d' };
+        default:
+          return { range: '1mo', interval: '1d' };
+      }
+    };
+
+    const { range, interval } = mapToYahoo();
+
+    setServerData([]); // clear to show fallback while loading
+
+    supabase.functions
+      .invoke('fetch-stock-history', {
+        body: { symbol, range, interval },
+      })
+      .then((res) => {
+        if (isCancelled) return;
+        const candles = (res.data as any)?.candles ?? [];
+        if (Array.isArray(candles) && candles.length) {
+          setServerData(candles);
+        } else {
+          setServerData([]);
+        }
+      })
+      .catch((err) => {
+        console.error('fetch-stock-history error', err);
+        if (!isCancelled) setServerData([]);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [symbol, selectedRange]);
   
   return (
     <Card className={cn("overflow-hidden h-full", className)}>
