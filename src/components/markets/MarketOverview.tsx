@@ -8,10 +8,9 @@ import { MarketIndex, formatPercentage } from '@/utils/stocksApi';
 interface MarketOverviewProps {
   indices: MarketIndex[];
   className?: string;
-  horizontal?: boolean;
 }
 
-export function MarketOverview({ indices, className, horizontal = false }: MarketOverviewProps) {
+export function MarketOverview({ indices, className }: MarketOverviewProps) {
   const groupedByRegion = indices.reduce<Record<string, MarketIndex[]>>((acc, index) => {
     if (!acc[index.region]) {
       acc[index.region] = [];
@@ -58,52 +57,6 @@ export function MarketOverview({ indices, className, horizontal = false }: Marke
       ))}
     </>
   );
-  
-  const renderHorizontalItem = (index: MarketIndex) => (
-    <div 
-      key={index.symbol}
-      className="flex items-center gap-3 px-6 py-2 border-r border-border/50 last:border-0 whitespace-nowrap"
-    >
-      <span className="font-medium text-sm">{index.symbol}</span>
-      <span className="font-semibold">{index.value.toLocaleString(undefined, { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
-      })}</span>
-      <span className={cn(
-        "flex items-center text-sm font-medium",
-        index.change >= 0 ? "text-success" : "text-danger"
-      )}>
-        {index.change >= 0 ? 
-          <ArrowUpIcon className="h-3 w-3 mr-1" /> : 
-          <ArrowDownIcon className="h-3 w-3 mr-1" />
-        }
-        {formatPercentage(index.changePercent)}
-      </span>
-    </div>
-  );
-
-  if (horizontal) {
-    return (
-      <Card className={cn("overflow-hidden", className)}>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center">
-            <GlobeIcon className="h-5 w-5 mr-2" />
-            Global Markets
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="relative overflow-hidden">
-            <div className="animate-scroll-horizontal hover:[animation-play-state:paused]">
-              <div className="flex">
-                {indices.map(renderHorizontalItem)}
-                {indices.map(renderHorizontalItem)}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
   
   return (
     <Card className={cn("overflow-hidden", className)}>

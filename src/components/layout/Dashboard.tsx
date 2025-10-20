@@ -81,13 +81,8 @@ export function Dashboard() {
               />
             </div>
             
-            {/* Global Markets Horizontal Ticker */}
-            <div className="mb-6 animate-slide-up" style={{ '--delay': '150ms' } as React.CSSProperties}>
-              <MarketOverview indices={indices} horizontal />
-            </div>
-            
             {/* Main Content Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Left column - Stock list */}
               <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
                 <h2 className="text-xl font-semibold">Watchlist</h2>
@@ -104,7 +99,7 @@ export function Dashboard() {
                 </div>
               </div>
               
-              {/* Right column - Chart */}
+              {/* Middle column - Chart */}
               <div className="lg:col-span-2 space-y-4 animate-slide-up" style={{ '--delay': '300ms' } as React.CSSProperties}>
                 <StockChart 
                   symbol={selectedStock.symbol} 
@@ -112,6 +107,11 @@ export function Dashboard() {
                   currentPrice={selectedStock.price}
                   volatility={2.5}
                 />
+              </div>
+              
+              {/* Right column - Markets */}
+              <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '400ms' } as React.CSSProperties}>
+                <MarketOverview indices={indices} />
               </div>
             </div>
           </div>
