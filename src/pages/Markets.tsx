@@ -5,7 +5,7 @@ import { MarketOverview } from '@/components/markets/MarketOverview';
 import { useMarketIndices, mockIndices } from '@/utils/stocksApi';
 
 const Markets = () => {
-  const indices = useMarketIndices(mockIndices, 5000);
+  const indices = useMarketIndices(mockIndices, 5000); // Updates every 5 seconds with real data
   
   return (
     <PageLayout title="Markets Overview">

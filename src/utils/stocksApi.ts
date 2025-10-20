@@ -645,31 +645,103 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
   return { stocks, priceHistory, isMarketOpen };
 }
 
-export function useMarketIndices(initialData: MarketIndex[], updateInterval = 8000) {
+async function fetchRealTimeMarketIndices(indices: MarketIndex[]): Promise<{ data: any[], marketOpen: boolean }> {
+  try {
+    const symbols = indices.map(index => ({
+      symbol: index.symbol
+    }));
+    
+    const { data, error } = await supabase.functions.invoke('fetch-market-indices', {
+      body: { symbols }
+    });
+    
+    if (error) {
+      console.error('Error fetching market indices:', error);
+      return { data: [], marketOpen: false };
+    }
+    
+    return {
+      data: data.data || [],
+      marketOpen: data.marketOpen || false
+    };
+  } catch (error) {
+    console.error('Failed to fetch real-time indices:', error);
+    return { data: [], marketOpen: false };
+  }
+}
+
+export function useMarketIndices(initialData: MarketIndex[], updateInterval = 5000) {
   const [indices, setIndices] = useState<MarketIndex[]>(initialData);
+  const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
+  const [lastRealValues, setLastRealValues] = useState<Map<string, number>>(() => {
+    const valuesMap = new Map<string, number>();
+    initialData.forEach(index => {
+      valuesMap.set(index.symbol, index.value);
+    });
+    return valuesMap;
+  });
   
   useEffect(() => {
-    const intervalId = setInterval(() => {
+    const updateIndices = async () => {
+      const { data: realTimeData, marketOpen } = await fetchRealTimeMarketIndices(indices);
+      setIsMarketOpen(marketOpen);
+      
       setIndices(prevIndices => 
         prevIndices.map(index => {
-          const changeAmount = (Math.random() - 0.5) * (index.value * 0.0015);
-          const newValue = Math.max(index.value + changeAmount, 0.01);
-          const newChange = index.change + changeAmount;
-          const newChangePercent = (newChange / (newValue - newChange)) * 100;
+          const realtimeIndex = realTimeData.find(d => d.symbol === index.symbol);
           
-          return {
-            ...index,
-            value: parseFloat(newValue.toFixed(2)),
-            change: parseFloat(newChange.toFixed(2)),
-            changePercent: parseFloat(newChangePercent.toFixed(2)),
-            lastUpdated: new Date()
-          };
+          const baseIndex = mockIndices.find(i => i.symbol === index.symbol);
+          const baseValue = baseIndex?.value || index.value;
+          
+          if (marketOpen && realtimeIndex && !realtimeIndex.error && !realtimeIndex.marketClosed) {
+            // Use real-time data from API when market is open
+            const newValue = realtimeIndex.value || baseValue;
+            const newStock = {
+              ...index,
+              value: newValue,
+              change: realtimeIndex.change || index.change,
+              changePercent: realtimeIndex.changePercent || index.changePercent,
+              lastUpdated: new Date()
+            };
+            
+            // Store this as the last real exchange value
+            setLastRealValues(prev => {
+              const newMap = new Map(prev);
+              newMap.set(index.symbol, newValue);
+              return newMap;
+            });
+            
+            return newStock;
+          } else {
+            // Market closed - generate values within ±0.05% of last real value
+            const lastRealValue = lastRealValues.get(index.symbol) || baseValue || index.value;
+            
+            const randomChangePercent = (Math.random() - 0.5) * 0.1; // Random value between -0.05 and +0.05
+            const valueChange = lastRealValue * (randomChangePercent / 100);
+            let newValue = lastRealValue + valueChange;
+            
+            newValue = Math.max(newValue, 0.01);
+            
+            const finalChange = newValue - lastRealValue;
+            const finalChangePercent = (finalChange / lastRealValue) * 100;
+            
+            return {
+              ...index,
+              value: parseFloat(newValue.toFixed(2)),
+              change: parseFloat(finalChange.toFixed(2)),
+              changePercent: parseFloat(finalChangePercent.toFixed(2)),
+              lastUpdated: new Date()
+            };
+          }
         })
       );
-    }, updateInterval);
+    };
+    
+    updateIndices();
+    const intervalId = setInterval(updateIndices, updateInterval);
     
     return () => clearInterval(intervalId);
-  }, [initialData, updateInterval]);
+  }, [updateInterval]);
   
   return indices;
 }
