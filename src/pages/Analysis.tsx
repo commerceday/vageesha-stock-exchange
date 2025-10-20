@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, Treemap, LineChart, Line } from 'recharts';
 import { mockStocks, mockCryptos, generatePriceHistory, formatNumber } from '@/utils/stocksApi';
+import { nseStocksData } from '@/utils/nse-stocks-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bitcoin, TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -34,14 +35,38 @@ const Analysis = () => {
     { name: 'Small Cap', value: 15 },
   ];
   
-  // Format stock data for the heatmap (treemap)
-  const stockGrowthData = mockStocks
-    .map(stock => ({
-      name: stock.symbol,
-      value: Math.abs(stock.changePercent),
-      changePercent: stock.changePercent
-    }))
-    .sort((a, b) => b.changePercent - a.changePercent);
+  // State for heatmap data with auto-refresh
+  const [stockGrowthData, setStockGrowthData] = useState(() => {
+    // Add slight randomness to simulate live price changes
+    return nseStocksData
+      .map(stock => ({
+        name: stock.symbol,
+        value: Math.abs(stock.changePercent),
+        changePercent: stock.changePercent + (Math.random() * 0.5 - 0.25),
+        sector: stock.sector
+      }))
+      .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+      .slice(0, 40); // Show top 40 stocks for better visibility
+  });
+
+  // Auto-refresh heatmap every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStockGrowthData(
+        nseStocksData
+          .map(stock => ({
+            name: stock.symbol,
+            value: Math.abs(stock.changePercent),
+            changePercent: stock.changePercent + (Math.random() * 0.5 - 0.25),
+            sector: stock.sector
+          }))
+          .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+          .slice(0, 40)
+      );
+    }, 10000); // Update every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
   
   // Format cryptocurrency data for analysis
   const cryptoData = mockCryptos
@@ -157,8 +182,14 @@ const Analysis = () => {
         </div>
         
         <div className="lg:col-span-2 bg-card rounded-lg p-6 shadow">
-          <h2 className="text-xl font-semibold mb-4">Stock Performance Heatmap</h2>
-          <div className="h-80">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">NSE Stock Performance Heatmap</h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Live updates every 10s</span>
+            </div>
+          </div>
+          <div className="h-80 animate-fade-in">
             <ResponsiveContainer width="100%" height="100%">
               <Treemap
                 data={stockGrowthData}
@@ -167,11 +198,22 @@ const Analysis = () => {
                 stroke="#fff"
                 fill="#8884d8"
                 content={<CustomizedContent />}
+                animationDuration={800}
               />
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 text-sm text-muted-foreground">
-            <p>Showing performance by percentage change. Green indicates positive growth, red indicates decline.</p>
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+            <p>Showing top 40 NSE stocks by percentage change. Green indicates positive growth, red indicates decline.</p>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-green-500 rounded"></div>
+                <span>Gainers</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 bg-red-500 rounded"></div>
+                <span>Losers</span>
+              </div>
+            </div>
           </div>
         </div>
         
