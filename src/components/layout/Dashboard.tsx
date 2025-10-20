@@ -45,6 +45,8 @@ export function Dashboard() {
         
         <main className="flex-1 transition-all duration-300">
           <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
+            <h1 className="text-2xl font-bold mb-6">Market Dashboard</h1>
+            
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
               <StatsCard 
@@ -79,15 +81,8 @@ export function Dashboard() {
               />
             </div>
             
-            {/* Global Markets */}
-            <div className="mb-6 animate-slide-up" style={{ '--delay': '150ms' } as React.CSSProperties}>
-              <MarketOverview indices={indices} horizontal />
-            </div>
-
-            <h1 className="text-2xl font-bold mb-6">Market Dashboard</h1>
-            
             {/* Main Content Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Left column - Stock list */}
               <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
                 <h2 className="text-xl font-semibold">Watchlist</h2>
@@ -112,6 +107,11 @@ export function Dashboard() {
                   currentPrice={selectedStock.price}
                   volatility={2.5}
                 />
+              </div>
+              
+              {/* Right column - Markets */}
+              <div className="lg:col-span-1 space-y-4 animate-slide-up" style={{ '--delay': '400ms' } as React.CSSProperties}>
+                <MarketOverview indices={indices} />
               </div>
             </div>
           </div>
