@@ -179,4 +179,17 @@
   .animate-scroll-markets {
     animation: scroll-markets 20s linear infinite;
   }
+
+  @keyframes scroll-horizontal {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-scroll-horizontal {
+    animation: scroll-horizontal 30s linear infinite;
+  }
 }
