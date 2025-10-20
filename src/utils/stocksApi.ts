@@ -339,40 +339,40 @@ export interface CandlestickData {
 export function generateIntradayData(
   intervalMinutes: number,
   periods: number,
-  startPrice: number,
+  currentPrice: number,
   volatility: number = 2
 ): CandlestickData[] {
   const data: CandlestickData[] = [];
   const now = new Date();
   
-  // Set to market open time (9:15 AM IST) for intraday
-  const marketOpenHour = 9;
-  const marketOpenMinute = 15;
+  // Generate prices working BACKWARDS from current price
+  // so the most recent candle matches the current price
+  const prices: number[] = [currentPrice];
   
-  let currentPrice = startPrice;
+  for (let i = 1; i < periods; i++) {
+    const change = (Math.random() - 0.5) * volatility;
+    const prevPrice = Math.max(prices[prices.length - 1] / (1 + change / 100), 0.1);
+    prices.push(prevPrice);
+  }
+  
+  // Reverse so oldest is first
+  prices.reverse();
   
   for (let i = 0; i < periods; i++) {
-    // Calculate timestamp going backward from current time
     const timestamp = new Date(now.getTime() - (periods - i - 1) * intervalMinutes * 60 * 1000);
     
-    // Generate OHLC data
-    const open = currentPrice;
+    const close = prices[i];
+    const open = i > 0 ? prices[i - 1] : close * (1 + (Math.random() - 0.5) * (volatility / 100));
     
-    // Generate random price movements within the candle
+    // Generate intracandle movements
     const change1 = (Math.random() - 0.5) * (volatility / 2);
     const change2 = (Math.random() - 0.5) * (volatility / 2);
     
     const price1 = open * (1 + change1 / 100);
-    const price2 = open * (1 + change2 / 100);
+    const price2 = close * (1 + change2 / 100);
     
-    const high = Math.max(open, price1, price2) * (1 + Math.random() * 0.003);
-    const low = Math.min(open, price1, price2) * (1 - Math.random() * 0.003);
-    
-    // Close price becomes next candle's potential open
-    const closeChange = (Math.random() - 0.5) * volatility;
-    const close = Math.max(open * (1 + closeChange / 100), 0.1);
-    
-    currentPrice = close;
+    const high = Math.max(open, close, price1, price2) * (1 + Math.random() * 0.003);
+    const low = Math.min(open, close, price1, price2) * (1 - Math.random() * 0.003);
     
     data.push({
       time: Math.floor(timestamp.getTime() / 1000),
@@ -388,37 +388,43 @@ export function generateIntradayData(
 
 export function generateDailyCandlestickData(
   days: number,
-  startPrice: number,
+  currentPrice: number,
   volatility: number = 2
 ): CandlestickData[] {
   const data: CandlestickData[] = [];
   const now = new Date();
   const msPerDay = 24 * 60 * 60 * 1000;
   
-  let currentPrice = startPrice;
+  // Generate prices working BACKWARDS from current price
+  // so today's close matches the current price
+  const prices: number[] = [currentPrice];
+  
+  for (let i = 1; i < days; i++) {
+    const change = (Math.random() - 0.5) * volatility;
+    const prevPrice = Math.max(prices[prices.length - 1] / (1 + change / 100), 0.1);
+    prices.push(prevPrice);
+  }
+  
+  // Reverse so oldest is first
+  prices.reverse();
   
   for (let i = 0; i < days; i++) {
     const date = new Date(now.getTime() - (days - i - 1) * msPerDay);
     
-    // Generate OHLC data
-    const open = currentPrice;
+    const close = prices[i];
+    const open = i > 0 ? prices[i - 1] : close * (1 + (Math.random() - 0.5) * (volatility / 100));
     
-    // Generate random price movements within the day
+    // Generate intraday movements
     const change1 = (Math.random() - 0.5) * volatility;
     const change2 = (Math.random() - 0.5) * volatility;
     const change3 = (Math.random() - 0.5) * volatility;
     
     const price1 = open * (1 + change1 / 100);
-    const price2 = open * (1 + change2 / 100);
-    const price3 = open * (1 + change3 / 100);
+    const price2 = close * (1 + change2 / 100);
+    const price3 = close * (1 + change3 / 100);
     
-    const high = Math.max(open, price1, price2, price3) * (1 + Math.random() * 0.01);
-    const low = Math.min(open, price1, price2, price3) * (1 - Math.random() * 0.01);
-    
-    const closeChange = (Math.random() - 0.5) * volatility;
-    const close = Math.max(open * (1 + closeChange / 100), 0.1);
-    
-    currentPrice = close;
+    const high = Math.max(open, close, price1, price2, price3) * (1 + Math.random() * 0.01);
+    const low = Math.min(open, close, price1, price2, price3) * (1 - Math.random() * 0.01);
     
     data.push({
       time: Math.floor(date.getTime() / 1000),
