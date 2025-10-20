@@ -127,6 +127,33 @@ export const mockIndices: MarketIndex[] = [
     lastUpdated: new Date()
   },
   {
+    symbol: 'DJI',
+    name: 'Dow Jones',
+    value: 41250.50,
+    change: -125.65,
+    changePercent: -0.30,
+    region: 'United States',
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'IXIC',
+    name: 'NASDAQ',
+    value: 17754.82,
+    change: 85.28,
+    changePercent: 0.48,
+    region: 'United States',
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'RUT',
+    name: 'Russell 2000',
+    value: 2184.35,
+    change: 12.45,
+    changePercent: 0.57,
+    region: 'United States',
+    lastUpdated: new Date()
+  },
+  {
     symbol: 'FTSE',
     name: 'FTSE 100',
     value: 8292.66,
@@ -136,11 +163,29 @@ export const mockIndices: MarketIndex[] = [
     lastUpdated: new Date()
   },
   {
+    symbol: 'FTMC',
+    name: 'FTSE 250',
+    value: 20485.75,
+    change: 48.92,
+    changePercent: 0.24,
+    region: 'United Kingdom',
+    lastUpdated: new Date()
+  },
+  {
     symbol: 'N225',
     name: 'Nikkei 225',
     value: 38920.26,
     change: 145.89,
     changePercent: 0.38,
+    region: 'Japan',
+    lastUpdated: new Date()
+  },
+  {
+    symbol: 'TOPX',
+    name: 'TOPIX',
+    value: 2748.56,
+    change: -8.34,
+    changePercent: -0.30,
     region: 'Japan',
     lastUpdated: new Date()
   }

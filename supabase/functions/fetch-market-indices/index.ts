@@ -112,8 +112,13 @@ function mapToYahooSymbol(symbol: string): string {
     'NIFTYNEXT50': 'NIFTYJR.NS',
     'NIFTYMIDCAP': '^NSEMDCP50',
     'SPX': '^GSPC',
+    'DJI': '^DJI',
+    'IXIC': '^IXIC',
+    'RUT': '^RUT',
     'FTSE': '^FTSE',
-    'N225': '^N225'
+    'FTMC': '^FTMC',
+    'N225': '^N225',
+    'TOPX': '^TOPX'
   };
   
   return symbolMap[symbol] || symbol;
