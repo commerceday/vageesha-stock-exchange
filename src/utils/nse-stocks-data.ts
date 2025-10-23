@@ -468,4 +468,9 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'SHOPERSTOP', name: 'Shoppers Stop Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 567890, marketCap: 140000000000, sector: 'Retail' },
   { symbol: 'RELAXO', name: 'Relaxo Footwears Ltd.', price: 1789.60, change: 21.30, changePercent: 1.20, volume: 234567, marketCap: 460000000000, sector: 'Consumer Durables' },
   { symbol: 'CENTURYPLY', name: 'Century Plyboards (India) Ltd.', price: 1234.50, change: 14.70, changePercent: 1.20, volume: 234567, marketCap: 150000000000, sector: 'Consumer Durables' },
+  
+  // Additional Stocks
+  { symbol: 'MAXHEALTH', name: 'Max Healthcare Institute Ltd.', price: 1345.80, change: 16.10, changePercent: 1.21, volume: 456789, marketCap: 125000000000, sector: 'Healthcare' },
+  { symbol: 'PVRINOX', name: 'PVR INOX Ltd.', price: 2234.60, change: 26.70, changePercent: 1.21, volume: 345678, marketCap: 180000000000, sector: 'Media & Entertainment' },
+  { symbol: 'PNBHOUSING', name: 'PNB Housing Finance Ltd.', price: 1089.90, change: 13.00, changePercent: 1.21, volume: 567890, marketCap: 280000000000, sector: 'Financial Services' },
 ];
