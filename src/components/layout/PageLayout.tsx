@@ -22,9 +22,9 @@ export function PageLayout({ children, title }: PageLayoutProps) {
       <div className="flex-1 flex">
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         
-        <main className="flex-1 transition-all duration-300">
-          <div className="container max-w-full p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-2xl font-bold mb-6">{title}</h1>
+        <main className="flex-1 transition-all duration-300 w-full">
+          <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
+            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{title}</h1>
             {children}
           </div>
         </main>

@@ -2,12 +2,14 @@
 import React from 'react';
 import { 
   BarChart, PieChart, BarChart3, Wallet, LineChart,
-  ChevronRight, ChevronLeft, Home
+  ChevronRight, ChevronLeft, Home, Menu
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Link, useLocation } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -23,6 +25,7 @@ interface NavItem {
 
 export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   const navItems = [
     {
@@ -57,31 +60,29 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
     }
   ];
 
-  return (
-    <aside className={cn(
-      "bg-sidebar text-sidebar-foreground relative transition-all duration-300 ease-in-out flex flex-col border-r border-sidebar-border",
-      isCollapsed ? "w-16" : "w-64",
-      className
-    )}>
+  const SidebarContent = () => (
+    <>
       <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
         <h2 className={cn(
           "font-semibold tracking-tight transition-opacity duration-200",
-          isCollapsed ? "opacity-0" : "opacity-100"
+          isCollapsed && !isMobile ? "opacity-0" : "opacity-100"
         )}>
           MarketPulse
         </h2>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggle}
-          className={cn(
-            "absolute right-2 text-sidebar-foreground h-8 w-8",
-            isCollapsed ? "right-2" : "right-4"
-          )}
-        >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
+        {!isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            className={cn(
+              "absolute right-2 text-sidebar-foreground h-8 w-8",
+              isCollapsed ? "right-2" : "right-4"
+            )}
+          >
+            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
+        )}
       </div>
       
       <ScrollArea className="flex-1 py-4">
@@ -95,13 +96,13 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
-                  isCollapsed && "justify-center px-0"
+                  isCollapsed && !isMobile && "justify-center px-0"
                 )}
               >
                 <item.icon className={cn("h-5 w-5 shrink-0")} />
                 <span className={cn(
                   "text-sm font-medium transition-opacity duration-200",
-                  isCollapsed ? "opacity-0 w-0" : "opacity-100"
+                  isCollapsed && !isMobile ? "opacity-0 w-0" : "opacity-100"
                 )}>
                   {item.title}
                 </span>
@@ -114,13 +115,40 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       <div className="p-4 border-t border-sidebar-border">
         <div className={cn(
           "transition-opacity duration-200 rounded-md bg-sidebar-accent/50 p-2 text-xs text-sidebar-accent-foreground",
-          isCollapsed ? "opacity-0" : "opacity-100"
+          isCollapsed && !isMobile ? "opacity-0" : "opacity-100"
         )}>
           <p className="font-medium">Market Status</p>
           <p>Markets are open</p>
           <p className="text-[10px]">Closes in 3h 45m</p>
         </div>
       </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="fixed top-3.5 left-4 z-50 md:hidden">
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0 bg-sidebar text-sidebar-foreground">
+          <div className="flex flex-col h-full">
+            <SidebarContent />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <aside className={cn(
+      "bg-sidebar text-sidebar-foreground relative transition-all duration-300 ease-in-out flex flex-col border-r border-sidebar-border hidden md:flex",
+      isCollapsed ? "w-16" : "w-64",
+      className
+    )}>
+      <SidebarContent />
     </aside>
   );
 }
