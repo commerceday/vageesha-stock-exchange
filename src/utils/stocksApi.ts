@@ -671,18 +671,20 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - generate prices within ±1 rupee of last real price
-            const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
+            // Market closed or real-time unavailable - anchor to last known real price
+            const anchorPrice = (realtimeStock && !realtimeStock.error && typeof realtimeStock.price === 'number' && realtimeStock.price > 0)
+              ? realtimeStock.price
+              : (lastRealPrices.get(stock.symbol) || basePrice || stock.price);
             
             // Generate random price change between -1 and +1 rupee
-            const priceChange = (Math.random() - 0.5) * 2; // Random value between -1 and +1
-            let newPrice = lastRealPrice + priceChange;
+            const priceChange = (Math.random() - 0.5) * 2; // -1 to +1
+            let newPrice = anchorPrice + priceChange;
             
             // Ensure price stays positive
             newPrice = Math.max(newPrice, 0.01);
             
-            const finalChange = newPrice - lastRealPrice;
-            const finalChangePercent = (finalChange / lastRealPrice) * 100;
+            const finalChange = newPrice - anchorPrice;
+            const finalChangePercent = (finalChange / anchorPrice) * 100;
             
             const newStock = {
               ...stock,
@@ -692,9 +694,16 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
               lastUpdated: new Date()
             };
             
+            // Persist the anchor so subsequent mocks stay near the real last price
+            setLastRealPrices(prev => {
+              const mp = new Map(prev);
+              mp.set(stock.symbol, anchorPrice);
+              return mp;
+            });
+            
             // Update price history with generated prices
             setPriceHistory(prev => {
-              const history = prev.get(stock.symbol) || [lastRealPrice];
+              const history = prev.get(stock.symbol) || [anchorPrice];
               const newHistory = [...history, newPrice].slice(-30);
               const newMap = new Map(prev);
               newMap.set(stock.symbol, newHistory);

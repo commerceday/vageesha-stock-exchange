@@ -69,8 +69,46 @@ serve(async (req) => {
               previousClose: previousClose,
             };
           } else {
-            // Market closed - return null to indicate pattern-based generation should be used
-            return { symbol, marketClosed: true };
+            // Market closed - still fetch latest available data to anchor mock prices
+            const yahooSymbol = `${symbol}.NS`;
+            const response = await fetch(
+              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`,
+              {
+                headers: {
+                  'User-Agent': 'Mozilla/5.0'
+                }
+              }
+            );
+
+            if (!response.ok) {
+              console.error(`Failed to fetch ${symbol} (closed): ${response.statusText}`);
+              return { symbol, marketClosed: true, error: true };
+            }
+
+            const data = await response.json();
+            const quote = data?.chart?.result?.[0];
+
+            if (!quote || !quote.meta) {
+              console.error(`No data for ${symbol} (closed)`);
+              return { symbol, marketClosed: true, error: true };
+            }
+
+            const currentPrice = quote.meta.regularMarketPrice || 0;
+            const previousClose = quote.meta.chartPreviousClose || quote.meta.previousClose || currentPrice || 0;
+            const change = currentPrice && previousClose ? currentPrice - previousClose : 0;
+            const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
+
+            return {
+              symbol,
+              price: previousClose || currentPrice,
+              change,
+              changePercent,
+              high: quote.meta.regularMarketDayHigh || 0,
+              low: quote.meta.regularMarketDayLow || 0,
+              open: quote.meta.regularMarketOpen || 0,
+              previousClose,
+              marketClosed: true
+            };
           }
         } catch (error) {
           console.error(`Error fetching ${symbol}:`, error);
