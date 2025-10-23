@@ -671,12 +671,11 @@ export function useStockData(initialData: Stock[], updateInterval = 5000) {
             
             return newStock;
           } else {
-            // Market closed - generate prices within ±0.1% of last real price
+            // Market closed - generate prices within ±1 rupee of last real price
             const lastRealPrice = lastRealPrices.get(stock.symbol) || basePrice || stock.price;
             
-            // Generate random price change between -0.1% and +0.1%
-            const randomChangePercent = (Math.random() - 0.5) * 0.2; // Random value between -0.1 and +0.1
-            const priceChange = lastRealPrice * (randomChangePercent / 100);
+            // Generate random price change between -1 and +1 rupee
+            const priceChange = (Math.random() - 0.5) * 2; // Random value between -1 and +1
             let newPrice = lastRealPrice + priceChange;
             
             // Ensure price stays positive
