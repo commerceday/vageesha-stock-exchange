@@ -7,11 +7,11 @@ import { BuySellDialog } from '@/components/stocks/BuySellDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Search, Filter } from 'lucide-react';
+import { ShoppingCart, Search, Filter, WifiOff } from 'lucide-react';
 import { VirtualizedStockList } from '@/components/stocks/VirtualizedStockList';
 
 const Stocks = () => {
-  const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
+  const { stocks, priceHistory, isMarketOpen, failedStocks } = useStockData(mockStocks);
   const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
@@ -41,7 +41,7 @@ const Stocks = () => {
   
   return (
     <PageLayout title="Stocks">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-success animate-pulse' : 'bg-muted-foreground'}`} />
           <span className="text-sm text-muted-foreground">
@@ -49,8 +49,14 @@ const Stocks = () => {
             {!isMarketOpen && ' (Using pattern-based simulation)'}
           </span>
         </div>
-        <div className="text-sm text-muted-foreground">
-          {filteredStocks.length} of {stocks.length} stocks
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span>{filteredStocks.length} of {stocks.length} stocks</span>
+          {isMarketOpen && failedStocks.size > 0 && (
+            <span className="text-danger flex items-center gap-1">
+              <WifiOff className="h-3 w-3" />
+              {failedStocks.size} failed
+            </span>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

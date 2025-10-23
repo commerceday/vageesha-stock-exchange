@@ -12,6 +12,7 @@ export interface Stock {
   marketCap: number;
   sector: string;
   lastUpdated: Date;
+  dataSource?: 'real' | 'simulated' | 'error';
 }
 
 export interface MarketIndex {
@@ -627,12 +628,15 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
     });
     return pricesMap;
   });
+  const [failedStocks, setFailedStocks] = useState<Set<string>>(new Set());
   
   useEffect(() => {
     // Initial fetch
     const updateStockPrices = async () => {
       const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(stocks);
       setIsMarketOpen(marketOpen);
+      
+      const newFailedStocks = new Set<string>();
       
       setStocks(prevStocks => 
         prevStocks.map(stock => {
@@ -650,7 +654,8 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
               price: newPrice,
               change: realtimeStock.change || stock.change,
               changePercent: realtimeStock.changePercent || stock.changePercent,
-              lastUpdated: new Date()
+              lastUpdated: new Date(),
+              dataSource: 'real' as const
             };
             
             // Update price history with real prices from API
@@ -670,6 +675,9 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
             });
             
             return newStock;
+          } else if (marketOpen && realtimeStock && realtimeStock.error) {
+            // Track failed stocks during market hours
+            newFailedStocks.add(stock.symbol);
           } else {
             // Market closed or real-time unavailable - anchor to last known real price
             const anchorPrice = (realtimeStock && !realtimeStock.error && typeof realtimeStock.price === 'number' && realtimeStock.price > 0)
@@ -691,7 +699,8 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
               price: parseFloat(newPrice.toFixed(2)),
               change: parseFloat(finalChange.toFixed(2)),
               changePercent: parseFloat(finalChangePercent.toFixed(2)),
-              lastUpdated: new Date()
+              lastUpdated: new Date(),
+              dataSource: (marketOpen && realtimeStock && realtimeStock.error) ? 'error' as const : 'simulated' as const
             };
             
             // Persist the anchor so subsequent mocks stay near the real last price
@@ -714,6 +723,13 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
           }
         })
       );
+      
+      // Log failed stocks to console
+      if (marketOpen && newFailedStocks.size > 0) {
+        console.warn(`⚠️ Failed to fetch real data for ${newFailedStocks.size} stocks:`, Array.from(newFailedStocks));
+      }
+      
+      setFailedStocks(newFailedStocks);
     };
     
     updateStockPrices();
@@ -722,7 +738,7 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
     return () => clearInterval(intervalId);
   }, [updateInterval]);
   
-  return { stocks, priceHistory, isMarketOpen };
+  return { stocks, priceHistory, isMarketOpen, failedStocks };
 }
 
 async function fetchRealTimeMarketIndices(indices: MarketIndex[]): Promise<{ data: any[], marketOpen: boolean }> {

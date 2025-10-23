@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUpIcon, ArrowDownIcon, BarChart3Icon } from 'lucide-react';
+import { ArrowUpIcon, ArrowDownIcon, BarChart3Icon, WifiOff, Activity } from 'lucide-react';
 import { Stock, formatCurrency, formatPercentage, formatNumber, formatDate } from '@/utils/stocksApi';
 import { Sparkline } from '@/components/stocks/Sparkline';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface StockCardProps {
   stock: Stock;
@@ -26,8 +27,22 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
       onClick={onClick}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className="space-y-1">
-          <CardTitle className="text-base font-semibold leading-none">{stock.symbol}</CardTitle>
+        <div className="space-y-1 flex-1">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base font-semibold leading-none">{stock.symbol}</CardTitle>
+            {stock.dataSource === 'real' && (
+              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-success/10 text-success border-success/20">
+                <Activity className="h-2.5 w-2.5 mr-0.5" />
+                LIVE
+              </Badge>
+            )}
+            {stock.dataSource === 'error' && (
+              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 bg-danger/10 text-danger border-danger/20">
+                <WifiOff className="h-2.5 w-2.5 mr-0.5" />
+                ERROR
+              </Badge>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground truncate max-w-[180px]">{stock.name}</p>
         </div>
         <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
