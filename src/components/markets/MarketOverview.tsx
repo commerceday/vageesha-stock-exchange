@@ -14,7 +14,22 @@ export function MarketOverview({ indices, className }: MarketOverviewProps) {
   // Sort regions in desired order: India, United States, United Kingdom, Japan
   const regionOrder = ['India', 'United States', 'United Kingdom', 'Japan'];
   
-  const groupedByRegion = indices.reduce<Record<string, MarketIndex[]>>((acc, index) => {
+  // Normalize region names to match the canonical order keys
+  const normalizeRegion = (region: string) => {
+    const r = region.trim().toLowerCase();
+    if (['us', 'usa', 'u.s.', 'u.s', 'united states', 'united states of america', 'america'].includes(r)) return 'United States';
+    if (['uk', 'u.k.', 'u.k', 'united kingdom', 'great britain', 'britain', 'england'].includes(r)) return 'United Kingdom';
+    if (['in', 'india', 'bharat'].includes(r)) return 'India';
+    if (['jp', 'jpn', 'japan', 'nippon'].includes(r)) return 'Japan';
+    return region;
+  };
+
+  const normalizedIndices = indices.map((idx) => ({
+    ...idx,
+    region: normalizeRegion(idx.region),
+  }));
+
+  const groupedByRegion = normalizedIndices.reduce<Record<string, MarketIndex[]>>((acc, index) => {
     if (!acc[index.region]) {
       acc[index.region] = [];
     }
@@ -22,10 +37,14 @@ export function MarketOverview({ indices, className }: MarketOverviewProps) {
     return acc;
   }, {});
   
-  // Sort the grouped regions by the desired order
-  const sortedRegions = regionOrder
-    .filter(region => groupedByRegion[region])
-    .map(region => [region, groupedByRegion[region]] as [string, MarketIndex[]]);
+  // Sort the grouped regions by the desired order and include any others after
+  const knownOrdered = regionOrder.filter((region) => groupedByRegion[region]);
+  const remaining = Object.keys(groupedByRegion)
+    .filter((r) => !regionOrder.includes(r))
+    .sort();
+  const sortedRegions = [...knownOrdered, ...remaining].map(
+    (region) => [region, groupedByRegion[region]] as [string, MarketIndex[]]
+  );
   
   const renderMarketContent = () => (
     <>
