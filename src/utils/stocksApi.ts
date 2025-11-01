@@ -679,44 +679,40 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
             // Track failed stocks during market hours
             newFailedStocks.add(stock.symbol);
           } else {
-            // Market closed - use last real closing price from Yahoo Finance
+            // Market closed - use last real closing price and add ±1 rupee fluctuation
             const hasRealData = realtimeStock && !realtimeStock.error && typeof realtimeStock.price === 'number' && realtimeStock.price > 0;
-            const lastClosePrice = hasRealData 
+            const realClosePrice = hasRealData 
               ? realtimeStock.price
               : (lastRealPrices.get(stock.symbol) || basePrice || stock.price);
             
-            const lastCloseChange = hasRealData 
-              ? (realtimeStock.change || 0)
-              : 0;
+            // Store the real close price for future use
+            if (hasRealData) {
+              setLastRealPrices(prev => {
+                const mp = new Map(prev);
+                mp.set(stock.symbol, realClosePrice);
+                return mp;
+              });
+            }
             
-            const lastCloseChangePercent = hasRealData 
-              ? (realtimeStock.changePercent || 0)
-              : 0;
+            // Add random fluctuation of ±1 rupee
+            const fluctuation = (Math.random() - 0.5) * 2; // -1 to +1
+            const mockPrice = Math.max(realClosePrice + fluctuation, 0.01);
+            const mockChange = mockPrice - realClosePrice;
+            const mockChangePercent = (mockChange / realClosePrice) * 100;
             
             const newStock = {
               ...stock,
-              price: parseFloat(lastClosePrice.toFixed(2)),
-              change: parseFloat(lastCloseChange.toFixed(2)),
-              changePercent: parseFloat(lastCloseChangePercent.toFixed(2)),
+              price: parseFloat(mockPrice.toFixed(2)),
+              change: parseFloat(mockChange.toFixed(2)),
+              changePercent: parseFloat(mockChangePercent.toFixed(2)),
               lastUpdated: new Date(),
-              dataSource: hasRealData ? 'real' as const : 'simulated' as const
+              dataSource: 'simulated' as const
             };
             
-            // Store the last real price
-            setLastRealPrices(prev => {
-              const mp = new Map(prev);
-              mp.set(stock.symbol, lastClosePrice);
-              return mp;
-            });
-            
-            // Update price history with last close price
+            // Update price history with mock price
             setPriceHistory(prev => {
-              const history = prev.get(stock.symbol) || [lastClosePrice];
-              // Only add to history if price actually changed
-              const lastHistoryPrice = history[history.length - 1];
-              const newHistory = lastHistoryPrice === lastClosePrice 
-                ? history 
-                : [...history, lastClosePrice].slice(-30);
+              const history = prev.get(stock.symbol) || [realClosePrice];
+              const newHistory = [...history, mockPrice].slice(-30);
               const newMap = new Map(prev);
               newMap.set(stock.symbol, newHistory);
               return newMap;

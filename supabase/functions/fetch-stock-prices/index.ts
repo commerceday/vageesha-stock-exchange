@@ -93,14 +93,16 @@ serve(async (req) => {
               return { symbol, marketClosed: true, error: true };
             }
 
-            const currentPrice = quote.meta.regularMarketPrice || 0;
-            const previousClose = quote.meta.chartPreviousClose || quote.meta.previousClose || currentPrice || 0;
-            const change = currentPrice && previousClose ? currentPrice - previousClose : 0;
-            const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
+            // When market is closed, use the last trading day's close price
+            const previousClose = quote.meta.previousClose || quote.meta.chartPreviousClose || 0;
+            const change = 0; // No change when market is closed
+            const changePercent = 0;
+
+            console.log(`${symbol} (CLOSED): Last close=${previousClose}`);
 
             return {
               symbol,
-              price: previousClose || currentPrice,
+              price: previousClose,
               change,
               changePercent,
               high: quote.meta.regularMarketDayHigh || 0,
