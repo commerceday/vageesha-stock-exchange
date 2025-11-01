@@ -93,8 +93,21 @@ serve(async (req) => {
               return { symbol, marketClosed: true, error: true };
             }
 
-            // When market is closed, use the last trading day's close price
-            const previousClose = quote.meta.previousClose || quote.meta.chartPreviousClose || 0;
+            // When market is closed, use the last trading day's close price (from series if available)
+            const closes: number[] | undefined = quote?.indicators?.quote?.[0]?.close;
+            let seriesLastClose = 0;
+            if (Array.isArray(closes)) {
+              for (let i = closes.length - 1; i >= 0; i--) {
+                const val = closes[i];
+                if (typeof val === 'number' && isFinite(val)) {
+                  seriesLastClose = val;
+                  break;
+                }
+              }
+            }
+
+            const metaPrevClose = quote.meta.previousClose || quote.meta.chartPreviousClose || 0;
+            const previousClose = seriesLastClose || metaPrevClose;
             const change = 0; // No change when market is closed
             const changePercent = 0;
 
