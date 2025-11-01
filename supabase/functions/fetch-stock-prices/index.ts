@@ -51,12 +51,27 @@ serve(async (req) => {
               return { symbol, error: true };
             }
             
+            // Get previous close from time series if available
+            const closes: number[] | undefined = quote?.indicators?.quote?.[0]?.close;
+            let seriesPrevClose = 0;
+            if (Array.isArray(closes) && closes.length >= 2) {
+              // Get second-to-last valid close as previous day's close
+              for (let i = closes.length - 2; i >= 0; i--) {
+                const val = closes[i];
+                if (typeof val === 'number' && isFinite(val)) {
+                  seriesPrevClose = val;
+                  break;
+                }
+              }
+            }
+            
             const currentPrice = quote.meta.regularMarketPrice || 0;
-            const previousClose = quote.meta.chartPreviousClose || quote.meta.previousClose || 0;
-            const change = currentPrice - previousClose;
+            const metaPrevClose = quote.meta.chartPreviousClose || quote.meta.previousClose || 0;
+            const previousClose = seriesPrevClose || metaPrevClose;
+            const change = currentPrice && previousClose ? currentPrice - previousClose : 0;
             const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
             
-            console.log(`${symbol}: Price=${currentPrice}, Change=${change}, %=${changePercent}`);
+            console.log(`${symbol}: Price=${currentPrice}, PrevClose=${previousClose}, Change=${change}, %=${changePercent}`);
             
             return {
               symbol,
