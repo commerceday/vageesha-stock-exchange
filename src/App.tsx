@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { StockAssistant } from "@/components/ai/StockAssistant";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Stocks from "./pages/Stocks";
@@ -33,6 +34,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <StockAssistant />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
