@@ -139,22 +139,35 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <TrendingUp className="h-12 w-12 text-primary" />
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/20" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,hsl(var(--primary)/0.1),transparent_50%)]" />
+      
+      {/* Floating orbs */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+      
+      <Card className="w-full max-w-md relative glass border-2 shadow-[0_0_50px_rgba(0,0,0,0.1)]">
+        <CardHeader className="space-y-1 pb-8">
+          <div className="flex items-center justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+              <TrendingUp className="h-14 w-14 text-primary relative animate-pulse-gentle" />
+            </div>
           </div>
-          <CardTitle className="text-2xl text-center">Indian Market Tracker</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-3xl text-center font-bold gradient-text">
+            Indian Market Tracker
+          </CardTitle>
+          <CardDescription className="text-center text-base">
             Track Indian stocks, markets, and cryptocurrencies
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/50">
+              <TabsTrigger value="signin" className="data-[state=active]:shadow-md">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:shadow-md">Sign Up</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
@@ -191,7 +204,7 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full gradient-bg hover:opacity-90 transition-opacity shadow-lg" disabled={loading}>
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </form>
@@ -242,7 +255,7 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full gradient-bg hover:opacity-90 transition-opacity shadow-lg" disabled={loading}>
                   {loading ? 'Creating account...' : 'Sign Up'}
                 </Button>
               </form>
