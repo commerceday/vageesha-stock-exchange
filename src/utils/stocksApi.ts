@@ -609,7 +609,7 @@ function generatePatternBasedPrice(stock: Stock, historicalData: number[]): Stoc
   };
 }
 
-export function useStockData(initialData: Stock[], updateInterval = 2000) {
+export function useStockData(initialData: Stock[], updateInterval = 0) {
   const [stocks, setStocks] = useState<Stock[]>(initialData);
   const [priceHistory, setPriceHistory] = useState<Map<string, number[]>>(() => {
     // Initialize with actual stock prices
@@ -765,7 +765,7 @@ async function fetchRealTimeMarketIndices(indices: MarketIndex[]): Promise<{ dat
   }
 }
 
-export function useMarketIndices(initialData: MarketIndex[], updateInterval = 2000) {
+export function useMarketIndices(initialData: MarketIndex[], updateInterval = 0) {
   const [indices, setIndices] = useState<MarketIndex[]>(initialData);
   const [isMarketOpen, setIsMarketOpen] = useState<boolean>(false);
   const [lastRealValues, setLastRealValues] = useState<Map<string, number>>(() => {
