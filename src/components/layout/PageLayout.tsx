@@ -16,15 +16,19 @@ export function PageLayout({ children, title }: PageLayoutProps) {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       <div className="flex-1 flex">
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         
         <main className="flex-1 transition-all duration-300 w-full">
-          <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{title}</h1>
+          <div className="container max-w-full p-4 sm:p-6 lg:p-8 animate-fade-in">
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                {title}
+              </h1>
+            </div>
             {children}
           </div>
         </main>

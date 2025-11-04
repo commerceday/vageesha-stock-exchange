@@ -20,7 +20,8 @@ export function StockCard({ stock, priceHistory, className, onClick }: StockCard
   return (
     <Card 
       className={cn(
-        "overflow-hidden transition-all duration-300 hover:shadow-md bg-card/50 backdrop-blur-sm",
+        "group relative overflow-hidden transition-all duration-500 bg-card/70 backdrop-blur-md border-2",
+        "hover:scale-[1.02] hover:shadow-[0_12px_40px_hsl(var(--foreground)/0.15)] hover:border-primary/30",
         onClick ? "cursor-pointer" : "",
         className
       )}

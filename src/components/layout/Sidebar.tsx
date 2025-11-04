@@ -62,9 +62,9 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
 
   const SidebarContent = () => (
     <>
-      <div className="flex h-16 items-center justify-center border-b border-sidebar-border">
+      <div className="flex h-16 sm:h-18 items-center justify-center border-b border-sidebar-border/50">
         <h2 className={cn(
-          "font-semibold tracking-tight transition-opacity duration-200",
+          "font-bold text-lg tracking-tight transition-opacity duration-200 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent",
           isCollapsed && !isMobile ? "opacity-0" : "opacity-100"
         )}>
           MarketPulse
@@ -76,17 +76,17 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
             size="icon"
             onClick={onToggle}
             className={cn(
-              "absolute right-2 text-sidebar-foreground h-8 w-8",
-              isCollapsed ? "right-2" : "right-4"
+              "absolute right-2 text-sidebar-foreground h-9 w-9 rounded-xl hover:bg-sidebar-accent transition-all duration-300",
+              isCollapsed ? "right-2 rotate-180" : "right-4"
             )}
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </Button>
         )}
       </div>
       
-      <ScrollArea className="flex-1 py-4">
-        <nav className="grid gap-1 px-2">
+      <ScrollArea className="flex-1 py-6">
+        <nav className="grid gap-2 px-3">
           {navItems.map((item, index) => {
             const isActive = location.pathname === item.href;
             return (
@@ -94,12 +94,15 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
                 key={index}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground",
+                  "flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-300 hover:scale-[1.02]",
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_4px_12px_hsl(var(--sidebar-primary)/0.15)]",
+                  isActive 
+                    ? "bg-gradient-to-r from-sidebar-primary/20 to-sidebar-primary/10 text-sidebar-primary font-semibold shadow-[0_4px_12px_hsl(var(--sidebar-primary)/0.2)]" 
+                    : "text-sidebar-foreground",
                   isCollapsed && !isMobile && "justify-center px-0"
                 )}
               >
-                <item.icon className={cn("h-5 w-5 shrink-0")} />
+                <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-sidebar-primary")} />
                 <span className={cn(
                   "text-sm font-medium transition-opacity duration-200",
                   isCollapsed && !isMobile ? "opacity-0 w-0" : "opacity-100"
@@ -112,14 +115,14 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
         </nav>
       </ScrollArea>
       
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-4 border-t border-sidebar-border/50">
         <div className={cn(
-          "transition-opacity duration-200 rounded-md bg-sidebar-accent/50 p-2 text-xs text-sidebar-accent-foreground",
+          "transition-opacity duration-200 rounded-xl bg-gradient-to-br from-sidebar-accent to-sidebar-accent/50 p-3 text-xs text-sidebar-accent-foreground border border-sidebar-border/30",
           isCollapsed && !isMobile ? "opacity-0" : "opacity-100"
         )}>
-          <p className="font-medium">Market Status</p>
-          <p>Markets are open</p>
-          <p className="text-[10px]">Closes in 3h 45m</p>
+          <p className="font-semibold text-sidebar-primary">Market Status</p>
+          <p className="text-sidebar-foreground/90">Markets are open</p>
+          <p className="text-[10px] text-sidebar-foreground/70">Closes in 3h 45m</p>
         </div>
       </div>
     </>

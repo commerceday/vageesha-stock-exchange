@@ -44,11 +44,19 @@ export function Dashboard() {
         <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         
         <main className="flex-1 transition-all duration-300 w-full">
-          <div className="container max-w-full p-3 sm:p-4 lg:p-6 animate-fade-in">
-            <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Market Dashboard</h1>
+          <div className="container max-w-full p-3 sm:p-4 lg:p-8 animate-fade-in">
+            {/* Hero Header */}
+            <div className="mb-8 space-y-2">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-fade-in">
+                Market Dashboard
+              </h1>
+              <p className="text-muted-foreground text-sm sm:text-base">
+                Real-time market data and insights at your fingertips
+              </p>
+            </div>
             
             {/* Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 animate-slide-up" style={{ '--delay': '100ms' } as React.CSSProperties}>
               <StatsCard 
                 title="Market Cap" 
                 value="₹13.42T"
@@ -82,10 +90,10 @@ export function Dashboard() {
             </div>
             
             {/* Main Content Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-7">
               {/* Left column - Stock list */}
-              <div className="lg:col-span-1 space-y-3 sm:space-y-4 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
-                <h2 className="text-lg sm:text-xl font-semibold">Watchlist</h2>
+              <div className="lg:col-span-1 space-y-4 sm:space-y-5 animate-slide-up" style={{ '--delay': '200ms' } as React.CSSProperties}>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Watchlist</h2>
                 <div className="space-y-4">
                   {stocks.slice(0, 5).map((stock) => (
                     <StockCard 
