@@ -2,6 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { 
   TrendingUp, 
   BarChart3, 
@@ -14,7 +20,10 @@ import {
   BookOpen,
   Building2,
   Clock,
-  IndianRupee
+  IndianRupee,
+  Star,
+  Quote,
+  HelpCircle
 } from 'lucide-react';
 
 const Landing = () => {
@@ -61,6 +70,72 @@ const Landing = () => {
       icon: IndianRupee,
       title: 'Why Invest in Stocks?',
       content: 'Stocks historically offer higher returns compared to traditional savings. They provide ownership in growing companies, dividend income, and help build long-term wealth. Diversification across sectors reduces risk.'
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: 'Rahul Sharma',
+      role: 'Day Trader',
+      avatar: 'RS',
+      rating: 5,
+      content: 'StockVerse has completely transformed my trading experience. The real-time data and AI insights have helped me make better decisions. Highly recommended!'
+    },
+    {
+      name: 'Priya Patel',
+      role: 'Long-term Investor',
+      avatar: 'PP',
+      rating: 5,
+      content: 'As someone new to investing, the educational resources and intuitive interface made it easy to start. My portfolio has grown 40% in just 6 months.'
+    },
+    {
+      name: 'Amit Verma',
+      role: 'Portfolio Manager',
+      avatar: 'AV',
+      rating: 5,
+      content: 'The advanced analytics and sector-wise filtering are exceptional. I can track all 1000+ stocks efficiently. Best platform for serious traders.'
+    },
+    {
+      name: 'Sneha Reddy',
+      role: 'Part-time Trader',
+      avatar: 'SR',
+      rating: 5,
+      content: 'Love the mobile-friendly design and instant notifications. I can trade on-the-go without missing any market opportunities. Fantastic app!'
+    }
+  ];
+
+  const faqs = [
+    {
+      question: 'What is stock trading and how do I start?',
+      answer: 'Stock trading involves buying and selling shares of publicly listed companies. To start, you need to open a trading account, complete KYC verification, and fund your account. Begin with researching companies, understanding market trends, and start with small investments to learn the process.'
+    },
+    {
+      question: 'What are the risks involved in stock trading?',
+      answer: 'Stock trading carries risks including market volatility, company-specific risks, and potential loss of capital. Prices can fluctuate based on economic conditions, company performance, and global events. Always invest only what you can afford to lose and diversify your portfolio to minimize risks.'
+    },
+    {
+      question: 'What is the difference between NIFTY and SENSEX?',
+      answer: 'NIFTY 50 is the benchmark index of the National Stock Exchange (NSE) comprising 50 top companies, while SENSEX is the Bombay Stock Exchange (BSE) index with 30 companies. Both track market performance but use different calculation methodologies and company compositions.'
+    },
+    {
+      question: 'How do I analyze stocks before investing?',
+      answer: 'Analyze stocks using fundamental analysis (financial statements, P/E ratio, earnings) and technical analysis (price charts, trends, indicators). Consider company revenue, profit margins, debt levels, industry position, and management quality. Our AI-powered tools can help simplify this analysis.'
+    },
+    {
+      question: 'What are dividends and how do they work?',
+      answer: 'Dividends are a portion of company profits distributed to shareholders. Companies declare dividends periodically (quarterly/annually). When you own shares on the record date, you receive dividends directly in your bank account. Dividend yield helps compare returns across stocks.'
+    },
+    {
+      question: 'What is intraday trading vs delivery trading?',
+      answer: 'Intraday trading involves buying and selling stocks within the same trading day to profit from short-term price movements. Delivery trading means holding stocks overnight or longer. Intraday requires lower margins but carries higher risk, while delivery trading is better for long-term wealth creation.'
+    },
+    {
+      question: 'How is my investment protected on StockVerse?',
+      answer: 'Your investments are protected through SEBI regulations, bank-grade encryption, and secure authentication. We follow strict compliance standards and your shares are held in your personal demat account. Two-factor authentication adds an extra layer of security to your account.'
+    },
+    {
+      question: 'Can I invest with a small amount?',
+      answer: 'Yes! You can start investing with as little as ₹100. Many quality stocks are available at affordable prices, and you can gradually build your portfolio. Some stocks also offer fractional investing options. Start small, learn the market, and increase investments as you gain confidence.'
     }
   ];
 
@@ -243,6 +318,90 @@ const Landing = () => {
                 </div>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 lg:py-28 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+              <Star className="h-4 w-4 fill-primary" />
+              Trusted by Thousands
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              What Our <span className="gradient-text">Traders Say</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of satisfied traders who have transformed their investment journey with StockVerse.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="card-modern bg-card/80 backdrop-blur-sm border-border/50 relative overflow-hidden group">
+                <div className="absolute top-4 right-4 text-primary/10 group-hover:text-primary/20 transition-colors">
+                  <Quote className="h-12 w-12" />
+                </div>
+                <CardContent className="p-6 relative">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                    "{testimonial.content}"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-semibold text-sm">
+                      {testimonial.avatar}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">{testimonial.name}</div>
+                      <div className="text-muted-foreground text-xs">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 lg:py-28">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-6">
+              <HelpCircle className="h-4 w-4" />
+              Got Questions?
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Frequently Asked <span className="gradient-text">Questions</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to know about stock trading and investing with StockVerse.
+            </p>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            <Accordion type="single" collapsible className="space-y-4">
+              {faqs.map((faq, index) => (
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`}
+                  className="bg-card rounded-xl border border-border/50 px-6 overflow-hidden data-[state=open]:shadow-lg transition-shadow"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline py-5">
+                    <span className="font-semibold text-base pr-4">{faq.question}</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground leading-relaxed pb-5">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
       </section>
