@@ -1034,5 +1034,8 @@ export const nseStocksData: Omit<Stock, 'lastUpdated'>[] = [
   { symbol: 'RAMCOCEM', name: 'The Ramco Cements Ltd.', price: 845.60, change: 10.15, changePercent: 1.21, volume: 234567, marketCap: 199000000000, sector: 'Cement' },
   { symbol: 'JKCEMENT', name: 'JK Cement Ltd.', price: 4567.80, change: 54.81, changePercent: 1.21, volume: 45678, marketCap: 352000000000, sector: 'Cement' },
   { symbol: 'BIRLACORPN', name: 'Birla Corporation Ltd.', price: 1234.50, change: 14.81, changePercent: 1.21, volume: 123456, marketCap: 95000000000, sector: 'Cement' },
+  { symbol: 'INDIACEM', name: 'The India Cements Ltd.', price: 234.50, change: 2.81, changePercent: 1.21, volume: 567890, marketCap: 72600000000, sector: 'Cement' },
+  { symbol: 'HEIDELBERG', name: 'HeidelbergCement India Ltd.', price: 234.50, change: 2.81, changePercent: 1.21, volume: 234567, marketCap: 53100000000, sector: 'Cement' },
+  { symbol: 'STARCEMENT', name: 'Star Cement Ltd.', price: 178.90, change: 2.15, changePercent: 1.21, volume: 345678, marketCap: 72400000000, sector: 'Cement' },
 ];
 
