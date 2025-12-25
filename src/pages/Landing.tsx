@@ -21,8 +21,6 @@ import {
   Building2,
   Clock,
   IndianRupee,
-  Star,
-  Quote,
   HelpCircle
 } from 'lucide-react';
 
@@ -73,36 +71,6 @@ const Landing = () => {
     }
   ];
 
-  const testimonials = [
-    {
-      name: 'Rahul Sharma',
-      role: 'Commerce Student',
-      avatar: 'RS',
-      rating: 5,
-      content: 'StockVerse helped me understand trading before using real money. I practiced for 3 months and now feel confident to start actual investing!'
-    },
-    {
-      name: 'Priya Patel',
-      role: 'MBA Student',
-      avatar: 'PP',
-      rating: 5,
-      content: 'The best mock trading platform I have used. Real market data with zero risk. Perfect for learning technical analysis and testing strategies.'
-    },
-    {
-      name: 'Amit Verma',
-      role: 'Finance Professional',
-      avatar: 'AV',
-      rating: 5,
-      content: 'I use this to teach my interns about stock markets. The simulation is incredibly realistic. Great educational tool for beginners.'
-    },
-    {
-      name: 'Sneha Reddy',
-      role: 'Aspiring Trader',
-      avatar: 'SR',
-      rating: 5,
-      content: 'Made so many learning mistakes with virtual money that I would have regretted with real funds. This platform is a must before real trading!'
-    }
-  ];
 
   const faqs = [
     {
@@ -321,54 +289,6 @@ const Landing = () => {
           </div>
         </div>
       </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 lg:py-28 bg-muted/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Star className="h-4 w-4 fill-primary" />
-              Trusted by Thousands
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              What Our <span className="gradient-text">Traders Say</span>
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of satisfied traders who have transformed their investment journey with StockVerse.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="card-modern bg-card/80 backdrop-blur-sm border-border/50 relative overflow-hidden group">
-                <div className="absolute top-4 right-4 text-primary/10 group-hover:text-primary/20 transition-colors">
-                  <Quote className="h-12 w-12" />
-                </div>
-                <CardContent className="p-6 relative">
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-warning text-warning" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-                    "{testimonial.content}"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-semibold text-sm">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-sm">{testimonial.name}</div>
-                      <div className="text-muted-foreground text-xs">{testimonial.role}</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section className="py-20 lg:py-28">
         <div className="container mx-auto px-6">
