@@ -33,8 +33,8 @@ export function Dashboard() {
   const topGainer = sortedByGain[0] || { symbol: 'N/A', name: 'No data', changePercent: 0 };
   const topLoser = sortedByLoss[0] || { symbol: 'N/A', name: 'No data', changePercent: 0 };
   
-  const totalMarketCap = stocks.reduce((sum, stock) => sum + stock.marketCap, 0);
-  const totalVolume = stocks.reduce((sum, stock) => sum + stock.volume, 0);
+  const totalMarketCap = validStocks.reduce((sum, stock) => sum + (stock.marketCap || 0), 0);
+  const totalVolume = validStocks.reduce((sum, stock) => sum + (stock.volume || 0), 0);
   
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => !prev);
