@@ -15,6 +15,8 @@ const yahooTickerOverrides: Record<string, string> = {
   MINDTREE: 'LTIM',
   ZENSAR: 'ZENSARTECH',
   AMARAJABAT: 'ARE&M',
+  BIRLASOF: 'BSOFT',
+  IDBIBANK: 'IDBI',
 };
 
 function toYahooTicker(symbol: string): string {
