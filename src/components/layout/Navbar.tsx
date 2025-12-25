@@ -26,7 +26,7 @@ interface NavbarProps {
 export function Navbar({ className }: NavbarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [balance, setBalance] = useState<number>(100000);
+  const [balance, setBalance] = useState<number>(500000);
 
   useEffect(() => {
     const fetchBalance = async () => {
