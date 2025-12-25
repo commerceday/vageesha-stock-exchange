@@ -9,6 +9,18 @@ interface StockSymbol {
   symbol: string;
 }
 
+// Some NSE symbols in our dataset are legacy tickers; Yahoo Finance uses updated tickers.
+const yahooTickerOverrides: Record<string, string> = {
+  LTI: 'LTIM',
+  MINDTREE: 'LTIM',
+  ZENSAR: 'ZENSARTECH',
+  AMARAJABAT: 'ARE&M',
+};
+
+function toYahooTicker(symbol: string): string {
+  return yahooTickerOverrides[symbol] ?? symbol;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -26,9 +38,10 @@ serve(async (req) => {
         try {
           if (isMarketOpen) {
             // Fetch real-time data from Yahoo Finance API (free, supports NSE)
-            const yahooSymbol = `${symbol}.NS`; // NSE stocks use .NS suffix
+            const yahooSymbol = `${toYahooTicker(symbol)}.NS`; // NSE stocks use .NS suffix
+            const yahooSymbolEncoded = encodeURIComponent(yahooSymbol);
             const response = await fetch(
-              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`,
+              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbolEncoded}?interval=1d&range=1d`,
               {
                 headers: {
                   'User-Agent': 'Mozilla/5.0'
@@ -85,9 +98,10 @@ serve(async (req) => {
             };
           } else {
             // Market closed - still fetch latest available data to anchor mock prices
-            const yahooSymbol = `${symbol}.NS`;
+            const yahooSymbol = `${toYahooTicker(symbol)}.NS`;
+            const yahooSymbolEncoded = encodeURIComponent(yahooSymbol);
             const response = await fetch(
-              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`,
+              `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbolEncoded}?interval=1d&range=1d`,
               {
                 headers: {
                   'User-Agent': 'Mozilla/5.0'
