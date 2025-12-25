@@ -641,7 +641,13 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
     // Initial fetch
     const updateStockPrices = async () => {
       const safeStocks = stocks.filter((s): s is Stock => Boolean(s && s.symbol));
-      const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(safeStocks);
+
+      // Avoid hammering the upstream data provider with hundreds/thousands of requests every refresh.
+      // We fetch real-time prices for a limited subset and keep the rest stable/simulated.
+      const MAX_REALTIME_SYMBOLS = 75;
+      const realtimeRequestStocks = safeStocks.slice(0, MAX_REALTIME_SYMBOLS);
+
+      const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(realtimeRequestStocks);
       setIsMarketOpen(marketOpen);
       
       const newFailedStocks = new Set<string>();
