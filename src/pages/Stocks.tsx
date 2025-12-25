@@ -12,7 +12,7 @@ import { VirtualizedStockList } from '@/components/stocks/VirtualizedStockList';
 
 const Stocks = () => {
   const { stocks, priceHistory, isMarketOpen, failedStocks } = useStockData(mockStocks);
-  const [selectedStock, setSelectedStock] = React.useState(stocks[0]);
+  const [selectedStock, setSelectedStock] = React.useState(() => stocks[0] ?? mockStocks[0]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState('');
