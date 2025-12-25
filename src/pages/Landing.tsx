@@ -57,7 +57,7 @@ const Landing = () => {
     {
       icon: LineChart,
       title: 'How Does Simulated Trading Work?',
-      content: 'You start with virtual money (₹10,00,000) and trade just like in real markets. Buy and sell stocks, track your portfolio performance, and learn from your decisions. All trades are simulated - no real money is involved.'
+      content: 'You start with virtual money (₹5,00,000) and trade just like in real markets. Buy and sell stocks, track your portfolio performance, and learn from your decisions. All trades are simulated - no real money is involved.'
     },
     {
       icon: Clock,
@@ -79,7 +79,7 @@ const Landing = () => {
     },
     {
       question: 'How much virtual money do I get to practice?',
-      answer: 'Every new user starts with ₹10,00,000 in virtual funds. You can use this to buy and sell stocks, build a portfolio, and track your performance. If you lose it all, you can reset your account and start fresh!'
+      answer: 'Every new user starts with ₹5,00,000 in virtual funds. You can use this to buy and sell stocks, build a portfolio, and track your performance. If you lose it all, you can reset your account and start fresh!'
     },
     {
       question: 'Is the stock data real or fictional?',
@@ -109,9 +109,42 @@ const Landing = () => {
 
   const stats = [
     { value: '1000+', label: 'Simulated Stocks' },
-    { value: '₹10L', label: 'Virtual Money' },
+    { value: '₹5L', label: 'Virtual Money' },
     { value: '100%', label: 'Risk Free' },
     { value: '₹0', label: 'Cost to Learn' }
+  ];
+
+  const howItWorks = [
+    {
+      step: '01',
+      title: 'Create Free Account',
+      description: 'Sign up in seconds with just your email. No KYC, no documents, no hassle.'
+    },
+    {
+      step: '02',
+      title: 'Get ₹5 Lakh Virtual Money',
+      description: 'Start with ₹5,00,000 in your virtual wallet to practice trading.'
+    },
+    {
+      step: '03',
+      title: 'Research & Analyze',
+      description: 'Browse 1000+ stocks, view charts, and analyze real market data.'
+    },
+    {
+      step: '04',
+      title: 'Buy & Sell Stocks',
+      description: 'Place mock orders just like real trading. Track your portfolio performance.'
+    },
+    {
+      step: '05',
+      title: 'Learn from Mistakes',
+      description: 'Review your trades, understand what worked, and refine your strategies.'
+    },
+    {
+      step: '06',
+      title: 'Go Live When Ready',
+      description: 'Once confident, open a real demat account and start actual investing.'
+    }
   ];
 
   return (
@@ -203,8 +236,43 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-20 lg:py-28 bg-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium mb-6">
+              <Zap className="h-4 w-4" />
+              Simple Steps
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              How It <span className="gradient-text">Works</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Start your mock trading journey in just a few simple steps.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {howItWorks.map((item, index) => (
+              <Card key={index} className="card-modern border-border/50 bg-card/80 backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute top-4 right-4 text-8xl font-bold text-primary/5 group-hover:text-primary/10 transition-colors">
+                  {item.step}
+                </div>
+                <CardContent className="p-6 relative">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm mb-4">
+                    {item.step}
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm">{item.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stock Exchange Education Section */}
-      <section id="learn-more" className="py-20 lg:py-28 bg-muted/30">
+      <section id="learn-more" className="py-20 lg:py-28">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -344,7 +412,7 @@ const Landing = () => {
           </h2>
           
           <p className="text-muted-foreground max-w-xl mx-auto mb-10">
-            Create your free account and get ₹10,00,000 in virtual money to start 
+            Create your free account and get ₹5,00,000 in virtual money to start 
             practicing. No credit card required. No real money involved.
           </p>
           
