@@ -30,7 +30,7 @@ const Auth = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/');
+        navigate('/dashboard');
       }
     };
     checkUser();
@@ -44,7 +44,7 @@ const Auth = () => {
       // Validate input
       authSchema.parse({ email, password, fullName });
 
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/dashboard`;
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -76,7 +76,7 @@ const Auth = () => {
           title: "Account created!",
           description: "You have successfully signed up. Redirecting...",
         });
-        setTimeout(() => navigate('/'), 1500);
+        setTimeout(() => navigate('/dashboard'), 1500);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -123,7 +123,7 @@ const Auth = () => {
           title: "Welcome back!",
           description: "You have successfully signed in.",
         });
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
