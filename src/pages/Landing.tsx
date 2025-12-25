@@ -30,120 +30,120 @@ const Landing = () => {
   const features = [
     {
       icon: TrendingUp,
-      title: 'Real-Time Trading',
-      description: 'Execute trades instantly with live market data and real-time price updates from NSE.'
+      title: 'Risk-Free Practice',
+      description: 'Trade with virtual money in a realistic simulation. Learn without risking real capital.'
     },
     {
       icon: BarChart3,
-      title: 'Advanced Analytics',
-      description: 'Comprehensive charts, technical indicators, and AI-powered market analysis.'
+      title: 'Real Market Data',
+      description: 'Practice with actual NSE stock prices and charts to experience real market movements.'
     },
     {
       icon: Shield,
-      title: 'Secure & Regulated',
-      description: 'Your investments are protected with bank-grade security and SEBI regulations.'
+      title: 'Safe Learning Environment',
+      description: 'Make mistakes, learn strategies, and build confidence before entering real markets.'
     },
     {
       icon: Globe,
-      title: '1000+ Stocks',
-      description: 'Access to all major NSE listed companies across diverse sectors.'
+      title: '1000+ Simulated Stocks',
+      description: 'Access all major NSE listed companies in our comprehensive mock trading platform.'
     }
   ];
 
   const stockExchangeInfo = [
     {
       icon: Building2,
-      title: 'What is a Stock Exchange?',
-      content: 'A stock exchange is a regulated marketplace where securities like stocks, bonds, and derivatives are bought and sold. The National Stock Exchange (NSE) of India is one of the largest stock exchanges in the world, providing a transparent and efficient platform for trading.'
+      title: 'What is a Mock Stock Exchange?',
+      content: 'A mock stock exchange is a simulated trading platform that mirrors real stock market conditions. StockVerse uses real NSE data to provide an authentic learning experience without any financial risk. Perfect for beginners and students.'
     },
     {
       icon: LineChart,
-      title: 'How Does Trading Work?',
-      content: 'When you buy a stock, you purchase a small ownership stake in a company. Stock prices fluctuate based on supply and demand, company performance, and market conditions. Traders aim to buy low and sell high to generate profits.'
+      title: 'How Does Simulated Trading Work?',
+      content: 'You start with virtual money (₹10,00,000) and trade just like in real markets. Buy and sell stocks, track your portfolio performance, and learn from your decisions. All trades are simulated - no real money is involved.'
     },
     {
       icon: Clock,
-      title: 'Market Hours',
-      content: 'The Indian stock market operates Monday to Friday, 9:15 AM to 3:30 PM IST. Pre-market sessions run from 9:00 AM to 9:15 AM. Markets remain closed on weekends and national holidays.'
+      title: 'Practice Anytime',
+      content: 'Unlike real markets with fixed hours (9:15 AM - 3:30 PM IST), our platform lets you practice 24/7. Review historical data, place mock orders, and build your trading strategies at your own pace.'
     },
     {
       icon: IndianRupee,
-      title: 'Why Invest in Stocks?',
-      content: 'Stocks historically offer higher returns compared to traditional savings. They provide ownership in growing companies, dividend income, and help build long-term wealth. Diversification across sectors reduces risk.'
+      title: 'Why Practice Before Investing?',
+      content: 'Studies show that 90% of new traders lose money. Our simulator helps you understand market dynamics, test strategies, and avoid costly beginner mistakes before investing real money.'
     }
   ];
 
   const testimonials = [
     {
       name: 'Rahul Sharma',
-      role: 'Day Trader',
+      role: 'Commerce Student',
       avatar: 'RS',
       rating: 5,
-      content: 'StockVerse has completely transformed my trading experience. The real-time data and AI insights have helped me make better decisions. Highly recommended!'
+      content: 'StockVerse helped me understand trading before using real money. I practiced for 3 months and now feel confident to start actual investing!'
     },
     {
       name: 'Priya Patel',
-      role: 'Long-term Investor',
+      role: 'MBA Student',
       avatar: 'PP',
       rating: 5,
-      content: 'As someone new to investing, the educational resources and intuitive interface made it easy to start. My portfolio has grown 40% in just 6 months.'
+      content: 'The best mock trading platform I have used. Real market data with zero risk. Perfect for learning technical analysis and testing strategies.'
     },
     {
       name: 'Amit Verma',
-      role: 'Portfolio Manager',
+      role: 'Finance Professional',
       avatar: 'AV',
       rating: 5,
-      content: 'The advanced analytics and sector-wise filtering are exceptional. I can track all 1000+ stocks efficiently. Best platform for serious traders.'
+      content: 'I use this to teach my interns about stock markets. The simulation is incredibly realistic. Great educational tool for beginners.'
     },
     {
       name: 'Sneha Reddy',
-      role: 'Part-time Trader',
+      role: 'Aspiring Trader',
       avatar: 'SR',
       rating: 5,
-      content: 'Love the mobile-friendly design and instant notifications. I can trade on-the-go without missing any market opportunities. Fantastic app!'
+      content: 'Made so many learning mistakes with virtual money that I would have regretted with real funds. This platform is a must before real trading!'
     }
   ];
 
   const faqs = [
     {
-      question: 'What is stock trading and how do I start?',
-      answer: 'Stock trading involves buying and selling shares of publicly listed companies. To start, you need to open a trading account, complete KYC verification, and fund your account. Begin with researching companies, understanding market trends, and start with small investments to learn the process.'
+      question: 'Is this a real stock trading platform?',
+      answer: 'No, StockVerse is a mock/simulated trading platform designed for learning and practice. All trades are virtual, and no real money is involved. We use real market data from NSE to provide an authentic experience, but you cannot buy or sell actual stocks here.'
     },
     {
-      question: 'What are the risks involved in stock trading?',
-      answer: 'Stock trading carries risks including market volatility, company-specific risks, and potential loss of capital. Prices can fluctuate based on economic conditions, company performance, and global events. Always invest only what you can afford to lose and diversify your portfolio to minimize risks.'
+      question: 'How much virtual money do I get to practice?',
+      answer: 'Every new user starts with ₹10,00,000 in virtual funds. You can use this to buy and sell stocks, build a portfolio, and track your performance. If you lose it all, you can reset your account and start fresh!'
     },
     {
-      question: 'What is the difference between NIFTY and SENSEX?',
-      answer: 'NIFTY 50 is the benchmark index of the National Stock Exchange (NSE) comprising 50 top companies, while SENSEX is the Bombay Stock Exchange (BSE) index with 30 companies. Both track market performance but use different calculation methodologies and company compositions.'
+      question: 'Is the stock data real or fictional?',
+      answer: 'We use real stock prices and data from the National Stock Exchange (NSE). This means you are practicing with actual market conditions, real company stocks, and genuine price movements - just without the financial risk.'
     },
     {
-      question: 'How do I analyze stocks before investing?',
-      answer: 'Analyze stocks using fundamental analysis (financial statements, P/E ratio, earnings) and technical analysis (price charts, trends, indicators). Consider company revenue, profit margins, debt levels, industry position, and management quality. Our AI-powered tools can help simplify this analysis.'
+      question: 'Can I transition to real trading after practicing here?',
+      answer: 'Absolutely! StockVerse is designed to prepare you for real markets. Once you feel confident, you can open a demat account with any SEBI-registered broker (like Zerodha, Groww, or Upstox) to start real trading.'
     },
     {
-      question: 'What are dividends and how do they work?',
-      answer: 'Dividends are a portion of company profits distributed to shareholders. Companies declare dividends periodically (quarterly/annually). When you own shares on the record date, you receive dividends directly in your bank account. Dividend yield helps compare returns across stocks.'
+      question: 'Is this platform free to use?',
+      answer: 'Yes! StockVerse is completely free for learning and practice. We believe everyone should have access to quality trading education without financial barriers. No hidden fees or premium subscriptions.'
     },
     {
-      question: 'What is intraday trading vs delivery trading?',
-      answer: 'Intraday trading involves buying and selling stocks within the same trading day to profit from short-term price movements. Delivery trading means holding stocks overnight or longer. Intraday requires lower margins but carries higher risk, while delivery trading is better for long-term wealth creation.'
+      question: 'What can I learn from mock trading?',
+      answer: 'You will learn how to read stock charts, understand market trends, build diversified portfolios, manage risk, use technical indicators, and develop trading strategies - all without risking real money.'
     },
     {
-      question: 'How is my investment protected on StockVerse?',
-      answer: 'Your investments are protected through SEBI regulations, bank-grade encryption, and secure authentication. We follow strict compliance standards and your shares are held in your personal demat account. Two-factor authentication adds an extra layer of security to your account.'
+      question: 'How is this different from paper trading?',
+      answer: 'Paper trading traditionally means recording trades on paper. StockVerse automates this with a digital platform, automatic profit/loss calculations, portfolio tracking, and performance analytics - making learning more effective.'
     },
     {
-      question: 'Can I invest with a small amount?',
-      answer: 'Yes! You can start investing with as little as ₹100. Many quality stocks are available at affordable prices, and you can gradually build your portfolio. Some stocks also offer fractional investing options. Start small, learn the market, and increase investments as you gain confidence.'
+      question: 'Who is this platform for?',
+      answer: 'StockVerse is perfect for students, beginners, aspiring traders, finance enthusiasts, and anyone who wants to understand stock markets before investing real money. It is also great for educators teaching investment concepts.'
     }
   ];
 
   const stats = [
-    { value: '1000+', label: 'Listed Stocks' },
-    { value: '₹450L Cr', label: 'Market Cap' },
-    { value: '24/7', label: 'Platform Access' },
-    { value: '0%', label: 'Hidden Fees' }
+    { value: '1000+', label: 'Simulated Stocks' },
+    { value: '₹10L', label: 'Virtual Money' },
+    { value: '100%', label: 'Risk Free' },
+    { value: '₹0', label: 'Cost to Learn' }
   ];
 
   return (
@@ -157,26 +157,26 @@ const Landing = () => {
         
         <div className="relative container mx-auto px-6 py-20 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 text-warning text-sm font-medium mb-8">
               <Zap className="h-4 w-4" />
-              Welcome to the Future of Trading
+              Mock Trading Simulator • No Real Money
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              <span className="gradient-text">Master the</span>
+              <span className="gradient-text">Learn to Trade</span>
               <br />
-              <span className="text-foreground">Stock Market</span>
+              <span className="text-foreground">Risk-Free</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Your gateway to the National Stock Exchange. Trade smarter with real-time data, 
-              advanced analytics, and AI-powered insights across 1000+ stocks.
+              Practice stock trading with virtual money using real NSE data. 
+              Build confidence and learn strategies before investing real capital.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/auth">
                 <Button size="lg" className="gap-2 px-8 py-6 text-lg shadow-glow">
-                  Get Started
+                  Start Practicing Free
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
@@ -212,10 +212,10 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Why Choose <span className="gradient-text">StockVerse</span>?
+              Why Practice on <span className="gradient-text">StockVerse</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Experience the most advanced trading platform with features designed for both beginners and professionals.
+              The most realistic mock trading simulator for learning stock market investing.
             </p>
           </div>
           
@@ -240,10 +240,10 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Understanding the <span className="gradient-text">Stock Exchange</span>
+              Understanding <span className="gradient-text">Mock Trading</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Learn the fundamentals of stock market investing and how the exchange works.
+              Learn how our simulated trading platform works and why it is the best way to learn.
             </p>
           </div>
           
@@ -414,23 +414,23 @@ const Landing = () => {
         <div className="relative container mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success text-sm font-medium mb-8">
             <Users className="h-4 w-4" />
-            Join 10,000+ Active Traders
+            Join 10,000+ Learners
           </div>
           
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Ready to Start Your
+            Ready to Learn
             <br />
-            <span className="gradient-text">Investment Journey?</span>
+            <span className="gradient-text">Stock Trading?</span>
           </h2>
           
           <p className="text-muted-foreground max-w-xl mx-auto mb-10">
-            Create your free account today and get access to real-time market data, 
-            advanced charts, and AI-powered trading insights.
+            Create your free account and get ₹10,00,000 in virtual money to start 
+            practicing. No credit card required. No real money involved.
           </p>
           
           <Link to="/auth">
             <Button size="lg" className="gap-2 px-10 py-6 text-lg shadow-glow">
-              Create Free Account
+              Start Mock Trading Free
               <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>
@@ -449,7 +449,7 @@ const Landing = () => {
             </div>
             
             <p className="text-muted-foreground text-sm text-center">
-              © 2025 StockVerse. All rights reserved. | NSE Trading Platform
+              © 2025 StockVerse. All rights reserved. | Mock Trading Simulator • Not a Real Stock Exchange
             </p>
             
             <div className="flex gap-6 text-sm text-muted-foreground">
