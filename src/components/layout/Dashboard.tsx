@@ -22,12 +22,16 @@ export function Dashboard() {
   const { stocks, priceHistory, isMarketOpen } = useStockData(mockStocks);
   const indices = useMarketIndices(mockIndices);
   
-  // Calculate market statistics
-  const gainers = stocks.filter(stock => stock.changePercent > 0);
-  const losers = stocks.filter(stock => stock.changePercent < 0);
+  // Calculate market statistics with safety checks
+  const validStocks = stocks.filter(stock => stock && typeof stock.changePercent === 'number');
+  const gainers = validStocks.filter(stock => stock.changePercent > 0);
+  const losers = validStocks.filter(stock => stock.changePercent < 0);
   
-  const topGainer = [...stocks].sort((a, b) => b.changePercent - a.changePercent)[0];
-  const topLoser = [...stocks].sort((a, b) => a.changePercent - b.changePercent)[0];
+  const sortedByGain = [...validStocks].sort((a, b) => b.changePercent - a.changePercent);
+  const sortedByLoss = [...validStocks].sort((a, b) => a.changePercent - b.changePercent);
+  
+  const topGainer = sortedByGain[0] || { symbol: 'N/A', name: 'No data', changePercent: 0 };
+  const topLoser = sortedByLoss[0] || { symbol: 'N/A', name: 'No data', changePercent: 0 };
   
   const totalMarketCap = stocks.reduce((sum, stock) => sum + stock.marketCap, 0);
   const totalVolume = stocks.reduce((sum, stock) => sum + stock.volume, 0);
