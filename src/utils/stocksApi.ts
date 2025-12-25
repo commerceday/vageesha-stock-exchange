@@ -610,12 +610,17 @@ function generatePatternBasedPrice(stock: Stock, historicalData: number[]): Stoc
 }
 
 export function useStockData(initialData: Stock[], updateInterval = 2000) {
-  const [stocks, setStocks] = useState<Stock[]>(initialData);
+  // Filter out undefined/null entries to prevent crashes
+  const validInitialData = initialData.filter(stock => stock && stock.symbol);
+  
+  const [stocks, setStocks] = useState<Stock[]>(validInitialData);
   const [priceHistory, setPriceHistory] = useState<Map<string, number[]>>(() => {
     // Initialize with actual stock prices
     const historyMap = new Map<string, number[]>();
-    initialData.forEach(stock => {
-      historyMap.set(stock.symbol, [stock.price]);
+    validInitialData.forEach(stock => {
+      if (stock && stock.symbol) {
+        historyMap.set(stock.symbol, [stock.price]);
+      }
     });
     return historyMap;
   });
@@ -623,8 +628,10 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
   const [lastRealPrices, setLastRealPrices] = useState<Map<string, number>>(() => {
     // Store last real exchange prices for each stock
     const pricesMap = new Map<string, number>();
-    initialData.forEach(stock => {
-      pricesMap.set(stock.symbol, stock.price);
+    validInitialData.forEach(stock => {
+      if (stock && stock.symbol) {
+        pricesMap.set(stock.symbol, stock.price);
+      }
     });
     return pricesMap;
   });
