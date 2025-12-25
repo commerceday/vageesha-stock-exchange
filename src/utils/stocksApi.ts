@@ -640,13 +640,15 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
   useEffect(() => {
     // Initial fetch
     const updateStockPrices = async () => {
-      const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(stocks);
+      const safeStocks = stocks.filter((s): s is Stock => Boolean(s && s.symbol));
+      const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(safeStocks);
       setIsMarketOpen(marketOpen);
       
       const newFailedStocks = new Set<string>();
       
-      setStocks(prevStocks => 
-        prevStocks.map(stock => {
+      setStocks(prevStocks => {
+        const safePrevStocks = prevStocks.filter((s): s is Stock => Boolean(s && s.symbol));
+        return safePrevStocks.map(stock => {
           const realtimeStock = realTimeData.find(d => d.symbol === stock.symbol);
           
           // Find base price from mockStocks as fallback
@@ -685,6 +687,11 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
           } else if (marketOpen && realtimeStock && realtimeStock.error) {
             // Track failed stocks during market hours
             newFailedStocks.add(stock.symbol);
+            return {
+              ...stock,
+              lastUpdated: new Date(),
+              dataSource: 'error' as const
+            };
           } else {
             // Market closed - use last real closing price and add ±1 rupee fluctuation
             const hasRealData = realtimeStock && !realtimeStock.error && typeof realtimeStock.price === 'number' && realtimeStock.price > 0;
@@ -727,8 +734,8 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
             
             return newStock;
           }
-        })
-      );
+        });
+      });
       
       // Log failed stocks to console
       if (marketOpen && newFailedStocks.size > 0) {
