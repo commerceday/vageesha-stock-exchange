@@ -1,12 +1,16 @@
 // Fetch real historical OHLC data for a stock symbol using Yahoo Finance chart API
-// Public edge function with CORS enabled
+// Protected edge function with CORS enabled
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const SYMBOL_REGEX = /^[A-Z0-9&_.-]{1,30}$/;
+const ALLOWED_RANGES = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "max"];
+const ALLOWED_INTERVALS = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo"];
 
 interface HistoryRequest {
   symbol: string; // e.g. "HDFCBANK" or "HDFCBANK.NS"
@@ -28,9 +32,28 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const body = (await req.json()) as HistoryRequest;
-    if (!body || !body.symbol) {
+    
+    // Input validation: symbol required
+    if (!body || !body.symbol || typeof body.symbol !== 'string') {
       return new Response(JSON.stringify({ error: "Missing 'symbol' in request body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate symbol format
+    if (!SYMBOL_REGEX.test(body.symbol)) {
+      return new Response(JSON.stringify({ error: "Invalid symbol format" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -39,6 +62,22 @@ serve(async (req: Request): Promise<Response> => {
     const symbol = body.symbol.endsWith(".NS") ? body.symbol : `${body.symbol}.NS`;
     const range = body.range ?? "1mo";
     const interval = body.interval ?? "1d";
+
+    // Validate range parameter
+    if (!ALLOWED_RANGES.includes(range)) {
+      return new Response(JSON.stringify({ error: `Invalid range. Allowed: ${ALLOWED_RANGES.join(", ")}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate interval parameter
+    if (!ALLOWED_INTERVALS.includes(interval)) {
+      return new Response(JSON.stringify({ error: `Invalid interval. Allowed: ${ALLOWED_INTERVALS.join(", ")}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`);
     url.searchParams.set("range", range);
