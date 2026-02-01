@@ -2,8 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+const MAX_SYMBOLS = 50;
+const SYMBOL_REGEX = /^[A-Z0-9&_-]{1,20}$/;
 
 interface StockSymbol {
   symbol: string;
@@ -29,7 +32,41 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { symbols } = await req.json() as { symbols: StockSymbol[] };
+
+    // Input validation
+    if (!symbols || !Array.isArray(symbols) || symbols.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request: symbols array required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (symbols.length > MAX_SYMBOLS) {
+      return new Response(
+        JSON.stringify({ error: `Maximum ${MAX_SYMBOLS} symbols allowed per request` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate each symbol format
+    for (const item of symbols) {
+      if (!item.symbol || typeof item.symbol !== 'string' || !SYMBOL_REGEX.test(item.symbol)) {
+        return new Response(
+          JSON.stringify({ error: `Invalid symbol format: ${item.symbol}` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     // Check if Indian stock market is open (IST: 9:15 AM - 3:30 PM, Mon-Fri)
     const isMarketOpen = checkMarketHours();

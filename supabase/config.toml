@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.fetch-mf-nav]
 verify_jwt = false
+
+[functions.fetch-market-indices]
+verify_jwt = false
+
+[functions.stock-assistant]
+verify_jwt = false

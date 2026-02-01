@@ -2,8 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+const MAX_SCHEMES = 50;
+const SCHEME_CODE_REGEX = /^\d{1,10}$/;
 
 interface NAVData {
   schemeCode: string;
@@ -65,7 +68,7 @@ async function fetchNAVFromMFAPI(schemeCodes: string[]): Promise<Record<string, 
   const fetchPromises = schemeCodes.map(async (schemeCode) => {
     try {
       const response = await fetchWithTimeout(
-        `https://api.mfapi.in/mf/${schemeCode}/latest`,
+        `https://api.mfapi.in/mf/${encodeURIComponent(schemeCode)}/latest`,
         {
           headers: {
             'Accept': 'application/json',
@@ -105,14 +108,42 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { schemeCodes } = await req.json();
     
-    if (!schemeCodes || !Array.isArray(schemeCodes)) {
+    // Input validation: array required
+    if (!schemeCodes || !Array.isArray(schemeCodes) || schemeCodes.length === 0) {
       console.error('Invalid request: schemeCodes array required');
       return new Response(
         JSON.stringify({ error: 'schemeCodes array is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Validate array length
+    if (schemeCodes.length > MAX_SCHEMES) {
+      return new Response(
+        JSON.stringify({ error: `Maximum ${MAX_SCHEMES} scheme codes allowed per request` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate each scheme code format (should be numeric)
+    for (const schemeCode of schemeCodes) {
+      if (typeof schemeCode !== 'string' || !SCHEME_CODE_REGEX.test(schemeCode)) {
+        return new Response(
+          JSON.stringify({ error: `Invalid scheme code format: ${schemeCode}` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     console.log(`Fetching NAV for ${schemeCodes.length} schemes`);
