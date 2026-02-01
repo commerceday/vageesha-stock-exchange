@@ -14,6 +14,7 @@ interface NAVData {
 
 // Fallback NAV data for when the API is unavailable
 const fallbackNAVData: Record<string, NAVData> = {
+  // Mutual Funds
   '119598': { schemeCode: '119598', schemeName: 'SBI Blue Chip Fund - Direct Plan - Growth', nav: 78.45, date: 'Fallback' },
   '100025': { schemeCode: '100025', schemeName: 'HDFC Top 100 Fund - Growth Option', nav: 945.67, date: 'Fallback' },
   '120505': { schemeCode: '120505', schemeName: 'ICICI Prudential Bluechip Fund - Direct Plan - Growth', nav: 89.34, date: 'Fallback' },
@@ -24,6 +25,21 @@ const fallbackNAVData: Record<string, NAVData> = {
   '100474': { schemeCode: '100474', schemeName: 'HDFC Mid-Cap Opportunities Fund - Growth Option', nav: 145.67, date: 'Fallback' },
   '125497': { schemeCode: '125497', schemeName: 'SBI Small Cap Fund - Direct Plan - Growth', nav: 156.78, date: 'Fallback' },
   '118778': { schemeCode: '118778', schemeName: 'Nippon India Small Cap Fund - Direct Plan - Growth', nav: 145.67, date: 'Fallback' },
+  // ETFs
+  '120716': { schemeCode: '120716', schemeName: 'Nippon India ETF Nifty BeES', nav: 267.12, date: 'Fallback' },
+  '136794': { schemeCode: '136794', schemeName: 'SBI ETF Nifty 50', nav: 234.34, date: 'Fallback' },
+  '120323': { schemeCode: '120323', schemeName: 'ICICI Prudential Nifty 50 ETF', nav: 245.45, date: 'Fallback' },
+  '118836': { schemeCode: '118836', schemeName: 'Nippon India ETF Nifty Bank BeES', nav: 456.34, date: 'Fallback' },
+  '120713': { schemeCode: '120713', schemeName: 'Nippon India ETF Junior BeES', nav: 567.45, date: 'Fallback' },
+  '107574': { schemeCode: '107574', schemeName: 'Nippon India ETF Gold BeES', nav: 56.67, date: 'Fallback' },
+  '120712': { schemeCode: '120712', schemeName: 'Nippon India ETF Nifty IT BeES', nav: 378.45, date: 'Fallback' },
+  '140555': { schemeCode: '140555', schemeName: 'Nippon India ETF Nifty PSU Bank BeES', nav: 78.56, date: 'Fallback' },
+  '120711': { schemeCode: '120711', schemeName: 'Nippon India ETF Infra BeES', nav: 678.23, date: 'Fallback' },
+  '147830': { schemeCode: '147830', schemeName: 'Nippon India Silver ETF', nav: 89.34, date: 'Fallback' },
+  '140524': { schemeCode: '140524', schemeName: 'Motilal Oswal NASDAQ 100 ETF', nav: 145.12, date: 'Fallback' },
+  '136714': { schemeCode: '136714', schemeName: 'CPSE ETF', nav: 78.67, date: 'Fallback' },
+  '136797': { schemeCode: '136797', schemeName: 'SBI ETF Nifty Bank', nav: 478.45, date: 'Fallback' },
+  '120715': { schemeCode: '120715', schemeName: 'Nippon India ETF Sensex BeES', nav: 678.56, date: 'Fallback' },
 };
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeout: number): Promise<Response> {

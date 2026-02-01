@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { etfData, ETF } from '@/utils/etf-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,9 +6,38 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, TrendingUp, TrendingDown, ArrowUpDown, ShoppingCart } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search, Filter, TrendingUp, TrendingDown, ArrowUpDown, ShoppingCart, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ETFBuySellDialog } from '@/components/etfs/ETFBuySellDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+// AMFI scheme code mapping for ETFs
+const etfSchemeCodeMapping: Record<string, string> = {
+  'NIFTYBEES': '120716',
+  'SETFNIF50': '136794',
+  'ICICINIF50': '120323',
+  'BANKBEES': '118836',
+  'JUNIORBEES': '120713',
+  'GOLDBEES': '107574',
+  'ITBEES': '120712',
+  'PSUBNKBEES': '140555',
+  'INFRABEES': '120711',
+  'SILVERBEES': '147830',
+  'N100': '140524',
+  'CPSE': '136714',
+  'SETFNIFBK': '136797',
+  'SENSEXBEES': '120715',
+};
+
+interface LiveNAVData {
+  [symbol: string]: {
+    nav: number;
+    date: string;
+    schemeName: string;
+  };
+}
 
 const ETFs = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +47,50 @@ const ETFs = () => {
     { ...etfData[0], lastUpdated: new Date() }
   );
   const [buySellDialogOpen, setBuySellDialogOpen] = useState(false);
+  const [liveNAVData, setLiveNAVData] = useState<LiveNAVData>({});
+  const [isLoadingNAV, setIsLoadingNAV] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+
+  // Fetch live NAV data
+  const fetchLiveNAV = async () => {
+    setIsLoadingNAV(true);
+    try {
+      const schemeCodes = Object.values(etfSchemeCodeMapping);
+      
+      const { data, error } = await supabase.functions.invoke('fetch-mf-nav', {
+        body: { schemeCodes },
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.data) {
+        // Map scheme codes back to symbols
+        const navBySymbol: LiveNAVData = {};
+        Object.entries(etfSchemeCodeMapping).forEach(([symbol, schemeCode]) => {
+          if (data.data[schemeCode]) {
+            navBySymbol[symbol] = {
+              nav: data.data[schemeCode].nav,
+              date: data.data[schemeCode].date,
+              schemeName: data.data[schemeCode].schemeName,
+            };
+          }
+        });
+        setLiveNAVData(navBySymbol);
+        setLastRefreshed(new Date());
+        toast.success('ETF NAV data updated successfully');
+      }
+    } catch (error) {
+      console.error('Error fetching ETF NAV:', error);
+      toast.error('Failed to fetch live ETF NAV data');
+    } finally {
+      setIsLoadingNAV(false);
+    }
+  };
+
+  // Fetch NAV on mount
+  useEffect(() => {
+    fetchLiveNAV();
+  }, []);
 
   // Get unique categories and fund houses
   const categories = React.useMemo(() => {
@@ -41,11 +114,22 @@ const ETFs = () => {
     });
   }, [searchQuery, selectedCategory, selectedFundHouse]);
 
+  // Get NAV for an ETF (live if available, otherwise static)
+  const getETFNAV = (etf: Omit<ETF, 'lastUpdated'>) => {
+    if (liveNAVData[etf.symbol]) {
+      return liveNAVData[etf.symbol].nav;
+    }
+    return etf.nav;
+  };
+
   const getPremiumDiscountColor = (value: number) => {
     if (value > 0.5) return 'text-danger';
     if (value < -0.5) return 'text-success';
     return 'text-muted-foreground';
   };
+
+  const selectedETFNAV = getETFNAV(selectedETF);
+  const hasLiveData = !!liveNAVData[selectedETF.symbol];
 
   return (
     <PageLayout title="Exchange Traded Funds (ETFs)">
@@ -53,6 +137,22 @@ const ETFs = () => {
         <p className="text-sm text-muted-foreground">
           {filteredETFs.length} of {etfData.length} ETFs
         </p>
+        <div className="flex items-center gap-2">
+          {lastRefreshed && (
+            <span className="text-xs text-muted-foreground">
+              Last updated: {lastRefreshed.toLocaleTimeString()}
+            </span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchLiveNAV}
+            disabled={isLoadingNAV}
+          >
+            <RefreshCw className={cn("h-4 w-4 mr-2", isLoadingNAV && "animate-spin")} />
+            Refresh NAV
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -106,44 +206,60 @@ const ETFs = () => {
 
           {/* ETF List */}
           <div className="h-[calc(100vh-450px)] overflow-y-auto space-y-3">
-            {filteredETFs.map((etf) => (
-              <Card 
-                key={etf.symbol}
-                className={cn(
-                  "cursor-pointer transition-all hover:shadow-md",
-                  selectedETF.symbol === etf.symbol && "ring-2 ring-primary"
-                )}
-                onClick={() => setSelectedETF({ ...etf, lastUpdated: new Date() })}
-              >
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{etf.symbol}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{etf.name}</p>
+            {filteredETFs.map((etf) => {
+              const etfNAV = getETFNAV(etf);
+              const isLive = !!liveNAVData[etf.symbol];
+              
+              return (
+                <Card 
+                  key={etf.symbol}
+                  className={cn(
+                    "cursor-pointer transition-all hover:shadow-md",
+                    selectedETF.symbol === etf.symbol && "ring-2 ring-primary"
+                  )}
+                  onClick={() => setSelectedETF({ ...etf, lastUpdated: new Date() })}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-sm">{etf.symbol}</p>
+                          {isLive && (
+                            <Badge variant="outline" className="text-[10px] px-1 py-0 bg-success/10 text-success border-success/20">
+                              LIVE
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{etf.name}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {etf.category}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      {etf.category}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-lg font-bold">₹{etf.price.toFixed(2)}</p>
-                      <p className={cn(
-                        "text-xs flex items-center gap-1",
-                        etf.changePercent >= 0 ? "text-success" : "text-danger"
-                      )}>
-                        {etf.changePercent >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                        {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
-                      </p>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        {isLoadingNAV && !liveNAVData[etf.symbol] ? (
+                          <Skeleton className="h-6 w-20" />
+                        ) : (
+                          <p className="text-lg font-bold">₹{etf.price.toFixed(2)}</p>
+                        )}
+                        <p className={cn(
+                          "text-xs flex items-center gap-1",
+                          etf.changePercent >= 0 ? "text-success" : "text-danger"
+                        )}>
+                          {etf.changePercent >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                          {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground">NAV</p>
+                        <p className="text-sm font-medium">₹{etfNAV.toFixed(2)}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">Exp Ratio</p>
-                      <p className="text-sm font-medium">{etf.expenseRatio}%</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
             {filteredETFs.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 No ETFs found matching your criteria
@@ -155,11 +271,23 @@ const ETFs = () => {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold">{selectedETF.symbol}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold">{selectedETF.symbol}</h2>
+                {hasLiveData && (
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    LIVE
+                  </Badge>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">{selectedETF.name}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Tracks: <span className="font-medium">{selectedETF.trackingIndex}</span>
               </p>
+              {hasLiveData && liveNAVData[selectedETF.symbol]?.date && (
+                <p className="text-xs text-muted-foreground">
+                  NAV as on: {liveNAVData[selectedETF.symbol].date}
+                </p>
+              )}
             </div>
             <Badge variant="secondary" className="text-sm">
               {selectedETF.category}
@@ -194,7 +322,11 @@ const ETFs = () => {
             <Card>
               <CardContent className="p-4">
                 <h3 className="font-medium text-sm text-muted-foreground">NAV</h3>
-                <p className="text-xl font-bold mt-1">₹{selectedETF.nav.toFixed(2)}</p>
+                {isLoadingNAV && !hasLiveData ? (
+                  <Skeleton className="h-7 w-20 mt-1" />
+                ) : (
+                  <p className="text-xl font-bold mt-1">₹{selectedETFNAV.toFixed(2)}</p>
+                )}
               </CardContent>
             </Card>
             <Card>
