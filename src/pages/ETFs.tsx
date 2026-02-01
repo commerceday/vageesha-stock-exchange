@@ -1,20 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { etfData, ETF } from '@/utils/etf-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, TrendingUp, TrendingDown, ArrowUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, Filter, TrendingUp, TrendingDown, ArrowUpDown, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ETFBuySellDialog } from '@/components/etfs/ETFBuySellDialog';
 
 const ETFs = () => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
-  const [selectedFundHouse, setSelectedFundHouse] = React.useState<string>('all');
-  const [selectedETF, setSelectedETF] = React.useState<ETF & { lastUpdated: Date }>(
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedFundHouse, setSelectedFundHouse] = useState<string>('all');
+  const [selectedETF, setSelectedETF] = useState<ETF & { lastUpdated: Date }>(
     { ...etfData[0], lastUpdated: new Date() }
   );
+  const [buySellDialogOpen, setBuySellDialogOpen] = useState(false);
 
   // Get unique categories and fund houses
   const categories = React.useMemo(() => {
@@ -163,10 +166,14 @@ const ETFs = () => {
             </Badge>
           </div>
           
-          {/* Price Card */}
+          {/* Price Card with Buy Button */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Market Price</CardTitle>
+              <Button onClick={() => setBuySellDialogOpen(true)} className="gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Buy / Sell
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-4">
@@ -280,6 +287,14 @@ const ETFs = () => {
           </Card>
         </div>
       </div>
+
+      {/* Buy/Sell Dialog */}
+      <ETFBuySellDialog
+        etf={selectedETF}
+        open={buySellDialogOpen}
+        onOpenChange={setBuySellDialogOpen}
+        onSuccess={() => {}}
+      />
     </PageLayout>
   );
 };
