@@ -15,6 +15,8 @@ import Portfolio from "./pages/Portfolio";
 import Performance from "./pages/Performance";
 import Analysis from "./pages/Analysis";
 import Auth from "./pages/Auth";
+import MutualFunds from "./pages/MutualFunds";
+import ETFs from "./pages/ETFs";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
           <Route path="/stocks" element={<ProtectedRoute><Stocks /></ProtectedRoute>} />
+          <Route path="/mutual-funds" element={<ProtectedRoute><MutualFunds /></ProtectedRoute>} />
+          <Route path="/etfs" element={<ProtectedRoute><ETFs /></ProtectedRoute>} />
           <Route path="/markets" element={<ProtectedRoute><Markets /></ProtectedRoute>} />
           <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
