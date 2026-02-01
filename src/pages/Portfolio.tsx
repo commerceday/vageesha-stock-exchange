@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { formatCurrency, formatPercentage } from '@/utils/stocksApi';
-import { TrendingUp, TrendingDown, Wallet, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Activity, BarChart, Landmark, Layers } from 'lucide-react';
 import { mockStocks } from '@/utils/stocksApi';
+import { mutualFundsData } from '@/utils/mutual-funds-data';
+import { etfData } from '@/utils/etf-data';
 import { toast } from '@/components/ui/use-toast';
+import { cn } from '@/lib/utils';
 
 interface Investment {
   id: string;
@@ -14,6 +19,7 @@ interface Investment {
   quantity: number;
   purchase_price: number;
   purchase_date: string;
+  type?: 'stock' | 'mf' | 'etf';
 }
 
 interface Transaction {
@@ -65,7 +71,21 @@ const Portfolio = () => {
         .eq('id', user.id)
         .single();
 
-      setInvestments(investmentsData || []);
+      // Categorize investments by type
+      const categorizedInvestments = (investmentsData || []).map(inv => {
+        const symbol = inv.stock_symbol;
+        let type: 'stock' | 'mf' | 'etf' = 'stock';
+        
+        if (mutualFundsData.find(mf => mf.symbol === symbol)) {
+          type = 'mf';
+        } else if (etfData.find(etf => etf.symbol === symbol)) {
+          type = 'etf';
+        }
+        
+        return { ...inv, type };
+      });
+
+      setInvestments(categorizedInvestments);
       setTransactions(transactionsData || []);
       setBalance(profile?.balance || 0);
     } catch (error) {
@@ -83,15 +103,10 @@ const Portfolio = () => {
       });
       if (error) {
         console.error('Error fetching live prices:', error);
-        toast({ description: 'Failed to refresh live prices.' });
         return;
       }
       const payload: any = data as any;
       const items = payload?.data || [];
-      const isOpen = payload?.marketOpen;
-      if (isOpen === false) {
-        toast({ description: 'Market closed. Showing last known/mock prices.' });
-      }
       const priceMap: Record<string, number> = {};
       for (const item of items) {
         if (item && typeof item.price === 'number' && item.price > 0) {
@@ -106,36 +121,120 @@ const Portfolio = () => {
 
   useEffect(() => {
     if (!investments.length) return;
-    const symbols = Array.from(new Set(investments.map((inv) => inv.stock_symbol)));
-    fetchLivePrices(symbols);
-    const interval = setInterval(() => fetchLivePrices(symbols), 30000);
-    return () => clearInterval(interval);
+    const stockSymbols = investments
+      .filter(inv => inv.type === 'stock')
+      .map(inv => inv.stock_symbol);
+    if (stockSymbols.length > 0) {
+      fetchLivePrices(stockSymbols);
+      const interval = setInterval(() => fetchLivePrices(stockSymbols), 30000);
+      return () => clearInterval(interval);
+    }
   }, [investments]);
 
-  const getCurrentPrice = (symbol: string) => {
+  const getCurrentPrice = (symbol: string, type: 'stock' | 'mf' | 'etf' = 'stock') => {
+    // Check live prices first
     const live = currentPrices[symbol];
     if (typeof live === 'number' && live > 0) return live;
+
+    // Fallback to mock data based on type
+    if (type === 'mf') {
+      const mf = mutualFundsData.find(m => m.symbol === symbol);
+      return mf?.nav || 0;
+    }
+    if (type === 'etf') {
+      const etf = etfData.find(e => e.symbol === symbol);
+      return etf?.price || 0;
+    }
+    
     const stock = mockStocks.find((s) => s.symbol === symbol);
     return stock?.price || 0;
   };
 
-  const calculateTotalValue = () => {
-    return investments.reduce((total, inv) => {
-      const currentPrice = getCurrentPrice(inv.stock_symbol);
+  const stockInvestments = investments.filter(inv => inv.type === 'stock');
+  const mfInvestments = investments.filter(inv => inv.type === 'mf');
+  const etfInvestments = investments.filter(inv => inv.type === 'etf');
+
+  const calculateTotals = (invList: Investment[]) => {
+    const totalValue = invList.reduce((total, inv) => {
+      const currentPrice = getCurrentPrice(inv.stock_symbol, inv.type);
       return total + (currentPrice * inv.quantity);
     }, 0);
-  };
 
-  const calculateTotalInvested = () => {
-    return investments.reduce((total, inv) => {
+    const totalInvested = invList.reduce((total, inv) => {
       return total + (inv.purchase_price * inv.quantity);
     }, 0);
+
+    const pnl = totalValue - totalInvested;
+    const pnlPercent = totalInvested > 0 ? (pnl / totalInvested) * 100 : 0;
+
+    return { totalValue, totalInvested, pnl, pnlPercent };
   };
 
-  const totalValue = calculateTotalValue();
-  const totalInvested = calculateTotalInvested();
-  const totalPnL = totalValue - totalInvested;
-  const totalPnLPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
+  const stockTotals = calculateTotals(stockInvestments);
+  const mfTotals = calculateTotals(mfInvestments);
+  const etfTotals = calculateTotals(etfInvestments);
+
+  const grandTotalValue = stockTotals.totalValue + mfTotals.totalValue + etfTotals.totalValue;
+  const grandTotalInvested = stockTotals.totalInvested + mfTotals.totalInvested + etfTotals.totalInvested;
+  const grandTotalPnL = grandTotalValue - grandTotalInvested;
+  const grandTotalPnLPercent = grandTotalInvested > 0 ? (grandTotalPnL / grandTotalInvested) * 100 : 0;
+
+  const renderInvestmentTable = (invList: Investment[], type: 'stock' | 'mf' | 'etf') => {
+    if (invList.length === 0) {
+      return (
+        <div className="text-center py-8 text-muted-foreground">
+          No {type === 'stock' ? 'stock' : type === 'mf' ? 'mutual fund' : 'ETF'} holdings yet. Start investing to see them here!
+        </div>
+      );
+    }
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left py-3 px-4">{type === 'mf' ? 'Fund' : type === 'etf' ? 'ETF' : 'Stock'}</th>
+              <th className="text-right py-3 px-4">{type === 'mf' ? 'Units' : 'Qty'}</th>
+              <th className="text-right py-3 px-4">{type === 'mf' ? 'Avg NAV' : 'Avg Price'}</th>
+              <th className="text-right py-3 px-4">{type === 'mf' ? 'Current NAV' : 'Current Price'}</th>
+              <th className="text-right py-3 px-4">Total Value</th>
+              <th className="text-right py-3 px-4">P&L</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invList.map((inv) => {
+              const currentPrice = getCurrentPrice(inv.stock_symbol, type);
+              const currentValue = currentPrice * inv.quantity;
+              const investedValue = inv.purchase_price * inv.quantity;
+              const pnl = currentValue - investedValue;
+              const pnlPercent = (pnl / investedValue) * 100;
+
+              return (
+                <tr key={inv.id} className="border-b hover:bg-muted/50">
+                  <td className="py-3 px-4">
+                    <div>
+                      <div className="font-semibold">{inv.stock_symbol}</div>
+                      <div className="text-sm text-muted-foreground line-clamp-1">{inv.stock_name}</div>
+                    </div>
+                  </td>
+                  <td className="text-right py-3 px-4">{inv.quantity}</td>
+                  <td className="text-right py-3 px-4">{formatCurrency(inv.purchase_price)}</td>
+                  <td className="text-right py-3 px-4">{formatCurrency(currentPrice)}</td>
+                  <td className="text-right py-3 px-4 font-semibold">
+                    {formatCurrency(currentValue)}
+                  </td>
+                  <td className={`text-right py-3 px-4 ${pnl >= 0 ? 'text-success' : 'text-danger'}`}>
+                    <div className="font-semibold">{formatCurrency(Math.abs(pnl))}</div>
+                    <div className="text-xs">({formatPercentage(pnlPercent)})</div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -173,7 +272,7 @@ const Portfolio = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{formatCurrency(totalInvested)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(grandTotalInvested)}</p>
             </CardContent>
           </Card>
 
@@ -184,7 +283,7 @@ const Portfolio = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{formatCurrency(totalValue)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(grandTotalValue)}</p>
             </CardContent>
           </Card>
 
@@ -196,78 +295,116 @@ const Portfolio = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-2">
-                {totalPnL >= 0 ? (
-                  <TrendingUp className="h-4 w-4 text-green-500" />
+                {grandTotalPnL >= 0 ? (
+                  <TrendingUp className="h-4 w-4 text-success" />
                 ) : (
-                  <TrendingDown className="h-4 w-4 text-red-500" />
+                  <TrendingDown className="h-4 w-4 text-danger" />
                 )}
-                <p className={`text-2xl font-bold ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {formatCurrency(Math.abs(totalPnL))}
+                <p className={`text-2xl font-bold ${grandTotalPnL >= 0 ? 'text-success' : 'text-danger'}`}>
+                  {formatCurrency(Math.abs(grandTotalPnL))}
                 </p>
-                <span className={`text-sm ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  ({formatPercentage(totalPnLPercent)})
+                <span className={`text-sm ${grandTotalPnL >= 0 ? 'text-success' : 'text-danger'}`}>
+                  ({formatPercentage(grandTotalPnLPercent)})
                 </span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Holdings */}
+        {/* Investment Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart className="h-5 w-5 text-primary" />
+                  <span className="font-medium">Stocks</span>
+                </div>
+                <Badge variant="outline">{stockInvestments.length} holdings</Badge>
+              </div>
+              <p className="text-2xl font-bold mt-2">{formatCurrency(stockTotals.totalValue)}</p>
+              <p className={cn(
+                "text-sm",
+                stockTotals.pnl >= 0 ? "text-success" : "text-danger"
+              )}>
+                {stockTotals.pnl >= 0 ? '+' : ''}{formatCurrency(stockTotals.pnl)} ({formatPercentage(stockTotals.pnlPercent)})
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-5 w-5 text-primary" />
+                  <span className="font-medium">Mutual Funds</span>
+                </div>
+                <Badge variant="outline">{mfInvestments.length} holdings</Badge>
+              </div>
+              <p className="text-2xl font-bold mt-2">{formatCurrency(mfTotals.totalValue)}</p>
+              <p className={cn(
+                "text-sm",
+                mfTotals.pnl >= 0 ? "text-success" : "text-danger"
+              )}>
+                {mfTotals.pnl >= 0 ? '+' : ''}{formatCurrency(mfTotals.pnl)} ({formatPercentage(mfTotals.pnlPercent)})
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-primary" />
+                  <span className="font-medium">ETFs</span>
+                </div>
+                <Badge variant="outline">{etfInvestments.length} holdings</Badge>
+              </div>
+              <p className="text-2xl font-bold mt-2">{formatCurrency(etfTotals.totalValue)}</p>
+              <p className={cn(
+                "text-sm",
+                etfTotals.pnl >= 0 ? "text-success" : "text-danger"
+              )}>
+                {etfTotals.pnl >= 0 ? '+' : ''}{formatCurrency(etfTotals.pnl)} ({formatPercentage(etfTotals.pnlPercent)})
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Holdings Tabs */}
         <Card>
           <CardHeader>
             <CardTitle>My Holdings</CardTitle>
           </CardHeader>
           <CardContent>
-            {investments.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No holdings yet. Start investing to see your portfolio here!
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 px-4">Stock</th>
-                      <th className="text-right py-3 px-4">Qty</th>
-                      <th className="text-right py-3 px-4">Avg Price</th>
-                      <th className="text-right py-3 px-4">Current Price</th>
-                      <th className="text-right py-3 px-4">Total Value</th>
-                      <th className="text-right py-3 px-4">P&L</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {investments.map((inv) => {
-                      const currentPrice = getCurrentPrice(inv.stock_symbol);
-                      const currentValue = currentPrice * inv.quantity;
-                      const investedValue = inv.purchase_price * inv.quantity;
-                      const pnl = currentValue - investedValue;
-                      const pnlPercent = (pnl / investedValue) * 100;
-
-                      return (
-                        <tr key={inv.id} className="border-b hover:bg-muted/50">
-                          <td className="py-3 px-4">
-                            <div>
-                              <div className="font-semibold">{inv.stock_symbol}</div>
-                              <div className="text-sm text-muted-foreground">{inv.stock_name}</div>
-                            </div>
-                          </td>
-                          <td className="text-right py-3 px-4">{inv.quantity}</td>
-                          <td className="text-right py-3 px-4">{formatCurrency(inv.purchase_price)}</td>
-                          <td className="text-right py-3 px-4">{formatCurrency(currentPrice)}</td>
-                          <td className="text-right py-3 px-4 font-semibold">
-                            {formatCurrency(currentValue)}
-                          </td>
-                          <td className={`text-right py-3 px-4 ${pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                            <div className="font-semibold">{formatCurrency(Math.abs(pnl))}</div>
-                            <div className="text-xs">({formatPercentage(pnlPercent)})</div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <Tabs defaultValue="stocks" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="stocks" className="flex items-center gap-2">
+                  <BarChart className="h-4 w-4" />
+                  Stocks ({stockInvestments.length})
+                </TabsTrigger>
+                <TabsTrigger value="mf" className="flex items-center gap-2">
+                  <Landmark className="h-4 w-4" />
+                  Mutual Funds ({mfInvestments.length})
+                </TabsTrigger>
+                <TabsTrigger value="etf" className="flex items-center gap-2">
+                  <Layers className="h-4 w-4" />
+                  ETFs ({etfInvestments.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="stocks" className="mt-4">
+                {renderInvestmentTable(stockInvestments, 'stock')}
+              </TabsContent>
+              
+              <TabsContent value="mf" className="mt-4">
+                {renderInvestmentTable(mfInvestments, 'mf')}
+              </TabsContent>
+              
+              <TabsContent value="etf" className="mt-4">
+                {renderInvestmentTable(etfInvestments, 'etf')}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
@@ -292,11 +429,11 @@ const Portfolio = () => {
                     className="flex items-center justify-between p-3 rounded-md border"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${txn.transaction_type === 'buy' ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                      <div className={`p-2 rounded-full ${txn.transaction_type === 'buy' ? 'bg-success/10' : 'bg-danger/10'}`}>
                         {txn.transaction_type === 'buy' ? (
-                          <TrendingUp className="h-4 w-4 text-green-500" />
+                          <TrendingUp className="h-4 w-4 text-success" />
                         ) : (
-                          <TrendingDown className="h-4 w-4 text-red-500" />
+                          <TrendingDown className="h-4 w-4 text-danger" />
                         )}
                       </div>
                       <div>

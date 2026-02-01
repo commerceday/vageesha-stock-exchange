@@ -17,6 +17,7 @@ import Analysis from "./pages/Analysis";
 import Auth from "./pages/Auth";
 import MutualFunds from "./pages/MutualFunds";
 import ETFs from "./pages/ETFs";
+import AdminUsers from "./pages/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/portfolio" element={<ProtectedRoute><Portfolio /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><Performance /></ProtectedRoute>} />
           <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

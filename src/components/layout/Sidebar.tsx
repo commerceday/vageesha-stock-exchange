@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   BarChart, PieChart, BarChart3, Wallet, LineChart,
-  ChevronRight, ChevronLeft, Home, Menu, Landmark, Layers
+  ChevronRight, ChevronLeft, Home, Menu, Landmark, Layers, Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Link, useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -21,13 +22,27 @@ interface NavItem {
   title: string;
   icon: React.ElementType;
   href: string;
+  adminOnly?: boolean;
 }
 
 export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const [isAdmin, setIsAdmin] = useState(false);
   
-  const navItems = [
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: hasRole } = await supabase
+          .rpc('has_role', { _user_id: user.id, _role: 'admin' });
+        setIsAdmin(!!hasRole);
+      }
+    };
+    checkAdminStatus();
+  }, []);
+  
+  const navItems: NavItem[] = [
     {
       title: 'Dashboard',
       icon: Home,
@@ -67,8 +82,16 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       title: 'Analysis',
       icon: PieChart,
       href: '/analysis',
+    },
+    {
+      title: 'User Management',
+      icon: Users,
+      href: '/admin/users',
+      adminOnly: true,
     }
   ];
+
+  const filteredNavItems = navItems.filter(item => !item.adminOnly || isAdmin);
 
   const SidebarContent = () => (
     <>
@@ -97,7 +120,7 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       
       <ScrollArea className="flex-1 py-6">
         <nav className="grid gap-2 px-3">
-          {navItems.map((item, index) => {
+          {filteredNavItems.map((item, index) => {
             const isActive = location.pathname === item.href;
             return (
               <Link
@@ -109,7 +132,8 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
                   isActive 
                     ? "bg-gradient-to-r from-sidebar-primary/20 to-sidebar-primary/10 text-sidebar-primary font-semibold shadow-[0_4px_12px_hsl(var(--sidebar-primary)/0.2)]" 
                     : "text-sidebar-foreground",
-                  isCollapsed && !isMobile && "justify-center px-0"
+                  isCollapsed && !isMobile && "justify-center px-0",
+                  item.adminOnly && "border-l-2 border-danger/50"
                 )}
               >
                 <item.icon className={cn("h-5 w-5 shrink-0", isActive && "text-sidebar-primary")} />
