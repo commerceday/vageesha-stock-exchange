@@ -48,14 +48,31 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get current balance
-      const { data: profile, error: profileError } = await supabase
+      // Get current balance - use maybeSingle to handle missing profile
+      let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('balance')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError) throw profileError;
+      // If profile doesn't exist, create it with default balance
+      if (!profile) {
+        const { data: newProfile, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || null,
+            balance: 500000
+          })
+          .select('balance')
+          .single();
+        
+        if (insertError) throw new Error('Failed to create profile: ' + insertError.message);
+        profile = newProfile;
+      } else if (profileError) {
+        throw profileError;
+      }
 
       if (profile.balance < amount) {
         toast({
