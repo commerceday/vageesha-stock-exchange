@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.fetch-stock-history]
 verify_jwt = false
+
+[functions.fetch-mf-nav]
+verify_jwt = false
