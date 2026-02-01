@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { TrendingUp, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { TrendingUp, Eye, EyeOff, ArrowLeft, HelpCircle, KeyRound } from 'lucide-react';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -16,12 +18,29 @@ const authSchema = z.object({
   fullName: z.string().trim().min(2, { message: "Full name must be at least 2 characters" }).optional(),
 });
 
+const emailSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }),
+});
+
+const passwordSchema = z.object({
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z.string().min(6, { message: "Password must be at least 6 characters" }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 const Auth = () => {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,14 +53,30 @@ const Auth = () => {
       }
     };
     checkUser();
-  }, [navigate]);
+
+    // Check for password recovery mode from URL
+    const type = searchParams.get('type');
+    if (type === 'recovery') {
+      setShowResetPassword(true);
+    }
+  }, [navigate, searchParams]);
+
+  // Listen for auth state changes (for password recovery)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setShowResetPassword(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Validate input
       authSchema.parse({ email, password, fullName });
 
       const redirectUrl = `${window.location.origin}/dashboard`;
@@ -96,7 +131,6 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Validate input
       authSchema.parse({ email, password });
 
       const { error } = await supabase.auth.signInWithPassword({
@@ -119,6 +153,13 @@ const Auth = () => {
           });
         }
       } else {
+        // Store remember me preference
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          localStorage.removeItem('rememberMe');
+        }
+        
         toast({
           title: "Welcome back!",
           description: "You have successfully signed in.",
@@ -137,6 +178,205 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      emailSchema.parse({ email });
+
+      const redirectUrl = `${window.location.origin}/auth?type=recovery`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "We've sent you a password reset link. Please check your inbox.",
+        });
+        setShowForgotPassword(false);
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      passwordSchema.parse({ password, confirmPassword });
+
+      const { error } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Password updated",
+          description: "Your password has been successfully updated.",
+        });
+        setShowResetPassword(false);
+        setPassword('');
+        setConfirmPassword('');
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset Password Form
+  if (showResetPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,hsl(var(--primary)/0.1),transparent_50%)]" />
+        
+        <Card className="w-full max-w-md relative glass border-2 shadow-[0_0_50px_rgba(0,0,0,0.1)]">
+          <CardHeader className="space-y-1 pb-8">
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+                <KeyRound className="h-14 w-14 text-primary relative" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center font-bold">
+              Set New Password
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your new password below
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <div className="relative">
+                  <Input
+                    id="new-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full gradient-bg" disabled={loading}>
+                {loading ? 'Updating...' : 'Update Password'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Forgot Password Form
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,hsl(var(--primary)/0.1),transparent_50%)]" />
+        
+        <Card className="w-full max-w-md relative glass border-2 shadow-[0_0_50px_rgba(0,0,0,0.1)]">
+          <CardHeader className="space-y-1 pb-8">
+            <div className="flex items-center justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+                <KeyRound className="h-14 w-14 text-primary relative" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl text-center font-bold">
+              Reset Password
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your email and we'll send you a reset link
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full gradient-bg" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Reset Link'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => setShowForgotPassword(false)}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Sign In
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden p-4">
@@ -192,7 +432,16 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
                   <div className="relative">
                     <Input
                       id="signin-password"
@@ -212,6 +461,33 @@ const Auth = () => {
                     </button>
                   </div>
                 </div>
+                
+                {/* Remember Me with Tooltip */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember-me"
+                      checked={rememberMe}
+                      onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    />
+                    <Label htmlFor="remember-me" className="text-sm cursor-pointer">
+                      Remember me
+                    </Label>
+                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="text-muted-foreground hover:text-foreground">
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-[200px]">
+                      <p className="text-xs">
+                        💡 Pro tip: Use a password manager like 1Password, Bitwarden, or your browser's built-in password manager to never forget your password!
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
                 <Button type="submit" className="w-full gradient-bg hover:opacity-90 transition-opacity shadow-lg" disabled={loading}>
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
