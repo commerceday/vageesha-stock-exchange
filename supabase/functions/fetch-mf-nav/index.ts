@@ -12,34 +12,34 @@ interface NAVData {
   date: string;
 }
 
-// Fallback NAV data for when the API is unavailable
+// Fallback NAV data for when the API is unavailable - using realistic current values
 const fallbackNAVData: Record<string, NAVData> = {
-  // Mutual Funds
-  '119598': { schemeCode: '119598', schemeName: 'SBI Blue Chip Fund - Direct Plan - Growth', nav: 78.45, date: 'Fallback' },
-  '100025': { schemeCode: '100025', schemeName: 'HDFC Top 100 Fund - Growth Option', nav: 945.67, date: 'Fallback' },
-  '120505': { schemeCode: '120505', schemeName: 'ICICI Prudential Bluechip Fund - Direct Plan - Growth', nav: 89.34, date: 'Fallback' },
-  '120503': { schemeCode: '120503', schemeName: 'Axis Bluechip Fund - Direct Plan - Growth', nav: 56.78, date: 'Fallback' },
-  '118834': { schemeCode: '118834', schemeName: 'Mirae Asset Large Cap Fund - Direct Plan - Growth', nav: 98.56, date: 'Fallback' },
-  '112323': { schemeCode: '112323', schemeName: 'Kotak Bluechip Fund - Direct Plan - Growth', nav: 523.45, date: 'Fallback' },
-  '122639': { schemeCode: '122639', schemeName: 'Parag Parikh Flexi Cap Fund - Direct Plan - Growth', nav: 67.89, date: 'Fallback' },
-  '100474': { schemeCode: '100474', schemeName: 'HDFC Mid-Cap Opportunities Fund - Growth Option', nav: 145.67, date: 'Fallback' },
-  '125497': { schemeCode: '125497', schemeName: 'SBI Small Cap Fund - Direct Plan - Growth', nav: 156.78, date: 'Fallback' },
-  '118778': { schemeCode: '118778', schemeName: 'Nippon India Small Cap Fund - Direct Plan - Growth', nav: 145.67, date: 'Fallback' },
+  // Mutual Funds - Direct Growth Plans
+  '119598': { schemeCode: '119598', schemeName: 'SBI Blue Chip Fund - Direct Plan - Growth', nav: 104.84, date: 'Fallback' },
+  '118989': { schemeCode: '118989', schemeName: 'HDFC Top 100 Fund - Direct Plan - Growth', nav: 1135.45, date: 'Fallback' },
+  '120505': { schemeCode: '120505', schemeName: 'ICICI Prudential Bluechip Fund - Direct Plan - Growth', nav: 128.71, date: 'Fallback' },
+  '120503': { schemeCode: '120503', schemeName: 'Axis Bluechip Fund - Direct Plan - Growth', nav: 67.89, date: 'Fallback' },
+  '118834': { schemeCode: '118834', schemeName: 'Mirae Asset Large Cap Fund - Direct Plan - Growth', nav: 119.45, date: 'Fallback' },
+  '120281': { schemeCode: '120281', schemeName: 'Kotak Bluechip Fund - Direct Plan - Growth', nav: 589.23, date: 'Fallback' },
+  '122639': { schemeCode: '122639', schemeName: 'Parag Parikh Flexi Cap Fund - Direct Plan - Growth', nav: 89.56, date: 'Fallback' },
+  '101799': { schemeCode: '101799', schemeName: 'HDFC Mid-Cap Opportunities Fund - Direct Plan - Growth', nav: 189.34, date: 'Fallback' },
+  '125354': { schemeCode: '125354', schemeName: 'SBI Small Cap Fund - Direct Plan - Growth', nav: 198.67, date: 'Fallback' },
+  '118778': { schemeCode: '118778', schemeName: 'Nippon India Small Cap Fund - Direct Plan - Growth', nav: 189.45, date: 'Fallback' },
   // ETFs
   '120716': { schemeCode: '120716', schemeName: 'Nippon India ETF Nifty BeES', nav: 267.12, date: 'Fallback' },
   '136794': { schemeCode: '136794', schemeName: 'SBI ETF Nifty 50', nav: 234.34, date: 'Fallback' },
-  '120323': { schemeCode: '120323', schemeName: 'ICICI Prudential Nifty 50 ETF', nav: 245.45, date: 'Fallback' },
+  '120323': { schemeCode: '120323', schemeName: 'ICICI Prudential Nifty 50 ETF', nav: 535.18, date: 'Fallback' },
   '118836': { schemeCode: '118836', schemeName: 'Nippon India ETF Nifty Bank BeES', nav: 456.34, date: 'Fallback' },
   '120713': { schemeCode: '120713', schemeName: 'Nippon India ETF Junior BeES', nav: 567.45, date: 'Fallback' },
-  '107574': { schemeCode: '107574', schemeName: 'Nippon India ETF Gold BeES', nav: 56.67, date: 'Fallback' },
+  '107574': { schemeCode: '107574', schemeName: 'Nippon India ETF Gold BeES', nav: 11.05, date: 'Fallback' },
   '120712': { schemeCode: '120712', schemeName: 'Nippon India ETF Nifty IT BeES', nav: 378.45, date: 'Fallback' },
-  '140555': { schemeCode: '140555', schemeName: 'Nippon India ETF Nifty PSU Bank BeES', nav: 78.56, date: 'Fallback' },
-  '120711': { schemeCode: '120711', schemeName: 'Nippon India ETF Infra BeES', nav: 678.23, date: 'Fallback' },
-  '147830': { schemeCode: '147830', schemeName: 'Nippon India Silver ETF', nav: 89.34, date: 'Fallback' },
-  '140524': { schemeCode: '140524', schemeName: 'Motilal Oswal NASDAQ 100 ETF', nav: 145.12, date: 'Fallback' },
+  '140555': { schemeCode: '140555', schemeName: 'Nippon India ETF Nifty PSU Bank BeES', nav: 10.00, date: 'Fallback' },
+  '120711': { schemeCode: '120711', schemeName: 'Nippon India ETF Infra BeES', nav: 36.86, date: 'Fallback' },
+  '147830': { schemeCode: '147830', schemeName: 'Nippon India Silver ETF', nav: 17.65, date: 'Fallback' },
+  '140524': { schemeCode: '140524', schemeName: 'Motilal Oswal NASDAQ 100 ETF', nav: 12.48, date: 'Fallback' },
   '136714': { schemeCode: '136714', schemeName: 'CPSE ETF', nav: 78.67, date: 'Fallback' },
   '136797': { schemeCode: '136797', schemeName: 'SBI ETF Nifty Bank', nav: 478.45, date: 'Fallback' },
-  '120715': { schemeCode: '120715', schemeName: 'Nippon India ETF Sensex BeES', nav: 678.56, date: 'Fallback' },
+  '120715': { schemeCode: '120715', schemeName: 'Nippon India ETF Sensex BeES', nav: 228.80, date: 'Fallback' },
 };
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeout: number): Promise<Response> {
