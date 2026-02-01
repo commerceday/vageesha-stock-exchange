@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   BarChart, PieChart, BarChart3, Wallet, LineChart,
-  ChevronRight, ChevronLeft, Home, Menu
+  ChevronRight, ChevronLeft, Home, Menu, Landmark, Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,16 @@ export function Sidebar({ isCollapsed, onToggle, className }: SidebarProps) {
       title: 'Stocks',
       icon: BarChart,
       href: '/stocks',
+    },
+    {
+      title: 'Mutual Funds',
+      icon: Landmark,
+      href: '/mutual-funds',
+    },
+    {
+      title: 'ETFs',
+      icon: Layers,
+      href: '/etfs',
     },
     {
       title: 'Markets',
