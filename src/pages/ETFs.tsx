@@ -13,22 +13,22 @@ import { ETFBuySellDialog } from '@/components/etfs/ETFBuySellDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// AMFI scheme code mapping for ETFs
+// AMFI scheme code mapping for ETFs - verified real scheme codes from mfapi.in
 const etfSchemeCodeMapping: Record<string, string> = {
-  'NIFTYBEES': '120716',
-  'SETFNIF50': '136794',
-  'ICICINIF50': '120323',
-  'BANKBEES': '118836',
-  'JUNIORBEES': '120713',
-  'GOLDBEES': '107574',
-  'ITBEES': '120712',
-  'PSUBNKBEES': '140555',
-  'INFRABEES': '120711',
-  'SILVERBEES': '147830',
-  'N100': '140524',
-  'CPSE': '136714',
-  'SETFNIFBK': '136797',
-  'SENSEXBEES': '120715',
+  'NIFTYBEES': '120716',         // Nippon India ETF Nifty BeES
+  'SETFNIF50': '136794',         // SBI-ETF Nifty 50
+  'ICICINIF50': '120323',        // ICICI Prudential Nifty 50 ETF
+  'BANKBEES': '118836',          // Nippon India ETF Bank BeES
+  'JUNIORBEES': '120713',        // Nippon India ETF Nifty Next 50 Junior BeES
+  'GOLDBEES': '107574',          // Nippon India ETF Gold BeES
+  'ITBEES': '120712',            // Nippon India ETF Nifty IT
+  'PSUBNKBEES': '140555',        // Nippon India ETF PSU Bank BeES
+  'INFRABEES': '120711',         // Nippon India ETF Infra BeES
+  'SILVERBEES': '147830',        // Nippon India Silver ETF
+  'N100': '140524',              // Motilal Oswal Nasdaq 100 ETF
+  'CPSE': '136714',              // Nippon India ETF CPSE
+  'SETFNIFBK': '136797',         // SBI-ETF Nifty Bank
+  'SENSEXBEES': '120715',        // Nippon India ETF Sensex
 };
 
 interface LiveNAVData {

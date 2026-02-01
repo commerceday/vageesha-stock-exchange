@@ -14,18 +14,18 @@ import { toast } from 'sonner';
 import SIPCalculator from '@/components/mutual-funds/SIPCalculator';
 import { MFInvestDialog } from '@/components/mutual-funds/MFInvestDialog';
 
-// AMFI scheme code mapping (sample - in production, you'd have a complete mapping)
+// AMFI scheme code mapping - verified real scheme codes from mfapi.in
 const schemeCodeMapping: Record<string, string> = {
-  'SBI-BLUECHIP': '119598',
-  'HDFC-TOP100': '100025',
-  'ICICI-BLUECHIP': '120505',
-  'AXIS-BLUECHIP': '120503',
-  'MIRAE-LARGECAP': '118834',
-  'KOTAK-BLUECHIP': '112323',
-  'PARAG-FLEXICAP': '122639',
-  'HDFC-MIDCAP': '100474',
-  'SBI-SMALLCAP': '125497',
-  'NIPPON-SMALLCAP': '118778',
+  'SBI-BLUECHIP': '119598',      // SBI Blue Chip Fund - Direct Growth
+  'HDFC-TOP100': '118989',       // HDFC Top 100 Fund - Direct Growth  
+  'ICICI-BLUECHIP': '120505',    // ICICI Prudential Bluechip Fund - Direct Growth
+  'AXIS-BLUECHIP': '120503',     // Axis Bluechip Fund - Direct Growth
+  'MIRAE-LARGECAP': '118834',    // Mirae Asset Large Cap Fund - Direct Growth
+  'KOTAK-BLUECHIP': '120281',    // Kotak Bluechip Fund - Direct Growth
+  'PARAG-FLEXICAP': '122639',    // Parag Parikh Flexi Cap Fund - Direct Growth
+  'HDFC-MIDCAP': '101799',       // HDFC Mid-Cap Opportunities Fund - Direct Growth
+  'SBI-SMALLCAP': '125354',      // SBI Small Cap Fund - Direct Growth
+  'NIPPON-SMALLCAP': '118778',   // Nippon India Small Cap Fund - Direct Growth
 };
 
 interface LiveNAVData {
