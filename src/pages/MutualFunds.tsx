@@ -7,11 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Filter, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { Search, Filter, TrendingUp, TrendingDown, RefreshCw, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import SIPCalculator from '@/components/mutual-funds/SIPCalculator';
+import { MFInvestDialog } from '@/components/mutual-funds/MFInvestDialog';
 
 // AMFI scheme code mapping (sample - in production, you'd have a complete mapping)
 const schemeCodeMapping: Record<string, string> = {
@@ -45,6 +46,7 @@ const MutualFunds = () => {
   const [liveNAVData, setLiveNAVData] = useState<LiveNAVData>({});
   const [isLoadingNAV, setIsLoadingNAV] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [investDialogOpen, setInvestDialogOpen] = useState(false);
 
   // Fetch live NAV data
   const fetchLiveNAV = async () => {
@@ -293,10 +295,14 @@ const MutualFunds = () => {
             </Badge>
           </div>
           
-          {/* NAV Card */}
+          {/* NAV Card with Invest Button */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Current NAV</CardTitle>
+              <Button onClick={() => setInvestDialogOpen(true)} className="gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Invest Now
+              </Button>
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-4">
@@ -395,6 +401,14 @@ const MutualFunds = () => {
           <SIPCalculator />
         </div>
       </div>
+
+      {/* Invest Dialog */}
+      <MFInvestDialog
+        fund={selectedFund}
+        open={investDialogOpen}
+        onOpenChange={setInvestDialogOpen}
+        onSuccess={() => {}}
+      />
     </PageLayout>
   );
 };
