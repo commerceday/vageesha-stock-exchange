@@ -95,20 +95,38 @@ const Portfolio = () => {
     }
   };
 
+  const BATCH_SIZE = 50;
+
   const fetchLivePrices = async (symbols: string[]) => {
     if (!symbols.length) return;
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
-        body: { symbols: symbols.map((s) => ({ symbol: s })) },
-      });
-      if (error) {
-        console.error('Error fetching live prices:', error);
-        return;
+      const allItems: any[] = [];
+      
+      // Process in batches of 50 to respect API limits
+      for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
+        const batch = symbols.slice(i, i + BATCH_SIZE);
+        
+        const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
+          body: { symbols: batch.map((s) => ({ symbol: s })) },
+        });
+        
+        if (error) {
+          console.error(`Error fetching live prices batch ${i / BATCH_SIZE + 1}:`, error);
+          continue;
+        }
+        
+        const payload: any = data as any;
+        const items = payload?.data || [];
+        allItems.push(...items);
+        
+        // Small delay between batches to avoid rate limiting
+        if (i + BATCH_SIZE < symbols.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
-      const payload: any = data as any;
-      const items = payload?.data || [];
+      
       const priceMap: Record<string, number> = {};
-      for (const item of items) {
+      for (const item of allItems) {
         if (item && typeof item.price === 'number' && item.price > 0) {
           priceMap[item.symbol] = item.price;
         }

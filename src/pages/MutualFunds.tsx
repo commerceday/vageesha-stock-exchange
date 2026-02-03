@@ -170,34 +170,52 @@ const MutualFunds = () => {
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [investDialogOpen, setInvestDialogOpen] = useState(false);
 
-  // Fetch live NAV data
+  const BATCH_SIZE = 50;
+
+  // Fetch live NAV data with batch processing
   const fetchLiveNAV = async () => {
     setIsLoadingNAV(true);
     try {
-      const schemeCodes = Object.values(schemeCodeMapping);
+      const allSchemeCodes = Object.values(schemeCodeMapping);
+      const allNavData: Record<string, any> = {};
       
-      const { data, error } = await supabase.functions.invoke('fetch-mf-nav', {
-        body: { schemeCodes },
-      });
-
-      if (error) throw error;
-
-      if (data?.success && data?.data) {
-        // Map scheme codes back to symbols
-        const navBySymbol: LiveNAVData = {};
-        Object.entries(schemeCodeMapping).forEach(([symbol, schemeCode]) => {
-          if (data.data[schemeCode]) {
-            navBySymbol[symbol] = {
-              nav: data.data[schemeCode].nav,
-              date: data.data[schemeCode].date,
-              schemeName: data.data[schemeCode].schemeName,
-            };
-          }
+      // Process in batches of 50 to respect API limits
+      for (let i = 0; i < allSchemeCodes.length; i += BATCH_SIZE) {
+        const batch = allSchemeCodes.slice(i, i + BATCH_SIZE);
+        
+        const { data, error } = await supabase.functions.invoke('fetch-mf-nav', {
+          body: { schemeCodes: batch },
         });
-        setLiveNAVData(navBySymbol);
-        setLastRefreshed(new Date());
-        toast.success('NAV data updated successfully');
+
+        if (error) {
+          console.error(`Error fetching NAV batch ${i / BATCH_SIZE + 1}:`, error);
+          continue;
+        }
+
+        if (data?.success && data?.data) {
+          Object.assign(allNavData, data.data);
+        }
+        
+        // Small delay between batches to avoid rate limiting
+        if (i + BATCH_SIZE < allSchemeCodes.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
+
+      // Map scheme codes back to symbols
+      const navBySymbol: LiveNAVData = {};
+      Object.entries(schemeCodeMapping).forEach(([symbol, schemeCode]) => {
+        if (allNavData[schemeCode]) {
+          navBySymbol[symbol] = {
+            nav: allNavData[schemeCode].nav,
+            date: allNavData[schemeCode].date,
+            schemeName: allNavData[schemeCode].schemeName,
+          };
+        }
+      });
+      setLiveNAVData(navBySymbol);
+      setLastRefreshed(new Date());
+      toast.success('NAV data updated successfully');
     } catch (error) {
       console.error('Error fetching NAV:', error);
       toast.error('Failed to fetch live NAV data');
