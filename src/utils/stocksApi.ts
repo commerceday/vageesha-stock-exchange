@@ -558,6 +558,8 @@ export function formatDate(date: Date): string {
   }
 }
 
+const BATCH_SIZE = 50;
+
 async function fetchRealTimeStockPrices(stocks: Stock[]): Promise<{ data: any[], marketOpen: boolean }> {
   try {
     const symbols = stocks.map(stock => ({
@@ -565,18 +567,38 @@ async function fetchRealTimeStockPrices(stocks: Stock[]): Promise<{ data: any[],
       exchange: 'NSE' // Kept for backwards compatibility, not used by Yahoo Finance
     }));
     
-    const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
-      body: { symbols }
-    });
+    // Process in batches of 50 to respect API limits
+    const allResults: any[] = [];
+    let marketOpen = false;
     
-    if (error) {
-      console.error('Error fetching stock prices:', error);
-      return { data: [], marketOpen: false };
+    for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
+      const batch = symbols.slice(i, i + BATCH_SIZE);
+      
+      const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
+        body: { symbols: batch }
+      });
+      
+      if (error) {
+        console.error(`Error fetching stock prices batch ${i / BATCH_SIZE + 1}:`, error);
+        continue;
+      }
+      
+      if (data?.data) {
+        allResults.push(...data.data);
+      }
+      if (data?.marketOpen) {
+        marketOpen = true;
+      }
+      
+      // Small delay between batches to avoid rate limiting
+      if (i + BATCH_SIZE < symbols.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
     }
     
     return {
-      data: data.data || [],
-      marketOpen: data.marketOpen || false
+      data: allResults,
+      marketOpen
     };
   } catch (error) {
     console.error('Failed to fetch real-time prices:', error);
