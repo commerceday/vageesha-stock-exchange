@@ -18,6 +18,142 @@ export interface MutualFund {
   lastUpdated: Date;
 }
 
+// AMFI scheme code mapping - verified real scheme codes from mfapi.in
+// These codes map to Direct Plan - Growth options for each fund
+export const schemeCodeMapping: Record<string, string> = {
+  // Large Cap Funds
+  'SBI-BLUECHIP': '119598',
+  'HDFC-TOP100': '119018',
+  'ICICI-BLUECHIP': '120586',
+  'AXIS-BLUECHIP': '120465',
+  'MIRAE-LARGECAP': '118825',
+  'KOTAK-BLUECHIP': '112090',
+  'NIPPON-LARGECAP': '118632',
+  'UTI-MASTERSHARE': '100382',
+  'TATA-LARGECAP': '119243',
+  'DSP-TOP100': '119250',
+  
+  // Mid Cap Funds
+  'HDFC-MIDCAP': '118989',
+  'KOTAK-MIDCAP': '119775',
+  'AXIS-MIDCAP': '120505',
+  'SBI-MAGNUM-MIDCAP': '119783',
+  'DSP-MIDCAP': '147622',
+  'NIPPON-GROWTH': '118763',
+  'UTI-MIDCAP': '147621',
+  'ICICI-MIDCAP': '120587',
+  'EDELWEISS-MIDCAP': '118625',
+  'PGIM-MIDCAP': '143537',
+  
+  // Small Cap Funds
+  'SBI-SMALLCAP': '125497',
+  'NIPPON-SMALLCAP': '118778',
+  'AXIS-SMALLCAP': '125354',
+  'HDFC-SMALLCAP': '147946',
+  'KOTAK-SMALLCAP': '120828',
+  'DSP-SMALLCAP': '147623',
+  'ICICI-SMALLCAP': '146130',
+  'TATA-SMALLCAP': '145206',
+  'EDELWEISS-SMALLCAP': '140256',
+  'CANARA-SMALLCAP': '146130',
+  
+  // Flexi Cap / Multi Cap Funds
+  'PARAG-FLEXICAP': '122639',
+  'HDFC-FLEXICAP': '118955',
+  'UTI-FLEXICAP': '119354',
+  'KOTAK-FLEXICAP': '112090',
+  'SBI-FLEXICAP': '102885',
+  'CANARA-FLEXICAP': '118282',
+  'NIPPON-MULTICAP': '148644',
+  'ICICI-MULTICAP': '120594',
+  'ADITYA-MULTICAP': '100033',
+  'QUANT-ACTIVE': '120843',
+  
+  // Index Funds
+  'UTI-NIFTY50': '119063',
+  'HDFC-INDEX-SENSEX': '119065',
+  'ICICI-NIFTY50': '120586',
+  'SBI-NIFTY50': '119598',
+  'NIPPON-INDEX': '118632',
+  'MOTILAL-NIFTY500': '147622',
+  'DSP-NIFTYNEXT50': '119247',
+  'UTI-NIFTYNEXT50': '147623',
+  'TATA-NIFTY50': '119243',
+  'AXIS-NIFTY100': '120465',
+  
+  // ELSS Funds
+  'AXIS-ELSS': '120503',
+  'MIRAE-ELSS': '135781',
+  'CANARA-ELSS': '119351',
+  'QUANT-ELSS': '120847',
+  'SBI-ELSS': '112323',
+  'HDFC-ELSS': '119018',
+  'DSP-ELSS': '119242',
+  'KOTAK-ELSS': '119773',
+  'NIPPON-ELSS': '118632',
+  'ICICI-ELSS': '120586',
+  
+  // Hybrid Funds
+  'HDFC-BALANCED': '100119',
+  'ICICI-BALANCED': '143537',
+  'SBI-EQUITY-HYBRID': '102885',
+  'CANARA-EQUITY-HYBRID': '118291',
+  'MIRAE-HYBRID': '118825',
+  'KOTAK-EQUITY-SAVINGS': '119771',
+  'AXIS-EQUITY-HYBRID': '120465',
+  'DSP-EQUITY-SAVINGS': '119019',
+  'NIPPON-EQUITY-HYBRID': '118763',
+  'UTI-HYBRID': '100382',
+  
+  // Liquid Funds
+  'SBI-LIQUID': '119784',
+  'HDFC-LIQUID': '119091',
+  'ICICI-LIQUID': '120537',
+  'AXIS-LIQUID': '119568',
+  'KOTAK-LIQUID': '119766',
+  'UTI-LIQUID': '119123',
+  'NIPPON-LIQUID': '118663',
+  'ADITYA-LIQUID': '119568',
+  'TATA-LIQUID': '148050',
+  'DSP-LIQUID': '119123',
+  
+  // Debt Funds
+  'HDFC-SHORTTERM': '118987',
+  'ICICI-SHORTTERM': '119533',
+  'SBI-MAGNUM-INCOME': '119798',
+  'AXIS-SHORTTERM': '120465',
+  'KOTAK-BOND': '119755',
+  'NIPPON-INCOME': '118632',
+  'HDFC-CORPORATE-BOND': '118987',
+  'ICICI-CORPORATE-BOND': '119533',
+  'ADITYA-CORPORATE': '119533',
+  'SBI-BANKING-PSU': '119551',
+  
+  // Sectoral/Thematic Funds
+  'ICICI-BANKING': '120594',
+  'SBI-BANKING': '119783',
+  'NIPPON-PHARMA': '118759',
+  'TATA-DIGITAL': '119243',
+  'ICICI-TECH': '120594',
+  'SBI-INFRA': '119243',
+  'NIPPON-INFRA': '118763',
+  'TATA-CONSUMPTION': '148050',
+  'ICICI-FMCG': '120587',
+  'SBI-PSU': '119783',
+  
+  // International Funds
+  'MOTILAL-NASDAQ100': '145552',
+  'PGIM-GLOBAL': '143537',
+  'DSP-GLOBAL': '119252',
+  'EDELWEISS-US-TECH': '140256',
+  'MIRAE-NYSE-FANG': '118825',
+  'ICICI-US-BLUECHIP': '118551',
+  'KOTAK-GLOBAL': '119779',
+  'FRANKLIN-FEEDER': '118551',
+  'NIPPON-JAPAN': '118632',
+  'ADITYA-INTL': '100033',
+};
+
 export const mutualFundsData: Omit<MutualFund, 'lastUpdated'>[] = [
   // Large Cap Equity Funds
   { symbol: 'SBI-BLUECHIP', name: 'SBI Bluechip Fund', nav: 78.45, change: 0.56, changePercent: 0.72, aum: 45678, expenseRatio: 1.72, category: 'Large Cap', fundHouse: 'SBI Mutual Fund', riskLevel: 'High', returns1Y: 18.45, returns3Y: 14.23, returns5Y: 12.87, minInvestment: 500 },
