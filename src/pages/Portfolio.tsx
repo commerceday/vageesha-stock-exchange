@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatCurrency, formatPercentage } from '@/utils/stocksApi';
 import { TrendingUp, TrendingDown, Wallet, Activity, BarChart, Landmark, Layers } from 'lucide-react';
 import { mockStocks } from '@/utils/stocksApi';
-import { mutualFundsData } from '@/utils/mutual-funds-data';
+import { mutualFundsData, schemeCodeMapping } from '@/utils/mutual-funds-data';
 import { etfData } from '@/utils/etf-data';
 import { toast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
@@ -137,16 +137,144 @@ const Portfolio = () => {
     }
   };
 
+  // Fetch live NAV for mutual funds
+  const fetchLiveNAV = async (mfSymbols: string[]) => {
+    if (!mfSymbols.length) return;
+    
+    // Build scheme code map from the shared mapping
+    const schemeCodeMap: Record<string, string> = {};
+    for (const symbol of mfSymbols) {
+      const schemeCode = schemeCodeMapping[symbol];
+      if (schemeCode) {
+        schemeCodeMap[symbol] = schemeCode;
+      }
+    }
+    
+    const schemeCodes = Object.values(schemeCodeMap);
+    if (!schemeCodes.length) return;
+    
+    try {
+      const allItems: any[] = [];
+      
+      // Process in batches of 50
+      for (let i = 0; i < schemeCodes.length; i += BATCH_SIZE) {
+        const batch = schemeCodes.slice(i, i + BATCH_SIZE);
+        
+        const { data, error } = await supabase.functions.invoke('fetch-mf-nav', {
+          body: { schemeCodes: batch },
+        });
+        
+        if (error) {
+          console.error(`Error fetching MF NAV batch ${i / BATCH_SIZE + 1}:`, error);
+          continue;
+        }
+        
+        const payload: any = data as any;
+        const items = payload?.data || [];
+        allItems.push(...items);
+        
+        if (i + BATCH_SIZE < schemeCodes.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      // Map scheme codes back to symbols
+      const navMap: Record<string, number> = {};
+      for (const item of allItems) {
+        if (item && typeof item.nav === 'number' && item.nav > 0) {
+          // Find symbol by scheme code
+          const symbolEntry = Object.entries(schemeCodeMap).find(([_, code]) => code === item.schemeCode);
+          if (symbolEntry) {
+            navMap[symbolEntry[0]] = item.nav;
+          }
+        }
+      }
+      
+      setCurrentPrices((prev) => ({ ...prev, ...navMap }));
+    } catch (err) {
+      console.error('Live MF NAV fetch failed:', err);
+    }
+  };
+
+  // Fetch live prices for ETFs (they trade like stocks)
+  const fetchLiveETFPrices = async (etfSymbols: string[]) => {
+    if (!etfSymbols.length) return;
+    try {
+      const allItems: any[] = [];
+      
+      for (let i = 0; i < etfSymbols.length; i += BATCH_SIZE) {
+        const batch = etfSymbols.slice(i, i + BATCH_SIZE);
+        
+        const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
+          body: { symbols: batch.map((s) => ({ symbol: s })) },
+        });
+        
+        if (error) {
+          console.error(`Error fetching ETF prices batch ${i / BATCH_SIZE + 1}:`, error);
+          continue;
+        }
+        
+        const payload: any = data as any;
+        const items = payload?.data || [];
+        allItems.push(...items);
+        
+        if (i + BATCH_SIZE < etfSymbols.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      const priceMap: Record<string, number> = {};
+      for (const item of allItems) {
+        if (item && typeof item.price === 'number' && item.price > 0) {
+          priceMap[item.symbol] = item.price;
+        }
+      }
+      setCurrentPrices((prev) => ({ ...prev, ...priceMap }));
+    } catch (err) {
+      console.error('Live ETF price fetch failed:', err);
+    }
+  };
+
+  // Fetch all live prices on investments change
   useEffect(() => {
     if (!investments.length) return;
+    
     const stockSymbols = investments
       .filter(inv => inv.type === 'stock')
       .map(inv => inv.stock_symbol);
-    if (stockSymbols.length > 0) {
-      fetchLivePrices(stockSymbols);
-      const interval = setInterval(() => fetchLivePrices(stockSymbols), 30000);
-      return () => clearInterval(interval);
-    }
+    
+    const mfSymbols = investments
+      .filter(inv => inv.type === 'mf')
+      .map(inv => inv.stock_symbol);
+    
+    const etfSymbols = investments
+      .filter(inv => inv.type === 'etf')
+      .map(inv => inv.stock_symbol);
+    
+    // Fetch all prices initially
+    if (stockSymbols.length > 0) fetchLivePrices(stockSymbols);
+    if (mfSymbols.length > 0) fetchLiveNAV(mfSymbols);
+    if (etfSymbols.length > 0) fetchLiveETFPrices(etfSymbols);
+    
+    // Set up refresh intervals
+    const stockInterval = stockSymbols.length > 0 
+      ? setInterval(() => fetchLivePrices(stockSymbols), 30000) 
+      : null;
+    
+    // MF NAVs update once daily, but refresh every 5 minutes for real-time feel
+    const mfInterval = mfSymbols.length > 0 
+      ? setInterval(() => fetchLiveNAV(mfSymbols), 300000) 
+      : null;
+    
+    const etfInterval = etfSymbols.length > 0 
+      ? setInterval(() => fetchLiveETFPrices(etfSymbols), 30000) 
+      : null;
+    
+    return () => {
+      if (stockInterval) clearInterval(stockInterval);
+      if (mfInterval) clearInterval(mfInterval);
+      if (etfInterval) clearInterval(etfInterval);
+    };
   }, [investments]);
 
   const getCurrentPrice = (symbol: string, type: 'stock' | 'mf' | 'etf' = 'stock') => {
