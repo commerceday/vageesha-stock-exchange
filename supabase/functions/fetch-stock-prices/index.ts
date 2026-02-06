@@ -50,23 +50,63 @@ type YahooQuote = {
 };
 
 async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
-  const symbolsParam = encodeURIComponent(yahooSymbols.join(","));
-  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbolsParam}`;
-
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Yahoo quote request failed: ${res.status} ${res.statusText} ${text}`);
+  // Try the chart endpoint for each symbol as v7/quote is now blocked
+  const quotes: YahooQuote[] = [];
+  
+  // Fetch in parallel batches of 10 to avoid overwhelming
+  const batchSize = 10;
+  for (let i = 0; i < yahooSymbols.length; i += batchSize) {
+    const batch = yahooSymbols.slice(i, i + batchSize);
+    const results = await Promise.allSettled(
+      batch.map(async (symbol) => {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json",
+          },
+        });
+        
+        if (!res.ok) {
+          console.error(`Chart request failed for ${symbol}: ${res.status}`);
+          return null;
+        }
+        
+        const json = await res.json();
+        const result = json?.chart?.result?.[0];
+        if (!result) return null;
+        
+        const meta = result.meta;
+        const quote = result.indicators?.quote?.[0];
+        
+        // Get the most recent values
+        const regularPrice = meta?.regularMarketPrice ?? 0;
+        const prevClose = meta?.chartPreviousClose ?? meta?.previousClose ?? 0;
+        const high = quote?.high?.[quote.high.length - 1] ?? meta?.regularMarketDayHigh ?? 0;
+        const low = quote?.low?.[quote.low.length - 1] ?? meta?.regularMarketDayLow ?? 0;
+        const open = quote?.open?.[0] ?? meta?.regularMarketOpen ?? 0;
+        
+        return {
+          symbol,
+          regularMarketPrice: regularPrice,
+          regularMarketPreviousClose: prevClose,
+          regularMarketChange: regularPrice - prevClose,
+          regularMarketChangePercent: prevClose > 0 ? ((regularPrice - prevClose) / prevClose) * 100 : 0,
+          regularMarketDayHigh: high,
+          regularMarketDayLow: low,
+          regularMarketOpen: open,
+        } as YahooQuote;
+      })
+    );
+    
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value) {
+        quotes.push(result.value);
+      }
+    }
   }
-
-  const json = await res.json();
-  const result = json?.quoteResponse?.result;
-  return Array.isArray(result) ? (result as YahooQuote[]) : [];
+  
+  return quotes;
 }
 
 serve(async (req) => {
