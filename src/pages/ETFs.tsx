@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
-import { etfData, ETF, getETFYahooSymbol } from '@/utils/etf-data';
+import { etfData, ETF } from '@/utils/etf-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +21,7 @@ interface LivePriceData {
     high?: number;
     low?: number;
     previousClose?: number;
+    marketClosed?: boolean;
   };
 }
 
@@ -35,21 +36,24 @@ const ETFs = () => {
   const [livePriceData, setLivePriceData] = useState<LivePriceData>({});
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [hasLoadedLivePrices, setHasLoadedLivePrices] = useState(false);
 
-  // Fetch live ETF prices from Yahoo Finance via the stock prices edge function
+  const getLive = (symbol: string) => livePriceData[symbol] ?? null;
+
+  // Fetch live ETF prices via backend function
   const fetchLivePrices = async () => {
     setIsLoadingPrices(true);
+
     try {
-      // Get all unique ETF symbols
       const symbols = etfData.map(etf => ({ symbol: etf.symbol }));
-      
+
       // Batch requests (max 50 per request)
       const BATCH_SIZE = 50;
       const allPriceData: LivePriceData = {};
-      
+
       for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
         const batch = symbols.slice(i, i + BATCH_SIZE);
-        
+
         const { data, error } = await supabase.functions.invoke('fetch-stock-prices', {
           body: { symbols: batch },
         });
@@ -69,27 +73,32 @@ const ETFs = () => {
                 high: stock.high,
                 low: stock.low,
                 previousClose: stock.previousClose,
+                marketClosed: stock.marketClosed,
               };
             }
           }
         }
-        
+
         // Small delay between batches to avoid rate limiting
         if (i + BATCH_SIZE < symbols.length) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
       }
-      
+
+      const fetchedCount = Object.keys(allPriceData).length;
+      if (fetchedCount === 0) {
+        throw new Error('No live prices returned');
+      }
+
       setLivePriceData(allPriceData);
       setLastRefreshed(new Date());
-      
-      const fetchedCount = Object.keys(allPriceData).length;
-      if (fetchedCount > 0) {
-        toast.success(`ETF prices updated (${fetchedCount} ETFs)`);
-      }
+      setHasLoadedLivePrices(true);
+
+      toast.success(`ETF prices updated (${fetchedCount} ETFs)`);
     } catch (error) {
       console.error('Error fetching ETF prices:', error);
       toast.error('Failed to fetch live ETF prices');
+      // Important: do NOT clear existing live prices on failure.
     } finally {
       setIsLoadingPrices(false);
     }
@@ -98,8 +107,7 @@ const ETFs = () => {
   // Fetch prices on mount and set up refresh interval
   useEffect(() => {
     fetchLivePrices();
-    
-    // Refresh every 30 seconds during market hours
+
     const interval = setInterval(fetchLivePrices, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -116,7 +124,7 @@ const ETFs = () => {
   // Filter ETFs based on search, category, and fund house
   const filteredETFs = React.useMemo(() => {
     return etfData.filter(etf => {
-      const matchesSearch = 
+      const matchesSearch =
         etf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         etf.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
         etf.trackingIndex.toLowerCase().includes(searchQuery.toLowerCase());
@@ -126,34 +134,29 @@ const ETFs = () => {
     });
   }, [searchQuery, selectedCategory, selectedFundHouse]);
 
-  // Get live price for an ETF (live if available, otherwise static)
-  const getETFPrice = (etf: Omit<ETF, 'lastUpdated'>) => {
-    if (livePriceData[etf.symbol]) {
-      return livePriceData[etf.symbol].price;
-    }
-    return etf.price;
-  };
+  const selectedLive = getLive(selectedETF.symbol);
+  const selectedETFPrice = selectedLive?.price ?? null;
+  const selectedETFChanges = selectedLive
+    ? { change: selectedLive.change, changePercent: selectedLive.changePercent }
+    : null;
 
-  const getETFChange = (etf: Omit<ETF, 'lastUpdated'>) => {
-    if (livePriceData[etf.symbol]) {
-      return {
-        change: livePriceData[etf.symbol].change,
-        changePercent: livePriceData[etf.symbol].changePercent,
-      };
-    }
-    return { change: etf.change, changePercent: etf.changePercent };
-  };
+  const selectedETFLiveForTrade: (ETF & { lastUpdated: Date }) = selectedLive
+    ? {
+        ...selectedETF,
+        price: selectedLive.price,
+        change: selectedLive.change,
+        changePercent: selectedLive.changePercent,
+      }
+    : selectedETF;
+
+  const hasLiveData = !!selectedLive;
+  const canTrade = hasLiveData;
 
   const getPremiumDiscountColor = (value: number) => {
     if (value > 0.5) return 'text-danger';
     if (value < -0.5) return 'text-success';
     return 'text-muted-foreground';
   };
-
-  const selectedETFPrice = getETFPrice(selectedETF);
-  const selectedETFChanges = getETFChange(selectedETF);
-  const hasLiveData = !!livePriceData[selectedETF.symbol];
-
   return (
     <PageLayout title="Exchange Traded Funds (ETFs)">
       <div className="mb-4 flex items-center justify-between">
@@ -230,12 +233,13 @@ const ETFs = () => {
           {/* ETF List */}
           <div className="h-[calc(100vh-450px)] overflow-y-auto space-y-3">
             {filteredETFs.map((etf) => {
-              const etfPrice = getETFPrice(etf);
-              const etfChanges = getETFChange(etf);
-              const isLive = !!livePriceData[etf.symbol];
-              
+              const live = getLive(etf.symbol);
+              const etfPrice = live?.price ?? null;
+              const etfChangePercent = live?.changePercent ?? null;
+              const isLive = !!live;
+
               return (
-                <Card 
+                <Card
                   key={etf.symbol}
                   className={cn(
                     "cursor-pointer transition-all hover:shadow-md",
@@ -249,7 +253,10 @@ const ETFs = () => {
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-sm">{etf.symbol}</p>
                           {isLive && (
-                            <Badge variant="outline" className="text-[10px] px-1 py-0 bg-success/10 text-success border-success/20">
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1 py-0 bg-success/10 text-success border-success/20"
+                            >
                               LIVE
                             </Badge>
                           )}
@@ -260,24 +267,42 @@ const ETFs = () => {
                         {etf.category}
                       </Badge>
                     </div>
+
                     <div className="flex justify-between items-center">
                       <div>
-                        {isLoadingPrices && !livePriceData[etf.symbol] ? (
+                        {isLoadingPrices && !live && !hasLoadedLivePrices ? (
                           <Skeleton className="h-6 w-20" />
+                        ) : etfPrice == null ? (
+                          <p className="text-lg font-bold">—</p>
                         ) : (
                           <p className="text-lg font-bold">₹{etfPrice.toFixed(2)}</p>
                         )}
-                        <p className={cn(
-                          "text-xs flex items-center gap-1",
-                          etfChanges.changePercent >= 0 ? "text-success" : "text-danger"
-                        )}>
-                          {etfChanges.changePercent >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                          {etfChanges.changePercent >= 0 ? '+' : ''}{etfChanges.changePercent.toFixed(2)}%
-                        </p>
+
+                        {etfChangePercent == null ? (
+                          <p className="text-xs text-muted-foreground">—</p>
+                        ) : (
+                          <p
+                            className={cn(
+                              "text-xs flex items-center gap-1",
+                              etfChangePercent >= 0 ? "text-success" : "text-danger"
+                            )}
+                          >
+                            {etfChangePercent >= 0 ? (
+                              <TrendingUp className="h-3 w-3" />
+                            ) : (
+                              <TrendingDown className="h-3 w-3" />
+                            )}
+                            {etfChangePercent >= 0 ? "+" : ""}
+                            {etfChangePercent.toFixed(2)}%
+                          </p>
+                        )}
                       </div>
+
                       <div className="text-right">
                         <p className="text-xs text-muted-foreground">Price</p>
-                        <p className="text-sm font-medium">₹{etfPrice.toFixed(2)}</p>
+                        <p className="text-sm font-medium">
+                          {etfPrice == null ? "—" : `₹${etfPrice.toFixed(2)}`}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -322,22 +347,49 @@ const ETFs = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Market Price</CardTitle>
-              <Button onClick={() => setBuySellDialogOpen(true)} className="gap-2">
+              <Button
+                onClick={() => setBuySellDialogOpen(true)}
+                className="gap-2"
+                disabled={!canTrade}
+              >
                 <ShoppingCart className="h-4 w-4" />
                 Buy / Sell
               </Button>
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline gap-4">
-                <span className="text-4xl font-bold">₹{selectedETFPrice.toFixed(2)}</span>
-                <span className={cn(
-                  "text-lg flex items-center gap-1",
-                  selectedETFChanges.changePercent >= 0 ? "text-success" : "text-danger"
-                )}>
-                  {selectedETFChanges.changePercent >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
-                  {selectedETFChanges.changePercent >= 0 ? '+' : ''}{selectedETFChanges.change.toFixed(2)} ({selectedETFChanges.changePercent.toFixed(2)}%)
-                </span>
+                {isLoadingPrices && !hasLiveData ? (
+                  <Skeleton className="h-10 w-40" />
+                ) : selectedETFPrice == null ? (
+                  <span className="text-4xl font-bold">—</span>
+                ) : (
+                  <span className="text-4xl font-bold">₹{selectedETFPrice.toFixed(2)}</span>
+                )}
+
+                {selectedETFChanges == null ? (
+                  <span className="text-sm text-muted-foreground">—</span>
+                ) : (
+                  <span
+                    className={cn(
+                      "text-lg flex items-center gap-1",
+                      selectedETFChanges.changePercent >= 0 ? "text-success" : "text-danger"
+                    )}
+                  >
+                    {selectedETFChanges.changePercent >= 0 ? (
+                      <TrendingUp className="h-5 w-5" />
+                    ) : (
+                      <TrendingDown className="h-5 w-5" />
+                    )}
+                    {selectedETFChanges.changePercent >= 0 ? "+" : ""}
+                    {selectedETFChanges.change.toFixed(2)} ({selectedETFChanges.changePercent.toFixed(2)}%)
+                  </span>
+                )}
               </div>
+              {!canTrade && (
+                <p className="text-xs text-muted-foreground mt-3">
+                  Live price unavailable right now—refresh to load.
+                </p>
+              )}
             </CardContent>
           </Card>
           
@@ -348,6 +400,8 @@ const ETFs = () => {
                 <h3 className="font-medium text-sm text-muted-foreground">Market Price</h3>
                 {isLoadingPrices && !hasLiveData ? (
                   <Skeleton className="h-7 w-20 mt-1" />
+                ) : selectedETFPrice == null ? (
+                  <p className="text-xl font-bold mt-1">—</p>
                 ) : (
                   <p className="text-xl font-bold mt-1">₹{selectedETFPrice.toFixed(2)}</p>
                 )}
@@ -446,7 +500,7 @@ const ETFs = () => {
 
       {/* Buy/Sell Dialog */}
       <ETFBuySellDialog
-        etf={selectedETF}
+        etf={selectedETFLiveForTrade}
         open={buySellDialogOpen}
         onOpenChange={setBuySellDialogOpen}
         onSuccess={() => {}}
