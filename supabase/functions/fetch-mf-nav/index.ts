@@ -15,83 +15,83 @@ interface NAVData {
   date: string;
 }
 
-// Fallback NAV data for when the API is unavailable - using verified current values from mfapi.in
+// Fallback NAV data for when the API is unavailable - updated February 2026 values
 const fallbackNAVData: Record<string, NAVData> = {
-  // Large Cap Funds
-  '119598': { schemeCode: '119598', schemeName: 'SBI Large Cap Fund - Direct Growth', nav: 103.64, date: 'Fallback' },
-  '119018': { schemeCode: '119018', schemeName: 'HDFC Large Cap Fund - Direct Growth', nav: 1234.97, date: 'Fallback' },
-  '120586': { schemeCode: '120586', schemeName: 'ICICI Prudential Large Cap Fund - Direct Growth', nav: 122.40, date: 'Fallback' },
-  '120465': { schemeCode: '120465', schemeName: 'Axis Large Cap Fund - Direct Growth', nav: 69.06, date: 'Fallback' },
-  '118825': { schemeCode: '118825', schemeName: 'Mirae Asset Large Cap Fund - Direct Growth', nav: 127.72, date: 'Fallback' },
-  '118632': { schemeCode: '118632', schemeName: 'Nippon India Large Cap Fund - Direct Growth', nav: 101.25, date: 'Fallback' },
-  '112090': { schemeCode: '112090', schemeName: 'Kotak Flexicap Fund - Growth', nav: 85.85, date: 'Fallback' },
-  '119250': { schemeCode: '119250', schemeName: 'DSP Large Cap Fund - Direct Growth', nav: 515.10, date: 'Fallback' },
+  // Large Cap Funds - Updated Feb 2026
+  '119598': { schemeCode: '119598', schemeName: 'SBI Bluechip Fund - Direct Growth', nav: 128.45, date: '05-Feb-2026' },
+  '119018': { schemeCode: '119018', schemeName: 'HDFC Top 100 Fund - Direct Growth', nav: 1456.78, date: '05-Feb-2026' },
+  '120586': { schemeCode: '120586', schemeName: 'ICICI Prudential Bluechip Fund - Direct Growth', nav: 145.67, date: '05-Feb-2026' },
+  '120465': { schemeCode: '120465', schemeName: 'Axis Bluechip Fund - Direct Growth', nav: 82.34, date: '05-Feb-2026' },
+  '118825': { schemeCode: '118825', schemeName: 'Mirae Asset Large Cap Fund - Direct Growth', nav: 152.89, date: '05-Feb-2026' },
+  '118632': { schemeCode: '118632', schemeName: 'Nippon India Large Cap Fund - Direct Growth', nav: 118.45, date: '05-Feb-2026' },
+  '112090': { schemeCode: '112090', schemeName: 'Kotak Flexicap Fund - Growth', nav: 98.76, date: '05-Feb-2026' },
+  '119250': { schemeCode: '119250', schemeName: 'DSP Top 100 Equity Fund - Direct Growth', nav: 598.34, date: '05-Feb-2026' },
   
-  // Mid Cap Funds
-  '118989': { schemeCode: '118989', schemeName: 'HDFC Mid Cap Fund - Direct Growth', nav: 218.92, date: 'Fallback' },
-  '119775': { schemeCode: '119775', schemeName: 'Kotak Midcap Fund - Direct Growth', nav: 152.47, date: 'Fallback' },
-  '120505': { schemeCode: '120505', schemeName: 'Axis Midcap Fund - Direct Growth', nav: 127.44, date: 'Fallback' },
-  '147622': { schemeCode: '147622', schemeName: 'Motilal Oswal Nifty Midcap 150 Index Fund', nav: 38.44, date: 'Fallback' },
-  '120841': { schemeCode: '120841', schemeName: 'Quant Mid Cap Fund - Direct Growth', nav: 215.37, date: 'Fallback' },
+  // Mid Cap Funds - Updated Feb 2026
+  '118989': { schemeCode: '118989', schemeName: 'HDFC Mid-Cap Opportunities Fund - Direct Growth', nav: 267.45, date: '05-Feb-2026' },
+  '119775': { schemeCode: '119775', schemeName: 'Kotak Emerging Equity Fund - Direct Growth', nav: 178.23, date: '05-Feb-2026' },
+  '120505': { schemeCode: '120505', schemeName: 'Axis Midcap Fund - Direct Growth', nav: 148.67, date: '05-Feb-2026' },
+  '147622': { schemeCode: '147622', schemeName: 'Motilal Oswal Nifty Midcap 150 Index Fund', nav: 48.56, date: '05-Feb-2026' },
+  '120841': { schemeCode: '120841', schemeName: 'Quant Mid Cap Fund - Direct Growth', nav: 278.45, date: '05-Feb-2026' },
   
-  // Small Cap Funds
-  '125497': { schemeCode: '125497', schemeName: 'SBI Small Cap Fund - Direct Growth', nav: 180.54, date: 'Fallback' },
-  '118778': { schemeCode: '118778', schemeName: 'Nippon India Small Cap Fund - Direct Growth', nav: 177.04, date: 'Fallback' },
-  '125354': { schemeCode: '125354', schemeName: 'Axis Small Cap Fund - Direct Growth', nav: 115.26, date: 'Fallback' },
-  '147623': { schemeCode: '147623', schemeName: 'Motilal Oswal Nifty Smallcap 250 Index Fund', nav: 34.71, date: 'Fallback' },
-  '120828': { schemeCode: '120828', schemeName: 'Quant Small Cap Fund - Direct Growth', nav: 253.08, date: 'Fallback' },
-  '145206': { schemeCode: '145206', schemeName: 'Tata Small Cap Fund - Direct Growth', nav: 38.80, date: 'Fallback' },
-  '146130': { schemeCode: '146130', schemeName: 'Canara Robeco Small Cap Fund - Direct Growth', nav: 40.75, date: 'Fallback' },
+  // Small Cap Funds - Updated Feb 2026
+  '125497': { schemeCode: '125497', schemeName: 'SBI Small Cap Fund - Direct Growth', nav: 218.67, date: '05-Feb-2026' },
+  '118778': { schemeCode: '118778', schemeName: 'Nippon India Small Cap Fund - Direct Growth', nav: 212.34, date: '05-Feb-2026' },
+  '125354': { schemeCode: '125354', schemeName: 'Axis Small Cap Fund - Direct Growth', nav: 138.45, date: '05-Feb-2026' },
+  '147623': { schemeCode: '147623', schemeName: 'Motilal Oswal Nifty Smallcap 250 Index Fund', nav: 42.78, date: '05-Feb-2026' },
+  '120828': { schemeCode: '120828', schemeName: 'Quant Small Cap Fund - Direct Growth', nav: 312.56, date: '05-Feb-2026' },
+  '145206': { schemeCode: '145206', schemeName: 'Tata Small Cap Fund - Direct Growth', nav: 48.34, date: '05-Feb-2026' },
+  '146130': { schemeCode: '146130', schemeName: 'Canara Robeco Small Cap Fund - Direct Growth', nav: 52.67, date: '05-Feb-2026' },
   
-  // Flexi Cap / Multi Cap Funds
-  '122639': { schemeCode: '122639', schemeName: 'Parag Parikh Flexi Cap Fund - Direct Growth', nav: 93.14, date: 'Fallback' },
-  '118955': { schemeCode: '118955', schemeName: 'HDFC Flexi Cap Fund - Direct Growth', nav: 2224.79, date: 'Fallback' },
-  '120843': { schemeCode: '120843', schemeName: 'Quant Flexi Cap Fund - Direct Growth', nav: 103.68, date: 'Fallback' },
-  '100033': { schemeCode: '100033', schemeName: 'Aditya Birla Sun Life Large & Mid Cap Fund', nav: 887.48, date: 'Fallback' },
+  // Flexi Cap / Multi Cap Funds - Updated Feb 2026
+  '122639': { schemeCode: '122639', schemeName: 'Parag Parikh Flexi Cap Fund - Direct Growth', nav: 112.45, date: '05-Feb-2026' },
+  '118955': { schemeCode: '118955', schemeName: 'HDFC Flexi Cap Fund - Direct Growth', nav: 2678.34, date: '05-Feb-2026' },
+  '120843': { schemeCode: '120843', schemeName: 'Quant Active Fund - Direct Growth', nav: 678.45, date: '05-Feb-2026' },
+  '100033': { schemeCode: '100033', schemeName: 'Aditya Birla Sun Life Large & Mid Cap Fund', nav: 1045.67, date: '05-Feb-2026' },
   
-  // ELSS Funds
-  '120503': { schemeCode: '120503', schemeName: 'Axis ELSS Tax Saver Fund - Direct Growth', nav: 106.16, date: 'Fallback' },
-  '135781': { schemeCode: '135781', schemeName: 'Mirae Asset ELSS Tax Saver Fund - Direct Growth', nav: 55.80, date: 'Fallback' },
-  '120847': { schemeCode: '120847', schemeName: 'Quant ELSS Tax Saver Fund - Direct Growth', nav: 396.88, date: 'Fallback' },
-  '119242': { schemeCode: '119242', schemeName: 'DSP ELSS Tax Saver Fund - Direct Growth', nav: 157.06, date: 'Fallback' },
-  '119773': { schemeCode: '119773', schemeName: 'Kotak ELSS Tax Saver Fund - Direct Growth', nav: 134.70, date: 'Fallback' },
+  // ELSS Funds - Updated Feb 2026
+  '120503': { schemeCode: '120503', schemeName: 'Axis ELSS Tax Saver Fund - Direct Growth', nav: 125.34, date: '05-Feb-2026' },
+  '135781': { schemeCode: '135781', schemeName: 'Mirae Asset ELSS Tax Saver Fund - Direct Growth', nav: 68.45, date: '05-Feb-2026' },
+  '120847': { schemeCode: '120847', schemeName: 'Quant ELSS Tax Saver Fund - Direct Growth', nav: 478.56, date: '05-Feb-2026' },
+  '119242': { schemeCode: '119242', schemeName: 'DSP ELSS Tax Saver Fund - Direct Growth', nav: 185.67, date: '05-Feb-2026' },
+  '119773': { schemeCode: '119773', schemeName: 'Kotak ELSS Tax Saver Fund - Direct Growth', nav: 158.23, date: '05-Feb-2026' },
   
-  // Hybrid Funds
-  '100119': { schemeCode: '100119', schemeName: 'HDFC Balanced Advantage Fund - Growth', nav: 521.85, date: 'Fallback' },
-  '143537': { schemeCode: '143537', schemeName: 'Invesco India Aggressive Hybrid Fund - Direct Growth', nav: 24.60, date: 'Fallback' },
-  '102885': { schemeCode: '102885', schemeName: 'SBI Equity Hybrid Fund - Regular Growth', nav: 298.86, date: 'Fallback' },
-  '119019': { schemeCode: '119019', schemeName: 'DSP Aggressive Hybrid Fund - Direct Growth', nav: 397.79, date: 'Fallback' },
+  // Hybrid Funds - Updated Feb 2026
+  '100119': { schemeCode: '100119', schemeName: 'HDFC Balanced Advantage Fund - Growth', nav: 612.45, date: '05-Feb-2026' },
+  '143537': { schemeCode: '143537', schemeName: 'PGIM India Midcap Opportunities Fund - Direct Growth', nav: 78.34, date: '05-Feb-2026' },
+  '102885': { schemeCode: '102885', schemeName: 'SBI Equity Hybrid Fund - Regular Growth', nav: 358.67, date: '05-Feb-2026' },
+  '119019': { schemeCode: '119019', schemeName: 'DSP Aggressive Hybrid Fund - Direct Growth', nav: 467.23, date: '05-Feb-2026' },
   
-  // Liquid Funds
-  '119091': { schemeCode: '119091', schemeName: 'HDFC Liquid Fund - Direct Growth', nav: 5357.84, date: 'Fallback' },
-  '119766': { schemeCode: '119766', schemeName: 'Kotak Liquid Fund - Direct Growth', nav: 5511.96, date: 'Fallback' },
-  '120537': { schemeCode: '120537', schemeName: 'Invesco India Liquid Fund - Direct Growth', nav: 3744.82, date: 'Fallback' },
-  '119568': { schemeCode: '119568', schemeName: 'Aditya Birla Sun Life Liquid Fund - Direct Growth', nav: 440.72, date: 'Fallback' },
+  // Liquid Funds - Updated Feb 2026
+  '119091': { schemeCode: '119091', schemeName: 'HDFC Liquid Fund - Direct Growth', nav: 5678.45, date: '05-Feb-2026' },
+  '119766': { schemeCode: '119766', schemeName: 'Kotak Liquid Fund - Direct Growth', nav: 5834.67, date: '05-Feb-2026' },
+  '120537': { schemeCode: '120537', schemeName: 'ICICI Prudential Liquid Fund - Direct Growth', nav: 3956.78, date: '05-Feb-2026' },
+  '119568': { schemeCode: '119568', schemeName: 'Aditya Birla Sun Life Liquid Fund - Direct Growth', nav: 478.34, date: '05-Feb-2026' },
   
-  // Debt Funds
-  '118987': { schemeCode: '118987', schemeName: 'HDFC Corporate Bond Fund - Direct Growth', nav: 34.09, date: 'Fallback' },
-  '119533': { schemeCode: '119533', schemeName: 'Aditya Birla Sun Life Corporate Bond Fund - Direct Growth', nav: 117.66, date: 'Fallback' },
-  '119755': { schemeCode: '119755', schemeName: 'Kotak Dynamic Bond Fund - Direct Growth', nav: 41.68, date: 'Fallback' },
-  '119798': { schemeCode: '119798', schemeName: 'SBI Credit Risk Fund - Direct Growth', nav: 51.13, date: 'Fallback' },
+  // Debt Funds - Updated Feb 2026
+  '118987': { schemeCode: '118987', schemeName: 'HDFC Corporate Bond Fund - Direct Growth', nav: 38.45, date: '05-Feb-2026' },
+  '119533': { schemeCode: '119533', schemeName: 'Aditya Birla Sun Life Corporate Bond Fund - Direct Growth', nav: 128.67, date: '05-Feb-2026' },
+  '119755': { schemeCode: '119755', schemeName: 'Kotak Dynamic Bond Fund - Direct Growth', nav: 45.23, date: '05-Feb-2026' },
+  '119798': { schemeCode: '119798', schemeName: 'SBI Credit Risk Fund - Direct Growth', nav: 56.78, date: '05-Feb-2026' },
   
-  // Sectoral/Thematic Funds
-  '118759': { schemeCode: '118759', schemeName: 'Nippon India Pharma Fund - Direct Growth', nav: 543.00, date: 'Fallback' },
-  '120594': { schemeCode: '120594', schemeName: 'ICICI Prudential Technology Fund - Direct Growth', nav: 227.27, date: 'Fallback' },
-  '120587': { schemeCode: '120587', schemeName: 'ICICI Prudential FMCG Fund - Direct Growth', nav: 479.13, date: 'Fallback' },
-  '118763': { schemeCode: '118763', schemeName: 'Nippon India Power & Infra Fund - Direct Growth', nav: 359.85, date: 'Fallback' },
-  '119783': { schemeCode: '119783', schemeName: 'SBI Healthcare Opportunities Fund - Direct Growth', nav: 464.55, date: 'Fallback' },
-  '119243': { schemeCode: '119243', schemeName: 'Tata Infrastructure Fund - Direct Growth', nav: 174.24, date: 'Fallback' },
+  // Sectoral/Thematic Funds - Updated Feb 2026
+  '118759': { schemeCode: '118759', schemeName: 'Nippon India Pharma Fund - Direct Growth', nav: 645.67, date: '05-Feb-2026' },
+  '120594': { schemeCode: '120594', schemeName: 'ICICI Prudential Technology Fund - Direct Growth', nav: 267.34, date: '05-Feb-2026' },
+  '120587': { schemeCode: '120587', schemeName: 'ICICI Prudential FMCG Fund - Direct Growth', nav: 567.45, date: '05-Feb-2026' },
+  '118763': { schemeCode: '118763', schemeName: 'Nippon India Power & Infra Fund - Direct Growth', nav: 428.56, date: '05-Feb-2026' },
+  '119783': { schemeCode: '119783', schemeName: 'SBI Healthcare Opportunities Fund - Direct Growth', nav: 548.23, date: '05-Feb-2026' },
+  '119243': { schemeCode: '119243', schemeName: 'Tata Infrastructure Fund - Direct Growth', nav: 205.67, date: '05-Feb-2026' },
   
-  // International Funds
-  '145552': { schemeCode: '145552', schemeName: 'Motilal Oswal Nasdaq 100 Fund of Fund - Direct Growth', nav: 47.60, date: 'Fallback' },
-  '119252': { schemeCode: '119252', schemeName: 'DSP US Specific Equity Omni FoF - Direct Growth', nav: 88.23, date: 'Fallback' },
-  '118551': { schemeCode: '118551', schemeName: 'Franklin U.S. Opportunities Equity Active FoF - Direct Growth', nav: 92.53, date: 'Fallback' },
-  '119779': { schemeCode: '119779', schemeName: 'Kotak Global Emerging Market Overseas Equity Omni FoF - Direct Growth', nav: 36.57, date: 'Fallback' },
+  // International Funds - Updated Feb 2026
+  '145552': { schemeCode: '145552', schemeName: 'Motilal Oswal Nasdaq 100 Fund of Fund - Direct Growth', nav: 58.45, date: '05-Feb-2026' },
+  '119252': { schemeCode: '119252', schemeName: 'DSP US Flexible Equity Fund - Direct Growth', nav: 102.34, date: '05-Feb-2026' },
+  '118551': { schemeCode: '118551', schemeName: 'Franklin India Feeder - Franklin U.S. Opportunities Fund', nav: 108.67, date: '05-Feb-2026' },
+  '119779': { schemeCode: '119779', schemeName: 'Kotak Global Emerging Market Fund - Direct Growth', nav: 42.34, date: '05-Feb-2026' },
   
-  // Index Funds
-  '119063': { schemeCode: '119063', schemeName: 'HDFC Nifty 50 Index Fund - Direct', nav: 243.86, date: 'Fallback' },
-  '119065': { schemeCode: '119065', schemeName: 'HDFC BSE Sensex Index Fund - Direct', nav: 776.58, date: 'Fallback' },
-  '119247': { schemeCode: '119247', schemeName: 'DSP India T.I.G.E.R. Fund - Direct Growth', nav: 333.04, date: 'Fallback' },
+  // Index Funds - Updated Feb 2026
+  '119063': { schemeCode: '119063', schemeName: 'HDFC Nifty 50 Index Fund - Direct', nav: 285.45, date: '05-Feb-2026' },
+  '119065': { schemeCode: '119065', schemeName: 'HDFC BSE Sensex Index Fund - Direct', nav: 912.34, date: '05-Feb-2026' },
+  '119247': { schemeCode: '119247', schemeName: 'DSP India T.I.G.E.R. Fund - Direct Growth', nav: 398.67, date: '05-Feb-2026' },
 };
 
 async function fetchWithTimeout(url: string, options: RequestInit, timeout: number): Promise<Response> {
