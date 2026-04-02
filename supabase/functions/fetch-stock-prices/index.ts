@@ -72,13 +72,29 @@ type YahooQuote = {
 };
 
 async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
-  // Try the chart endpoint for each symbol as v7/quote is now blocked
   const quotes: YahooQuote[] = [];
-  
-  // Fetch in parallel batches of 10 to avoid overwhelming
+  const uncached: string[] = [];
+
+  // Return cached quotes, collect uncached symbols
+  for (const symbol of yahooSymbols) {
+    const cached = getCached(symbol);
+    if (cached) {
+      quotes.push(cached);
+    } else {
+      uncached.push(symbol);
+    }
+  }
+
+  if (uncached.length === 0) {
+    console.log(`All ${yahooSymbols.length} symbols served from cache`);
+    return quotes;
+  }
+
+  console.log(`Cache hit: ${quotes.length}, fetching: ${uncached.length}`);
+
   const batchSize = 10;
-  for (let i = 0; i < yahooSymbols.length; i += batchSize) {
-    const batch = yahooSymbols.slice(i, i + batchSize);
+  for (let i = 0; i < uncached.length; i += batchSize) {
+    const batch = uncached.slice(i, i + batchSize);
     const results = await Promise.allSettled(
       batch.map(async (symbol) => {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
@@ -101,7 +117,6 @@ async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
         const meta = result.meta;
         const quote = result.indicators?.quote?.[0];
         
-        // Get the most recent values
         const regularPrice = meta?.regularMarketPrice ?? 0;
         const prevClose = meta?.chartPreviousClose ?? meta?.previousClose ?? 0;
         const high = quote?.high?.[quote.high.length - 1] ?? meta?.regularMarketDayHigh ?? 0;
@@ -123,6 +138,7 @@ async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
     
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
+        setCache(result.value.symbol, result.value);
         quotes.push(result.value);
       }
     }
