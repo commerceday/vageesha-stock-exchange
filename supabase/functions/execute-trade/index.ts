@@ -1,5 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders } from "../_shared/cors.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -7,12 +13,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Validate JWT
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Missing authorization header" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -20,30 +24,26 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
-    // Verify user with anon client
+    // Verify user
     const userClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: { user }, error: userError } = await userClient.auth.getUser();
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Parse and validate input
     const body = await req.json();
     const { action, stock_symbol, stock_name, quantity, price_per_unit } = body;
 
-    // Validate action
+    // Validate
     if (!["buy", "sell"].includes(action)) {
       return new Response(JSON.stringify({ error: "Action must be 'buy' or 'sell'" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Validate types and values
     if (typeof stock_symbol !== "string" || stock_symbol.length === 0 || stock_symbol.length > 50) {
       return new Response(JSON.stringify({ error: "Invalid stock_symbol" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -66,17 +66,11 @@ Deno.serve(async (req) => {
     }
 
     const total_amount = parseFloat((quantity * price_per_unit).toFixed(2));
-
-    // Use service role client for atomic operations
     const adminClient = createClient(supabaseUrl, supabaseServiceKey);
 
     if (action === "buy") {
-      // Get user balance
       const { data: profile, error: profileError } = await adminClient
-        .from("profiles")
-        .select("balance")
-        .eq("id", user.id)
-        .single();
+        .from("profiles").select("balance").eq("id", user.id).single();
 
       if (profileError || !profile) {
         return new Response(JSON.stringify({ error: "Profile not found" }), {
@@ -90,32 +84,19 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Insert transaction
       const { error: txError } = await adminClient.from("transactions").insert({
-        user_id: user.id,
-        stock_symbol,
-        stock_name,
-        transaction_type: "buy",
-        quantity,
-        price_per_unit,
-        total_amount,
+        user_id: user.id, stock_symbol, stock_name, transaction_type: "buy", quantity, price_per_unit, total_amount,
       });
       if (txError) throw txError;
 
-      // Check existing investment
-      const { data: existing } = await adminClient
-        .from("user_investments")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("stock_symbol", stock_symbol)
-        .maybeSingle();
+      const { data: existing } = await adminClient.from("user_investments")
+        .select("*").eq("user_id", user.id).eq("stock_symbol", stock_symbol).maybeSingle();
 
       if (existing) {
         const newQty = existing.quantity + quantity;
         const avgPrice = parseFloat((((existing.purchase_price * existing.quantity) + total_amount) / newQty).toFixed(2));
         const { error } = await adminClient.from("user_investments")
-          .update({ quantity: newQty, purchase_price: avgPrice })
-          .eq("id", existing.id);
+          .update({ quantity: newQty, purchase_price: avgPrice }).eq("id", existing.id);
         if (error) throw error;
       } else {
         const { error } = await adminClient.from("user_investments").insert({
@@ -124,10 +105,8 @@ Deno.serve(async (req) => {
         if (error) throw error;
       }
 
-      // Deduct balance
       const { error: balError } = await adminClient.from("profiles")
-        .update({ balance: parseFloat((profile.balance - total_amount).toFixed(2)) })
-        .eq("id", user.id);
+        .update({ balance: parseFloat((profile.balance - total_amount).toFixed(2)) }).eq("id", user.id);
       if (balError) throw balError;
 
       return new Response(JSON.stringify({ success: true, action: "buy", total_amount }), {
@@ -135,12 +114,8 @@ Deno.serve(async (req) => {
       });
 
     } else {
-      // SELL
       const { data: investment } = await adminClient.from("user_investments")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("stock_symbol", stock_symbol)
-        .maybeSingle();
+        .select("*").eq("user_id", user.id).eq("stock_symbol", stock_symbol).maybeSingle();
 
       if (!investment || investment.quantity < quantity) {
         return new Response(JSON.stringify({ error: "Insufficient shares", available: investment?.quantity || 0 }), {
@@ -148,29 +123,24 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Insert transaction
       const { error: txError } = await adminClient.from("transactions").insert({
         user_id: user.id, stock_symbol, stock_name, transaction_type: "sell", quantity, price_per_unit, total_amount,
       });
       if (txError) throw txError;
 
-      // Update or delete investment
       if (investment.quantity === quantity) {
         const { error } = await adminClient.from("user_investments").delete().eq("id", investment.id);
         if (error) throw error;
       } else {
         const { error } = await adminClient.from("user_investments")
-          .update({ quantity: investment.quantity - quantity })
-          .eq("id", investment.id);
+          .update({ quantity: investment.quantity - quantity }).eq("id", investment.id);
         if (error) throw error;
       }
 
-      // Credit balance
       const { data: profile } = await adminClient.from("profiles").select("balance").eq("id", user.id).single();
       if (profile) {
         const { error } = await adminClient.from("profiles")
-          .update({ balance: parseFloat((profile.balance + total_amount).toFixed(2)) })
-          .eq("id", user.id);
+          .update({ balance: parseFloat((profile.balance + total_amount).toFixed(2)) }).eq("id", user.id);
         if (error) throw error;
       }
 
