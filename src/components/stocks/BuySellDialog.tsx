@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Stock } from '@/utils/stocksApi';
 import { formatCurrency } from '@/utils/stocksApi';
+import { executeTrade } from '@/utils/tradeApi';
 
 interface BuySellDialogProps {
   stock: Stock | null;
@@ -25,94 +25,29 @@ export function BuySellDialog({ stock, open, onOpenChange, onSuccess }: BuySellD
 
   const totalCost = stock.price * quantity;
 
-  const handleBuy = async () => {
+  const handleTrade = async (action: 'buy' | 'sell') => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const result = await executeTrade({
+        action,
+        stock_symbol: stock.symbol,
+        stock_name: stock.name,
+        quantity,
+        price_per_unit: stock.price,
+      });
 
-      // Get current balance
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      if (profile.balance < totalCost) {
+      if (!result.success) {
         toast({
-          title: "Insufficient balance",
-          description: `You need ${formatCurrency(totalCost)} but only have ${formatCurrency(profile.balance)}`,
-          variant: "destructive",
+          title: action === 'buy' ? 'Purchase failed' : 'Sale failed',
+          description: result.error || 'An error occurred',
+          variant: 'destructive',
         });
-        setLoading(false);
         return;
       }
 
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          stock_symbol: stock.symbol,
-          stock_name: stock.name,
-          transaction_type: 'buy',
-          quantity,
-          price_per_unit: stock.price,
-          total_amount: totalCost
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Check if user already owns this stock
-      const { data: existingInvestment } = await supabase
-        .from('user_investments')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('stock_symbol', stock.symbol)
-        .single();
-
-      if (existingInvestment) {
-        // Update existing investment
-        const newQuantity = existingInvestment.quantity + quantity;
-        const avgPrice = ((existingInvestment.purchase_price * existingInvestment.quantity) + totalCost) / newQuantity;
-        
-        const { error: updateError } = await supabase
-          .from('user_investments')
-          .update({
-            quantity: newQuantity,
-            purchase_price: avgPrice
-          })
-          .eq('id', existingInvestment.id);
-
-        if (updateError) throw updateError;
-      } else {
-        // Create new investment
-        const { error: investmentError } = await supabase
-          .from('user_investments')
-          .insert({
-            user_id: user.id,
-            stock_symbol: stock.symbol,
-            stock_name: stock.name,
-            quantity,
-            purchase_price: stock.price
-          });
-
-        if (investmentError) throw investmentError;
-      }
-
-      // Update balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ balance: profile.balance - totalCost })
-        .eq('id', user.id);
-
-      if (balanceError) throw balanceError;
-
       toast({
-        title: "Purchase successful!",
-        description: `Bought ${quantity} shares of ${stock.symbol} for ${formatCurrency(totalCost)}`,
+        title: action === 'buy' ? 'Purchase successful!' : 'Sale successful!',
+        description: `${action === 'buy' ? 'Bought' : 'Sold'} ${quantity} share${quantity > 1 ? 's' : ''} of ${stock.symbol} for ${formatCurrency(totalCost)}`,
       });
 
       setQuantity(1);
@@ -120,114 +55,9 @@ export function BuySellDialog({ stock, open, onOpenChange, onSuccess }: BuySellD
       onSuccess();
     } catch (error: any) {
       toast({
-        title: "Purchase failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSell = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Get user's investment in this stock
-      const { data: investment, error: investmentError } = await supabase
-        .from('user_investments')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('stock_symbol', stock.symbol)
-        .single();
-
-      if (investmentError || !investment) {
-        toast({
-          title: "No shares to sell",
-          description: `You don't own any shares of ${stock.symbol}`,
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      if (investment.quantity < quantity) {
-        toast({
-          title: "Insufficient shares",
-          description: `You only own ${investment.quantity} shares`,
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const saleAmount = stock.price * quantity;
-
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          stock_symbol: stock.symbol,
-          stock_name: stock.name,
-          transaction_type: 'sell',
-          quantity,
-          price_per_unit: stock.price,
-          total_amount: saleAmount
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Update or delete investment
-      if (investment.quantity === quantity) {
-        // Sell all shares - delete the investment
-        const { error: deleteError } = await supabase
-          .from('user_investments')
-          .delete()
-          .eq('id', investment.id);
-
-        if (deleteError) throw deleteError;
-      } else {
-        // Sell partial shares - update quantity
-        const { error: updateError } = await supabase
-          .from('user_investments')
-          .update({ quantity: investment.quantity - quantity })
-          .eq('id', investment.id);
-
-        if (updateError) throw updateError;
-      }
-
-      // Update balance
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', user.id)
-        .single();
-
-      if (profile) {
-        const { error: balanceError } = await supabase
-          .from('profiles')
-          .update({ balance: profile.balance + saleAmount })
-          .eq('id', user.id);
-
-        if (balanceError) throw balanceError;
-      }
-
-      toast({
-        title: "Sale successful!",
-        description: `Sold ${quantity} shares of ${stock.symbol} for ${formatCurrency(saleAmount)}`,
-      });
-
-      setQuantity(1);
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: any) {
-      toast({
-        title: "Sale failed",
-        description: error.message,
-        variant: "destructive",
+        title: action === 'buy' ? 'Purchase failed' : 'Sale failed',
+        description: error.message || 'An error occurred',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -267,7 +97,7 @@ export function BuySellDialog({ stock, open, onOpenChange, onSuccess }: BuySellD
                 <span className="font-semibold">{formatCurrency(totalCost)}</span>
               </div>
             </div>
-            <Button onClick={handleBuy} disabled={loading} className="w-full">
+            <Button onClick={() => handleTrade('buy')} disabled={loading} className="w-full">
               {loading ? 'Processing...' : `Buy ${quantity} Share${quantity > 1 ? 's' : ''}`}
             </Button>
           </TabsContent>
@@ -289,7 +119,7 @@ export function BuySellDialog({ stock, open, onOpenChange, onSuccess }: BuySellD
                 <span className="font-semibold">{formatCurrency(totalCost)}</span>
               </div>
             </div>
-            <Button onClick={handleSell} disabled={loading} className="w-full" variant="destructive">
+            <Button onClick={() => handleTrade('sell')} disabled={loading} className="w-full" variant="destructive">
               {loading ? 'Processing...' : `Sell ${quantity} Share${quantity > 1 ? 's' : ''}`}
             </Button>
           </TabsContent>
