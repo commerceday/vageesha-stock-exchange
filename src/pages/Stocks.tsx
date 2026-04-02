@@ -11,12 +11,31 @@ import { ShoppingCart, Search, Filter, WifiOff } from 'lucide-react';
 import { VirtualizedStockList } from '@/components/stocks/VirtualizedStockList';
 
 const Stocks = () => {
-  const { stocks, priceHistory, isMarketOpen, failedStocks } = useStockData(mockStocks);
-  const [selectedStock, setSelectedStock] = React.useState(() => stocks[0] ?? mockStocks[0]);
+  const [selectedSymbol, setSelectedSymbol] = React.useState(() => mockStocks[0]?.symbol ?? '');
+  const { stocks, priceHistory, isMarketOpen, failedStocks } = useStockData(
+    mockStocks,
+    2000,
+    selectedSymbol ? [selectedSymbol] : []
+  );
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [refreshKey, setRefreshKey] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedSector, setSelectedSector] = React.useState<string>('all');
+
+  const selectedStock = React.useMemo(
+    () =>
+      stocks.find((stock) => stock.symbol === selectedSymbol) ??
+      mockStocks.find((stock) => stock.symbol === selectedSymbol) ??
+      stocks[0] ??
+      mockStocks[0],
+    [stocks, selectedSymbol]
+  );
+
+  React.useEffect(() => {
+    if (selectedStock && selectedStock.symbol !== selectedSymbol) {
+      setSelectedSymbol(selectedStock.symbol);
+    }
+  }, [selectedStock, selectedSymbol]);
 
   // Get unique sectors from stocks
   const sectors = React.useMemo(() => {
@@ -97,7 +116,7 @@ const Stocks = () => {
             stocks={filteredStocks}
             priceHistory={priceHistory}
             selectedStock={selectedStock}
-            onStockClick={setSelectedStock}
+            onStockClick={(stock) => setSelectedSymbol(stock.symbol)}
           />
         </div>
         
