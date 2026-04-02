@@ -116,7 +116,7 @@ const Stocks = () => {
             stocks={filteredStocks}
             priceHistory={priceHistory}
             selectedStock={selectedStock}
-            onStockClick={setSelectedStock}
+            onStockClick={(stock) => setSelectedSymbol(stock.symbol)}
           />
         </div>
         

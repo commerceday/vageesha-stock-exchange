@@ -631,7 +631,7 @@ function generatePatternBasedPrice(stock: Stock, historicalData: number[]): Stoc
   };
 }
 
-export function useStockData(initialData: Stock[], updateInterval = 2000) {
+export function useStockData(initialData: Stock[], updateInterval = 2000, prioritySymbols: string[] = []) {
   // Filter out undefined/null entries to prevent crashes
   const validInitialData = initialData.filter(stock => stock && stock.symbol);
   
@@ -658,16 +658,24 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
     return pricesMap;
   });
   const [failedStocks, setFailedStocks] = useState<Set<string>>(new Set());
+  const prioritySymbolsKey = prioritySymbols.filter(Boolean).join('|');
   
   useEffect(() => {
-    // Initial fetch
     const updateStockPrices = async () => {
       const safeStocks = stocks.filter((s): s is Stock => Boolean(s && s.symbol));
 
-      // Avoid hammering the upstream data provider with hundreds/thousands of requests every refresh.
-      // We fetch real-time prices for a limited subset and keep the rest stable/simulated.
+      // Always include priority symbols (like the currently selected stock), then fill the rest
+      // up to our realtime request limit to keep the app responsive.
       const MAX_REALTIME_SYMBOLS = 75;
-      const realtimeRequestStocks = safeStocks.slice(0, MAX_REALTIME_SYMBOLS);
+      const prioritizedStocks = Array.from(new Set(prioritySymbols.filter(Boolean)))
+        .map(symbol => safeStocks.find(stock => stock.symbol === symbol))
+        .filter((stock): stock is Stock => Boolean(stock));
+      const prioritizedSymbols = new Set(prioritizedStocks.map(stock => stock.symbol));
+      const remainingCapacity = Math.max(MAX_REALTIME_SYMBOLS - prioritizedStocks.length, 0);
+      const realtimeRequestStocks = [
+        ...prioritizedStocks,
+        ...safeStocks.filter(stock => !prioritizedSymbols.has(stock.symbol)).slice(0, remainingCapacity),
+      ];
 
       const { data: realTimeData, marketOpen } = await fetchRealTimeStockPrices(realtimeRequestStocks);
       setIsMarketOpen(marketOpen);
@@ -759,7 +767,6 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
         });
       });
       
-      // Log failed stocks to console
       if (marketOpen && newFailedStocks.size > 0) {
         console.warn(`⚠️ Failed to fetch real data for ${newFailedStocks.size} stocks:`, Array.from(newFailedStocks));
       }
@@ -771,7 +778,7 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
     const intervalId = setInterval(updateStockPrices, updateInterval);
     
     return () => clearInterval(intervalId);
-  }, [updateInterval]);
+  }, [updateInterval, prioritySymbolsKey]);
   
   return { stocks, priceHistory, isMarketOpen, failedStocks };
 }
