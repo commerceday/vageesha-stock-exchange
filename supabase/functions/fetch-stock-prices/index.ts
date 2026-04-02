@@ -9,9 +9,31 @@ const corsHeaders = {
 
 const MAX_SYMBOLS = 50;
 const SYMBOL_REGEX = /^[A-Z0-9&_-]{1,20}$/;
+const CACHE_TTL_MS = 60_000; // 1 minute cache
 
 interface StockSymbol {
   symbol: string;
+}
+
+// In-memory cache (persists across warm invocations)
+interface CacheEntry {
+  quote: YahooQuote;
+  timestamp: number;
+}
+const quoteCache = new Map<string, CacheEntry>();
+
+function getCached(symbol: string): YahooQuote | null {
+  const entry = quoteCache.get(symbol);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    quoteCache.delete(symbol);
+    return null;
+  }
+  return entry.quote;
+}
+
+function setCache(symbol: string, quote: YahooQuote) {
+  quoteCache.set(symbol, { quote, timestamp: Date.now() });
 }
 
 // Some NSE symbols in our dataset are legacy tickers; Yahoo Finance uses updated tickers.
