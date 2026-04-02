@@ -721,7 +721,7 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
               dataSource: 'error' as const
             };
           } else {
-            // Market closed - use last real closing price and add ±1 rupee fluctuation
+            // Market closed - use last real closing price without fluctuation
             const hasRealData = realtimeStock && !realtimeStock.error && typeof realtimeStock.price === 'number' && realtimeStock.price > 0;
             const realClosePrice = hasRealData 
               ? realtimeStock.price
@@ -736,25 +736,19 @@ export function useStockData(initialData: Stock[], updateInterval = 2000) {
               });
             }
             
-            // Add random fluctuation of ±1 rupee
-            const fluctuation = (Math.random() - 0.5) * 2; // -1 to +1
-            const mockPrice = Math.max(realClosePrice + fluctuation, 0.01);
-            const mockChange = mockPrice - realClosePrice;
-            const mockChangePercent = (mockChange / realClosePrice) * 100;
-            
             const newStock = {
               ...stock,
-              price: parseFloat(mockPrice.toFixed(2)),
-              change: parseFloat(mockChange.toFixed(2)),
-              changePercent: parseFloat(mockChangePercent.toFixed(2)),
+              price: parseFloat(realClosePrice.toFixed(2)),
+              change: hasRealData ? (realtimeStock.change || 0) : stock.change,
+              changePercent: hasRealData ? (realtimeStock.changePercent || 0) : stock.changePercent,
               lastUpdated: new Date(),
-              dataSource: 'simulated' as const
+              dataSource: hasRealData ? 'real' as const : 'simulated' as const
             };
             
-            // Update price history with mock price
+            // Update price history with real close price
             setPriceHistory(prev => {
               const history = prev.get(stock.symbol) || [realClosePrice];
-              const newHistory = [...history, mockPrice].slice(-30);
+              const newHistory = [...history, realClosePrice].slice(-30);
               const newMap = new Map(prev);
               newMap.set(stock.symbol, newHistory);
               return newMap;
