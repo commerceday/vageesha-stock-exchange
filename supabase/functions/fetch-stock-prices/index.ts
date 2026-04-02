@@ -9,9 +9,31 @@ const corsHeaders = {
 
 const MAX_SYMBOLS = 50;
 const SYMBOL_REGEX = /^[A-Z0-9&_-]{1,20}$/;
+const CACHE_TTL_MS = 60_000; // 1 minute cache
 
 interface StockSymbol {
   symbol: string;
+}
+
+// In-memory cache (persists across warm invocations)
+interface CacheEntry {
+  quote: YahooQuote;
+  timestamp: number;
+}
+const quoteCache = new Map<string, CacheEntry>();
+
+function getCached(symbol: string): YahooQuote | null {
+  const entry = quoteCache.get(symbol);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    quoteCache.delete(symbol);
+    return null;
+  }
+  return entry.quote;
+}
+
+function setCache(symbol: string, quote: YahooQuote) {
+  quoteCache.set(symbol, { quote, timestamp: Date.now() });
 }
 
 // Some NSE symbols in our dataset are legacy tickers; Yahoo Finance uses updated tickers.
@@ -50,13 +72,29 @@ type YahooQuote = {
 };
 
 async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
-  // Try the chart endpoint for each symbol as v7/quote is now blocked
   const quotes: YahooQuote[] = [];
-  
-  // Fetch in parallel batches of 10 to avoid overwhelming
+  const uncached: string[] = [];
+
+  // Return cached quotes, collect uncached symbols
+  for (const symbol of yahooSymbols) {
+    const cached = getCached(symbol);
+    if (cached) {
+      quotes.push(cached);
+    } else {
+      uncached.push(symbol);
+    }
+  }
+
+  if (uncached.length === 0) {
+    console.log(`All ${yahooSymbols.length} symbols served from cache`);
+    return quotes;
+  }
+
+  console.log(`Cache hit: ${quotes.length}, fetching: ${uncached.length}`);
+
   const batchSize = 10;
-  for (let i = 0; i < yahooSymbols.length; i += batchSize) {
-    const batch = yahooSymbols.slice(i, i + batchSize);
+  for (let i = 0; i < uncached.length; i += batchSize) {
+    const batch = uncached.slice(i, i + batchSize);
     const results = await Promise.allSettled(
       batch.map(async (symbol) => {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
@@ -79,7 +117,6 @@ async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
         const meta = result.meta;
         const quote = result.indicators?.quote?.[0];
         
-        // Get the most recent values
         const regularPrice = meta?.regularMarketPrice ?? 0;
         const prevClose = meta?.chartPreviousClose ?? meta?.previousClose ?? 0;
         const high = quote?.high?.[quote.high.length - 1] ?? meta?.regularMarketDayHigh ?? 0;
@@ -101,6 +138,7 @@ async function fetchYahooQuotes(yahooSymbols: string[]): Promise<YahooQuote[]> {
     
     for (const result of results) {
       if (result.status === "fulfilled" && result.value) {
+        setCache(result.value.symbol, result.value);
         quotes.push(result.value);
       }
     }
