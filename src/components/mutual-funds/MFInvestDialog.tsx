@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MutualFund } from '@/utils/mutual-funds-data';
+import { executeTrade } from '@/utils/tradeApi';
 
 interface MFInvestDialogProps {
   fund: (MutualFund & { lastUpdated: Date }) | null;
@@ -30,11 +30,10 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
 
   if (!fund) return null;
 
-  // Calculate units based on NAV
   const units = amount / fund.nav;
 
-  const handleInvest = async () => {
-    if (amount < fund.minInvestment) {
+  const handleTrade = async (action: 'buy' | 'sell') => {
+    if (action === 'buy' && amount < fund.minInvestment) {
       toast({
         title: "Minimum investment required",
         description: `Minimum investment for this fund is ${formatCurrency(fund.minInvestment)}`,
@@ -45,108 +44,32 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
 
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const tradeQuantity = action === 'buy'
+        ? Math.floor(units * 1000) / 1000
+        : Math.floor((amount / fund.nav) * 1000) / 1000;
 
-      // Get current balance - use maybeSingle to handle missing profile
-      let { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', user.id)
-        .maybeSingle();
+      const result = await executeTrade({
+        action,
+        stock_symbol: fund.symbol,
+        stock_name: fund.name,
+        quantity: tradeQuantity,
+        price_per_unit: fund.nav,
+      });
 
-      // If profile doesn't exist, create it with default balance
-      if (!profile) {
-        const { data: newProfile, error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email || '',
-            full_name: user.user_metadata?.full_name || null,
-            balance: 500000
-          })
-          .select('balance')
-          .single();
-        
-        if (insertError) throw new Error('Failed to create profile: ' + insertError.message);
-        profile = newProfile;
-      } else if (profileError) {
-        throw profileError;
-      }
-
-      if (profile.balance < amount) {
+      if (!result.success) {
         toast({
-          title: "Insufficient balance",
-          description: `You need ${formatCurrency(amount)} but only have ${formatCurrency(profile.balance)}`,
-          variant: "destructive",
+          title: action === 'buy' ? 'Investment failed' : 'Redemption failed',
+          description: result.error || 'An error occurred',
+          variant: 'destructive',
         });
-        setLoading(false);
         return;
       }
 
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          stock_symbol: fund.symbol,
-          stock_name: fund.name,
-          transaction_type: 'buy',
-          quantity: Math.floor(units * 1000) / 1000, // 3 decimal places for MF units
-          price_per_unit: fund.nav,
-          total_amount: amount
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Check if user already owns this fund
-      const { data: existingInvestment } = await supabase
-        .from('user_investments')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('stock_symbol', fund.symbol)
-        .single();
-
-      if (existingInvestment) {
-        // Update existing investment
-        const newUnits = existingInvestment.quantity + units;
-        const avgNav = ((existingInvestment.purchase_price * existingInvestment.quantity) + amount) / newUnits;
-        
-        const { error: updateError } = await supabase
-          .from('user_investments')
-          .update({
-            quantity: Math.floor(newUnits * 1000) / 1000,
-            purchase_price: avgNav
-          })
-          .eq('id', existingInvestment.id);
-
-        if (updateError) throw updateError;
-      } else {
-        // Create new investment
-        const { error: investmentError } = await supabase
-          .from('user_investments')
-          .insert({
-            user_id: user.id,
-            stock_symbol: fund.symbol,
-            stock_name: fund.name,
-            quantity: Math.floor(units * 1000) / 1000,
-            purchase_price: fund.nav
-          });
-
-        if (investmentError) throw investmentError;
-      }
-
-      // Update balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .update({ balance: profile.balance - amount })
-        .eq('id', user.id);
-
-      if (balanceError) throw balanceError;
-
       toast({
-        title: "Investment successful!",
-        description: `Invested ${formatCurrency(amount)} in ${fund.name} (${units.toFixed(3)} units)`,
+        title: action === 'buy' ? 'Investment successful!' : 'Redemption successful!',
+        description: action === 'buy'
+          ? `Invested ${formatCurrency(amount)} in ${fund.name} (${tradeQuantity.toFixed(3)} units)`
+          : `Redeemed ${formatCurrency(amount)} from ${fund.name}`,
       });
 
       setAmount(5000);
@@ -155,118 +78,9 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
-        title: "Investment failed",
+        title: action === 'buy' ? 'Investment failed' : 'Redemption failed',
         description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRedeem = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Get user's investment in this fund
-      const { data: investment, error: investmentError } = await supabase
-        .from('user_investments')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('stock_symbol', fund.symbol)
-        .single();
-
-      if (investmentError || !investment) {
-        toast({
-          title: "No units to redeem",
-          description: `You don't own any units of ${fund.name}`,
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const unitsToRedeem = amount / fund.nav;
-      
-      if (investment.quantity < unitsToRedeem) {
-        const maxRedeemable = investment.quantity * fund.nav;
-        toast({
-          title: "Insufficient units",
-          description: `You can redeem maximum ${formatCurrency(maxRedeemable)}`,
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Create transaction record
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          stock_symbol: fund.symbol,
-          stock_name: fund.name,
-          transaction_type: 'sell',
-          quantity: Math.floor(unitsToRedeem * 1000) / 1000,
-          price_per_unit: fund.nav,
-          total_amount: amount
-        });
-
-      if (transactionError) throw transactionError;
-
-      // Update or delete investment
-      const remainingUnits = investment.quantity - unitsToRedeem;
-      
-      if (remainingUnits < 0.001) {
-        // Redeem all - delete the investment
-        const { error: deleteError } = await supabase
-          .from('user_investments')
-          .delete()
-          .eq('id', investment.id);
-
-        if (deleteError) throw deleteError;
-      } else {
-        // Partial redemption - update quantity
-        const { error: updateError } = await supabase
-          .from('user_investments')
-          .update({ quantity: Math.floor(remainingUnits * 1000) / 1000 })
-          .eq('id', investment.id);
-
-        if (updateError) throw updateError;
-      }
-
-      // Update balance
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', user.id)
-        .single();
-
-      if (profile) {
-        const { error: balanceError } = await supabase
-          .from('profiles')
-          .update({ balance: profile.balance + amount })
-          .eq('id', user.id);
-
-        if (balanceError) throw balanceError;
-      }
-
-      toast({
-        title: "Redemption successful!",
-        description: `Redeemed ${formatCurrency(amount)} from ${fund.name}`,
-      });
-
-      setAmount(5000);
-      onOpenChange(false);
-      onSuccess();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-      toast({
-        title: "Redemption failed",
-        description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -311,7 +125,7 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
                 <span className="font-semibold">{units.toFixed(3)}</span>
               </div>
             </div>
-            <Button onClick={handleInvest} disabled={loading} className="w-full">
+            <Button onClick={() => handleTrade('buy')} disabled={loading} className="w-full">
               {loading ? 'Processing...' : `Invest ${formatCurrency(amount)}`}
             </Button>
           </TabsContent>
@@ -338,7 +152,7 @@ export function MFInvestDialog({ fund, open, onOpenChange, onSuccess }: MFInvest
                 <span className="font-semibold">{(amount / fund.nav).toFixed(3)}</span>
               </div>
             </div>
-            <Button onClick={handleRedeem} disabled={loading} className="w-full" variant="destructive">
+            <Button onClick={() => handleTrade('sell')} disabled={loading} className="w-full" variant="destructive">
               {loading ? 'Processing...' : `Redeem ${formatCurrency(amount)}`}
             </Button>
           </TabsContent>
